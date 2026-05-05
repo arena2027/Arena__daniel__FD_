@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import type { ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Bookmark } from 'lucide-react';
 import {
   Home, Compass, Zap, Target, MessageCircle,
   Wallet, Settings, Bell, Menu, X, User,
@@ -20,6 +21,7 @@ const navItems = [
   { icon: Wallet,          label: 'Wallet',      path: '/wallet' },
   { icon: LayoutDashboard, label: 'Dashboard',   path: '/dashboard' },
   { icon: Settings,        label: 'Settings',    path: '/settings' },
+  { icon: Bookmark,        label: 'Bookmarks', path: '/bookmarks' },
 ];
 
 const bottomNavItems = [

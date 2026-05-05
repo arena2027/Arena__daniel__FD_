@@ -5,11 +5,12 @@ import {
   ArrowRight, Zap, Trophy, ChevronRight, Check
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import type { UserRole } from '../App';
 
 type Mode = 'landing' | 'signin' | 'signup' | 'tipster';
 
 interface AuthPageProps {
-  onComplete: () => void;
+  onComplete: (role: UserRole, name?: string, email?: string) => void;
 }
 
 const sports = ['Football', 'Basketball', 'Tennis', 'Cricket', 'Rugby', 'Baseball', 'MMA', 'F1'];
@@ -43,8 +44,6 @@ export function AuthPage({ onComplete }: AuthPageProps) {
 
   return (
     <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-black">
-
-      {/* Background */}
       <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[url('/auth-bg.jpg')] bg-cover bg-center opacity-30" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
@@ -52,9 +51,9 @@ export function AuthPage({ onComplete }: AuthPageProps) {
 
       {/* Logo top left */}
       <div className="absolute top-6 left-6 z-10 flex items-center gap-2">
-       <div className="w-9 h-9 rounded-full overflow-hidden bg-[#ef4444]">
-        <img src="/logo.jpg" alt="Arena" className="w-full h-full object-cover" />
-      </div>
+        <div className="w-9 h-9 rounded-full overflow-hidden bg-[#ef4444]">
+          <img src="/logo.jpg" alt="Arena" className="w-full h-full object-cover" />
+        </div>
         <span className="text-white font-black text-lg">Arena</span>
       </div>
 
@@ -65,17 +64,12 @@ export function AuthPage({ onComplete }: AuthPageProps) {
 
             {/* ── LANDING ── */}
             {mode === 'landing' && (
-              <motion.div
-                key="landing"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
+              <motion.div key="landing" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
                 className="flex flex-col items-center gap-4"
               >
-               <div className="w-16 h-16 rounded-full overflow-hidden bg-[#ef4444] shadow-lg shadow-red-500/30">
-                <img src="/logo.jpg" alt="Arena" className="w-full h-full object-cover" />
+                <div className="w-16 h-16 rounded-full overflow-hidden bg-[#ef4444] shadow-lg shadow-red-500/30">
+                  <img src="/logo.jpg" alt="Arena" className="w-full h-full object-cover" />
                 </div>
-
                 <div className="text-center">
                   <h1 className="text-3xl font-black text-white">Welcome to Arena</h1>
                   <p className="text-sm text-white/50 mt-1">The home of sports fans worldwide</p>
@@ -134,37 +128,24 @@ export function AuthPage({ onComplete }: AuthPageProps) {
 
             {/* ── SIGN IN ── */}
             {mode === 'signin' && (
-              <motion.div
-                key="signin"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
+              <motion.div key="signin" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
                 <button onClick={() => setMode('landing')} className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 transition-colors mb-5">
                   <X className="w-4 h-4 text-white/60" />
                 </button>
-
                 <h2 className="text-2xl font-black text-white mb-1">Sign in</h2>
                 <p className="text-sm text-white/40 mb-6">Welcome back to Arena 👋</p>
 
                 <div className="space-y-3 mb-4">
                   <div className="flex items-center gap-2 bg-white/5 border border-white/10 focus-within:border-[#ef4444]/50 rounded-xl px-3 py-3 transition-all">
                     <Mail className="w-4 h-4 text-white/30 shrink-0" />
-                    <input
-                      type="email"
-                      placeholder="Email address"
-                      value={form.email}
+                    <input type="email" placeholder="Email address" value={form.email}
                       onChange={e => update('email', e.target.value)}
                       className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
                     />
                   </div>
-
                   <div className="flex items-center gap-2 bg-white/5 border border-white/10 focus-within:border-[#ef4444]/50 rounded-xl px-3 py-3 transition-all">
                     <Lock className="w-4 h-4 text-white/30 shrink-0" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Password"
-                      value={form.password}
+                    <input type={showPassword ? 'text' : 'password'} placeholder="Password" value={form.password}
                       onChange={e => update('password', e.target.value)}
                       className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
                     />
@@ -172,13 +153,11 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-
                   <div className="text-right">
                     <button className="text-xs text-[#ef4444] hover:underline">Forgot password?</button>
                   </div>
-
                   <button
-                    onClick={onComplete}
+                    onClick={() => onComplete('user', form.name || 'SportX Fan', form.email)}
                     className="w-full bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white font-bold text-sm py-3 rounded-full hover:opacity-90 transition-all shadow-lg shadow-red-500/30"
                   >
                     Sign In
@@ -187,57 +166,38 @@ export function AuthPage({ onComplete }: AuthPageProps) {
 
                 <p className="text-sm text-white/40 text-center">
                   Don't have an account?{' '}
-                  <button onClick={() => setMode('signup')} className="text-[#ef4444] font-bold hover:underline">
-                    Sign up
-                  </button>
+                  <button onClick={() => setMode('signup')} className="text-[#ef4444] font-bold hover:underline">Sign up</button>
                 </p>
               </motion.div>
             )}
 
             {/* ── SIGN UP ── */}
             {mode === 'signup' && (
-              <motion.div
-                key="signup"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
+              <motion.div key="signup" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
                 <button onClick={() => setMode('landing')} className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 transition-colors mb-5">
                   <X className="w-4 h-4 text-white/60" />
                 </button>
-
                 <h2 className="text-2xl font-black text-white mb-1">Create account</h2>
                 <p className="text-sm text-white/40 mb-6">Join the Arena community 🏟️</p>
 
                 <div className="space-y-3 mb-4">
                   <div className="flex items-center gap-2 bg-white/5 border border-white/10 focus-within:border-[#ef4444]/50 rounded-xl px-3 py-3 transition-all">
                     <User className="w-4 h-4 text-white/30 shrink-0" />
-                    <input
-                      type="text"
-                      placeholder="Full name"
-                      value={form.name}
+                    <input type="text" placeholder="Full name" value={form.name}
                       onChange={e => update('name', e.target.value)}
                       className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
                     />
                   </div>
-
                   <div className="flex items-center gap-2 bg-white/5 border border-white/10 focus-within:border-[#ef4444]/50 rounded-xl px-3 py-3 transition-all">
                     <Mail className="w-4 h-4 text-white/30 shrink-0" />
-                    <input
-                      type="email"
-                      placeholder="Email address"
-                      value={form.email}
+                    <input type="email" placeholder="Email address" value={form.email}
                       onChange={e => update('email', e.target.value)}
                       className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
                     />
                   </div>
-
                   <div className="flex items-center gap-2 bg-white/5 border border-white/10 focus-within:border-[#ef4444]/50 rounded-xl px-3 py-3 transition-all">
                     <Lock className="w-4 h-4 text-white/30 shrink-0" />
-                    <input
-                      type={showPassword ? 'text' : 'password'}
-                      placeholder="Create password"
-                      value={form.password}
+                    <input type={showPassword ? 'text' : 'password'} placeholder="Create password" value={form.password}
                       onChange={e => update('password', e.target.value)}
                       className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
                     />
@@ -245,9 +205,8 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
                   </div>
-
                   <button
-                    onClick={onComplete}
+                    onClick={() => onComplete('user', form.name, form.email)}
                     className="w-full bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white font-bold text-sm py-3 rounded-full hover:opacity-90 transition-all shadow-lg shadow-red-500/30"
                   >
                     Create Account
@@ -260,24 +219,16 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                   <span className="text-white/50 underline cursor-pointer">Privacy Policy</span> and{' '}
                   <span className="text-white/50 underline cursor-pointer">Cookie Policy</span>.
                 </p>
-
                 <p className="text-sm text-white/40 text-center mt-3">
                   Already have an account?{' '}
-                  <button onClick={() => setMode('signin')} className="text-[#ef4444] font-bold hover:underline">
-                    Sign in
-                  </button>
+                  <button onClick={() => setMode('signin')} className="text-[#ef4444] font-bold hover:underline">Sign in</button>
                 </p>
               </motion.div>
             )}
 
-            {/* ── TIPSTER ── */}
+            {/* ── TIPSTER REGISTER ── */}
             {mode === 'tipster' && (
-              <motion.div
-                key="tipster"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-              >
+              <motion.div key="tipster" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}>
                 <button onClick={() => setMode('landing')} className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 transition-colors mb-4">
                   <X className="w-4 h-4 text-white/60" />
                 </button>
@@ -285,16 +236,12 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                 {/* Step bar */}
                 <div className="flex items-center gap-2 mb-5">
                   {[1, 2, 3].map(s => (
-                    <div key={s} className={cn(
-                      'h-1 flex-1 rounded-full transition-all',
-                      s <= tipsterStep ? 'bg-[#ef4444]' : 'bg-white/10'
-                    )} />
+                    <div key={s} className={cn('h-1 flex-1 rounded-full transition-all', s <= tipsterStep ? 'bg-[#ef4444]' : 'bg-white/10')} />
                   ))}
                 </div>
 
                 <AnimatePresence mode="wait">
-
-                  {/* Step 1 */}
+                  {/* Step 1 — Perks */}
                   {tipsterStep === 1 && (
                     <motion.div key="ts1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                       <div className="flex items-center gap-2 mb-1">
@@ -302,7 +249,6 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                         <h2 className="text-xl font-black text-white">Become a Tipster</h2>
                       </div>
                       <p className="text-sm text-white/40 mb-4">Share your expertise and earn from predictions</p>
-
                       <div className="space-y-2 mb-4">
                         {perks.map((perk, i) => (
                           <div key={i} className="flex items-center gap-2.5 py-1.5 border-b border-white/5 last:border-0">
@@ -313,14 +259,12 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                           </div>
                         ))}
                       </div>
-
                       <div className="bg-[#ef4444]/10 border border-[#ef4444]/20 rounded-xl p-3 mb-4">
                         <p className="text-xs text-[#ef4444] font-semibold">⚠️ Tipster Code of Conduct</p>
                         <p className="text-xs text-white/50 mt-1 leading-relaxed">
                           Tipsters must post honest predictions only. Misleading or fraudulent tickets will result in a permanent ban.
                         </p>
                       </div>
-
                       <button
                         onClick={() => setTipsterStep(2)}
                         className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white font-bold text-sm py-3 rounded-full hover:opacity-90 transition-all"
@@ -330,12 +274,11 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                     </motion.div>
                   )}
 
-                  {/* Step 2 */}
+                  {/* Step 2 — Speciality */}
                   {tipsterStep === 2 && (
                     <motion.div key="ts2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                       <h2 className="text-xl font-black text-white mb-1">Your Speciality</h2>
                       <p className="text-sm text-white/40 mb-4">Select the sports you specialise in</p>
-
                       <div className="grid grid-cols-2 gap-2 mb-4">
                         {sports.map(sport => (
                           <button
@@ -353,7 +296,6 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                           </button>
                         ))}
                       </div>
-
                       <div className="space-y-3 mb-4">
                         <textarea
                           placeholder="Brief bio — tell users about yourself..."
@@ -370,7 +312,6 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                           className="w-full bg-white/5 border border-white/10 focus:border-[#ef4444]/50 rounded-xl px-3 py-3 text-sm text-white placeholder:text-white/30 outline-none transition-all"
                         />
                       </div>
-
                       <button
                         onClick={() => setTipsterStep(3)}
                         disabled={selectedSports.length === 0}
@@ -381,52 +322,36 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                     </motion.div>
                   )}
 
-                  {/* Step 3 */}
+                  {/* Step 3 — Account Details */}
                   {tipsterStep === 3 && (
                     <motion.div key="ts3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                       <h2 className="text-xl font-black text-white mb-1">Account Details</h2>
                       <p className="text-sm text-white/40 mb-4">Create your tipster account</p>
-
                       <div className="space-y-3 mb-4">
                         <div className="flex items-center gap-2 bg-white/5 border border-white/10 focus-within:border-[#ef4444]/50 rounded-xl px-3 py-3 transition-all">
                           <User className="w-4 h-4 text-white/30 shrink-0" />
-                          <input
-                            type="text"
-                            placeholder="Full name"
-                            value={form.name}
+                          <input type="text" placeholder="Full name" value={form.name}
                             onChange={e => update('name', e.target.value)}
                             className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
                           />
                         </div>
-
                         <div className="flex items-center gap-2 bg-white/5 border border-white/10 focus-within:border-[#ef4444]/50 rounded-xl px-3 py-3 transition-all">
                           <Mail className="w-4 h-4 text-white/30 shrink-0" />
-                          <input
-                            type="email"
-                            placeholder="Email address"
-                            value={form.email}
+                          <input type="email" placeholder="Email address" value={form.email}
                             onChange={e => update('email', e.target.value)}
                             className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
                           />
                         </div>
-
                         <div className="flex items-center gap-2 bg-white/5 border border-white/10 focus-within:border-[#ef4444]/50 rounded-xl px-3 py-3 transition-all">
                           <Zap className="w-4 h-4 text-white/30 shrink-0" />
-                          <input
-                            type="text"
-                            placeholder="Channel name (e.g. GoldTips VIP)"
-                            value={form.channelName}
+                          <input type="text" placeholder="Channel name (e.g. GoldTips VIP)" value={form.channelName}
                             onChange={e => update('channelName', e.target.value)}
                             className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
                           />
                         </div>
-
                         <div className="flex items-center gap-2 bg-white/5 border border-white/10 focus-within:border-[#ef4444]/50 rounded-xl px-3 py-3 transition-all">
                           <Lock className="w-4 h-4 text-white/30 shrink-0" />
-                          <input
-                            type={showPassword ? 'text' : 'password'}
-                            placeholder="Create password"
-                            value={form.password}
+                          <input type={showPassword ? 'text' : 'password'} placeholder="Create password" value={form.password}
                             onChange={e => update('password', e.target.value)}
                             className="flex-1 bg-transparent text-sm text-white placeholder:text-white/30 outline-none"
                           />
@@ -435,20 +360,17 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                           </button>
                         </div>
                       </div>
-
                       <button
-                        onClick={onComplete}
+                        onClick={() => onComplete('tipster', form.name, form.email)}
                         className="w-full bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white font-bold text-sm py-3 rounded-full hover:opacity-90 transition-all shadow-lg shadow-red-500/30"
                       >
                         Submit Application
                       </button>
-
                       <p className="text-[11px] text-white/30 text-center mt-3 leading-relaxed">
                         Your application will be reviewed within 24-48 hours.
                       </p>
                     </motion.div>
                   )}
-
                 </AnimatePresence>
               </motion.div>
             )}

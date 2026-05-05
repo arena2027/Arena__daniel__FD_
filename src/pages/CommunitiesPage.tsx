@@ -1,10 +1,11 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, ArrowLeft, Users, Plus, Send,
   X, MessageCircle, Heart, Share, MoreHorizontal
 } from 'lucide-react';
 import { cn } from '../lib/utils';
+import { CreateCommunity } from '../components/SharedComponents';
 
 // ── Types ─────────────────────────────────────────────────────
 interface Community {
@@ -37,15 +38,12 @@ interface ChatMessage {
 }
 
 // ── Mock Data ─────────────────────────────────────────────────
-const communities: Community[] = [
+const initialCommunities: Community[] = [
   {
     id: 'c1',
     name: 'Premier League Fans',
     description: 'The biggest Premier League community on Arena. Match discussions, transfers, and hot takes.',
-    members: 124000,
-    category: 'Football',
-    emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-    joined: true,
+    members: 124000, category: 'Football', emoji: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', joined: true,
     posts: [
       { id: 'p1', user: 'John Pulse', content: 'That Haaland hat trick last night was absolutely insane. City are unstoppable 🔥', time: '5m ago', likes: 234, comments: 45 },
       { id: 'p2', user: 'Sarah Kicks', content: 'Arsenal fans after losing to City for the 4th time this season 😭', time: '1h ago', likes: 891, comments: 123 },
@@ -54,17 +52,14 @@ const communities: Community[] = [
     messages: [
       { id: 'm1', user: 'John Pulse', text: 'Who is everyone backing for the title? 🏆', time: '10:00', mine: false },
       { id: 'm2', user: 'Me', text: 'Man City all day. Haaland is just different', time: '10:02', mine: true },
-      { id: 'm3', user: 'Sarah Kicks', text: 'Arsenal still have a chance! Don\'t count us out', time: '10:05', mine: false },
+      { id: 'm3', user: 'Sarah Kicks', text: "Arsenal still have a chance! Don't count us out", time: '10:05', mine: false },
     ],
   },
   {
     id: 'c2',
     name: 'NBA Talk',
     description: 'All things NBA. Game recaps, trades, drafts and goat debates.',
-    members: 89000,
-    category: 'Basketball',
-    emoji: '🏀',
-    joined: true,
+    members: 89000, category: 'Basketball', emoji: '🏀', joined: true,
     posts: [
       { id: 'p1', user: 'NBA Central', content: 'LeBron at 39 years old still dropping 30 points a night is the most impressive thing in sports history', time: '30m ago', likes: 1204, comments: 341 },
       { id: 'p2', user: 'Hoops Talk', content: 'Curry vs LeBron GOAT debate is the most boring debate in sports. Both are GOATs in their own right', time: '3h ago', likes: 567, comments: 234 },
@@ -77,11 +72,8 @@ const communities: Community[] = [
   {
     id: 'c3',
     name: 'Champions League',
-    description: 'Europe\'s biggest stage. UCL match discussions, predictions and analysis.',
-    members: 210000,
-    category: 'Football',
-    emoji: '🏆',
-    joined: false,
+    description: "Europe's biggest stage. UCL match discussions, predictions and analysis.",
+    members: 210000, category: 'Football', emoji: '🏆', joined: false,
     posts: [
       { id: 'p1', user: 'UCL King', content: 'Real Madrid vs Man City in the quarters. This is literally the final before the final 🤯', time: '1h ago', likes: 3421, comments: 892 },
     ],
@@ -91,10 +83,7 @@ const communities: Community[] = [
     id: 'c4',
     name: 'Transfer Rumours',
     description: 'Latest transfer news, rumours and confirmed deals from around the world.',
-    members: 156000,
-    category: 'Football',
-    emoji: '🔁',
-    joined: false,
+    members: 156000, category: 'Football', emoji: '🔁', joined: false,
     posts: [
       { id: 'p1', user: 'Transfer News', content: '🚨 EXCLUSIVE: Top club closes in on €80M midfielder. Deal expected this week', time: '2h ago', likes: 8921, comments: 1234 },
     ],
@@ -104,10 +93,7 @@ const communities: Community[] = [
     id: 'c5',
     name: 'F1 Racing',
     description: 'Formula 1 community. Race discussions, driver news and technical analysis.',
-    members: 67000,
-    category: 'F1',
-    emoji: '🏎️',
-    joined: false,
+    members: 67000, category: 'F1', emoji: '🏎️', joined: false,
     posts: [
       { id: 'p1', user: 'F1 Central', content: 'Verstappen qualifying lap in Monaco was on another planet. No one else was even close', time: '4h ago', likes: 2341, comments: 445 },
     ],
@@ -134,11 +120,6 @@ function CommunityDetail({ community, onBack }: { community: Community; onBack: 
   const [chatInput, setChatInput] = useState('');
   const [messages, setMessages] = useState(community.messages);
   const [liked, setLiked] = useState<Record<string, boolean>>({});
-  const bottomRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (tab === 'chat') bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [tab, messages]);
 
   const sendMessage = () => {
     if (!chatInput.trim()) return;
@@ -202,11 +183,9 @@ function CommunityDetail({ community, onBack }: { community: Community; onBack: 
           {/* Feed */}
           {tab === 'feed' && (
             <motion.div key="feed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              {/* Description */}
               <div className="px-4 py-3 border-b border-[#1f1f1f] bg-[#ef4444]/5">
                 <p className="text-xs text-[#71767b] leading-relaxed">{community.description}</p>
               </div>
-
               {community.posts.map((post, i) => (
                 <motion.div
                   key={post.id}
@@ -235,8 +214,7 @@ function CommunityDetail({ community, onBack }: { community: Community; onBack: 
                       {post.likes + (liked[post.id] ? 1 : 0)}
                     </button>
                     <button className="flex items-center gap-1.5 text-xs hover:text-[#ef4444] transition-colors">
-                      <MessageCircle className="w-4 h-4" />
-                      {post.comments}
+                      <MessageCircle className="w-4 h-4" />{post.comments}
                     </button>
                     <button className="flex items-center gap-1.5 text-xs hover:text-[#ef4444] transition-colors">
                       <Share className="w-4 h-4" />
@@ -280,15 +258,13 @@ function CommunityDetail({ community, onBack }: { community: Community; onBack: 
                     </div>
                   </motion.div>
                 ))}
-                <div ref={bottomRef} />
               </div>
             </motion.div>
           )}
-
         </AnimatePresence>
       </div>
 
-      {/* Chat Input — only in chat tab */}
+      {/* Chat Input */}
       {tab === 'chat' && (
         <div className="flex items-center gap-2 px-3 py-2 border-t border-[#1f1f1f] bg-black shrink-0">
           <input
@@ -316,6 +292,8 @@ export function CommunitiesPage() {
   const [query, setQuery] = useState('');
   const [selected, setSelected] = useState<Community | null>(null);
   const [tab, setTab] = useState<'discover' | 'joined'>('discover');
+  const [showCreate, setShowCreate] = useState(false);
+  const [communities, setCommunities] = useState(initialCommunities);
 
   if (selected) {
     return <CommunityDetail community={selected} onBack={() => setSelected(null)} />;
@@ -328,6 +306,25 @@ export function CommunitiesPage() {
     return matchesQuery && matchesTab;
   });
 
+  const handleCreate = (data: { name: string; description: string; category: string; type: string }) => {
+    const emojis: Record<string, string> = {
+      Football: '⚽', Basketball: '🏀', Tennis: '🎾', F1: '🏎️',
+      Cricket: '🏏', Rugby: '🏉', MMA: '🥊', General: '🌍',
+    };
+    const newCommunity: Community = {
+      id: `c${Date.now()}`,
+      name: data.name,
+      description: data.description,
+      members: 1,
+      category: data.category,
+      emoji: emojis[data.category] ?? '🌍',
+      joined: true,
+      posts: [],
+      messages: [],
+    };
+    setCommunities(prev => [newCommunity, ...prev]);
+  };
+
   return (
     <div>
       {/* Header */}
@@ -335,12 +332,14 @@ export function CommunitiesPage() {
         <div className="px-4 py-3">
           <div className="flex items-center justify-between mb-3">
             <h1 className="text-lg font-black text-white">Communities</h1>
-            <button className="flex items-center gap-1.5 px-3 py-1.5 bg-[#ef4444] rounded-full text-xs font-bold text-white hover:bg-[#dc2626] transition-colors">
+            <button
+              onClick={() => setShowCreate(true)}
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-[#ef4444] rounded-full text-xs font-bold text-white hover:bg-[#dc2626] transition-colors"
+            >
               <Plus className="w-3.5 h-3.5" /> Create
             </button>
           </div>
 
-          {/* Search */}
           <div className="flex items-center gap-2 bg-[#111] rounded-full px-4 py-2 border border-[#1f1f1f] focus-within:border-[#ef4444]/30 transition-all mb-3">
             <Search className="w-4 h-4 text-[#71767b] shrink-0" />
             <input
@@ -349,10 +348,13 @@ export function CommunitiesPage() {
               placeholder="Search communities..."
               className="flex-1 bg-transparent text-sm text-white placeholder:text-[#71767b] outline-none"
             />
-            {query && <button onClick={() => setQuery('')}><X className="w-4 h-4 text-[#71767b]" /></button>}
+            {query && (
+              <button onClick={() => setQuery('')}>
+                <X className="w-4 h-4 text-[#71767b]" />
+              </button>
+            )}
           </div>
 
-          {/* Tabs */}
           <div className="flex items-center gap-1">
             {(['discover', 'joined'] as const).map(t => (
               <button
@@ -418,6 +420,16 @@ export function CommunitiesPage() {
             </motion.div>
           ))}
         </motion.div>
+      </AnimatePresence>
+
+      {/* Create Community Modal */}
+      <AnimatePresence>
+        {showCreate && (
+          <CreateCommunity
+            onClose={() => setShowCreate(false)}
+            onCreate={handleCreate}
+          />
+        )}
       </AnimatePresence>
     </div>
   );

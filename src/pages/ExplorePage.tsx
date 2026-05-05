@@ -6,6 +6,7 @@ import {
 import { cn } from '../lib/utils';
 import { TeamDetailPage } from './TeamDetailPage';
 import { PlayerProfilePage } from './PlayerProfilePage';
+import { FollowButton } from '../components/SharedComponents';
 
 // ── Mock Data ─────────────────────────────────────────────────
 const trending = [
@@ -70,22 +71,20 @@ export function ExplorePage() {
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
 
-  // Show team detail
   if (selectedTeam) {
     return <TeamDetailPage onBack={() => setSelectedTeam(null)} />;
   }
 
-  // Show player profile
   if (selectedPlayer) {
     return <PlayerProfilePage onBack={() => setSelectedPlayer(null)} />;
   }
 
   const tabs = [
-    { key: 'trending',  label: 'Trending',  icon: TrendingUp },
-    { key: 'sports',    label: 'Sports',    icon: Trophy },
-    { key: 'teams',     label: 'Teams',     icon: Users },
-    { key: 'players',   label: 'Players',   icon: Zap },
-    { key: 'hashtags',  label: 'Hashtags',  icon: Hash },
+    { key: 'trending', label: 'Trending', icon: TrendingUp },
+    { key: 'sports',   label: 'Sports',   icon: Trophy },
+    { key: 'teams',    label: 'Teams',    icon: Users },
+    { key: 'players',  label: 'Players',  icon: Zap },
+    { key: 'hashtags', label: 'Hashtags', icon: Hash },
   ] as const;
 
   return (
@@ -159,7 +158,9 @@ export function ExplorePage() {
                   <div>
                     <div className="flex items-center gap-2 mb-0.5">
                       <span className="text-xs text-[#71767b]">#{i + 1} · {item.category}</span>
-                      {item.hot && <span className="text-[9px] bg-[#ef4444]/20 text-[#ef4444] px-1.5 py-0.5 rounded-full font-bold">🔥 HOT</span>}
+                      {item.hot && (
+                        <span className="text-[9px] bg-[#ef4444]/20 text-[#ef4444] px-1.5 py-0.5 rounded-full font-bold">🔥 HOT</span>
+                      )}
                     </div>
                     <p className="font-bold text-sm text-white">{item.tag}</p>
                     <p className="text-xs text-[#71767b] mt-0.5">{item.posts} posts</p>
@@ -216,9 +217,9 @@ export function ExplorePage() {
                       <p className="text-xs text-[#71767b]">{team.league} · {team.followers} followers</p>
                     </div>
                   </div>
-                  <button className="px-3 py-1.5 rounded-full border border-[#ef4444]/30 text-[#ef4444] text-xs font-bold hover:bg-[#ef4444]/10 transition-colors">
-                    Follow
-                  </button>
+                  <div onClick={e => e.stopPropagation()}>
+                    <FollowButton size="sm" />
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -247,9 +248,9 @@ export function ExplorePage() {
                       <p className="text-xs text-[#71767b]">{player.followers} followers</p>
                     </div>
                   </div>
-                  <button className="px-3 py-1.5 rounded-full border border-[#ef4444]/30 text-[#ef4444] text-xs font-bold hover:bg-[#ef4444]/10 transition-colors">
-                    Follow
-                  </button>
+                  <div onClick={e => e.stopPropagation()}>
+                    <FollowButton size="sm" />
+                  </div>
                 </motion.div>
               ))}
             </div>
@@ -276,7 +277,9 @@ export function ExplorePage() {
                     <p className="font-bold text-sm text-white">{item.tag}</p>
                     <p className="text-xs text-[#71767b]">{item.posts} posts · {item.category}</p>
                   </div>
-                  {item.hot && <span className="text-[9px] bg-[#ef4444]/20 text-[#ef4444] px-1.5 py-0.5 rounded-full font-bold">🔥 HOT</span>}
+                  {item.hot && (
+                    <span className="text-[9px] bg-[#ef4444]/20 text-[#ef4444] px-1.5 py-0.5 rounded-full font-bold">🔥 HOT</span>
+                  )}
                 </motion.div>
               ))}
             </div>
