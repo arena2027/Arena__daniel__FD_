@@ -260,6 +260,13 @@ function MobileBottomNav() {
 interface MainLayoutProps {
   children: ReactNode;
   onLogout: () => void;
+  userRole?: 'user' | 'tipster';
+  appUser?: {
+    name: string;
+    handle: string;
+    email: string;
+    role: 'user' | 'tipster';
+  };
 }
 
 export function MainLayout({ children, onLogout }: MainLayoutProps) {

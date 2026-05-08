@@ -360,7 +360,7 @@ export function ProfilePage({ appUser, onBecameTipster }: ProfilePageProps) {
   const tabs = ['Overview', 'Posts', 'Following', 'Followers', 'Subscriptions'];
 
   const handleBecomeTipster = () => {
-    navigate('/become-tipster');
+    onBecameTipster();
   };
 
   return (

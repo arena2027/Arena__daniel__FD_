@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, TrendingUp, Zap, Star, Plus, X,
   Ticket, Lock, Check, ArrowLeft,
-  Users, Trophy, Smile, Mic, ChevronRight
+  Users, Smile, Mic, ChevronRight
 } from 'lucide-react';
 import { cn } from '../lib/utils';
 

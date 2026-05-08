@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, type MouseEvent } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Heart, MessageCircle, Repeat2,
@@ -45,7 +45,7 @@ const mockPosts: Post[] = [
 ];
 
 // ── Avatar ────────────────────────────────────────────────────
-function Avatar({ name, size = 'md', onClick }: { name: string; size?: 'sm' | 'md' | 'lg'; onClick?: () => void }) {
+function Avatar({ name, size = 'md', onClick }: { name: string; size?: 'sm' | 'md' | 'lg'; onClick?: (e: MouseEvent<HTMLDivElement>) => void }) {
   const colors = ['bg-red-600', 'bg-blue-600', 'bg-green-600', 'bg-purple-600', 'bg-orange-600', 'bg-pink-600'];
   const color = colors[name.charCodeAt(0) % colors.length];
   const sizes = { sm: 'w-8 h-8 text-xs', md: 'w-10 h-10 text-sm', lg: 'w-12 h-12 text-base' };
