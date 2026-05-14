@@ -4,7 +4,7 @@ import {
   ArrowLeft, Send, Zap, MessageCircle,
   BarChart2, Clock, Shield
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
 // ── Mock Match Data ───────────────────────────────────────────
 const match = {

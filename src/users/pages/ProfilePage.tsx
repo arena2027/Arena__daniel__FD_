@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Heart, MessageCircle, Repeat2, Share, Bookmark, Trophy } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
-import type { AppUser } from '../App';
+import type { AppUser } from '../../core/types';
 
 // ── Mock Data ─────────────────────────────────────────────────
 const followedTipsters = [
@@ -348,19 +348,21 @@ function SubscriptionsTab() {
 // ── Profile Page ──────────────────────────────────────────────
 interface ProfilePageProps {
   appUser: AppUser;
-  onBecameTipster: () => void;
 }
 
-export function ProfilePage({ appUser, onBecameTipster }: ProfilePageProps) {
+export function ProfilePage({ appUser }: ProfilePageProps) {
   const [activeTab, setActiveTab] = useState('Overview');
   const [editMode, setEditMode] = useState(false);
+  const [isNavigating, setIsNavigating] = useState(false);
   const navigate = useNavigate();
   const isTipster = appUser.role === 'tipster';
 
   const tabs = ['Overview', 'Posts', 'Following', 'Followers', 'Subscriptions'];
 
   const handleBecomeTipster = () => {
-    onBecameTipster();
+    if (isNavigating) return;
+    setIsNavigating(true);
+    navigate('/become-tipster');
   };
 
   return (
@@ -414,10 +416,14 @@ export function ProfilePage({ appUser, onBecameTipster }: ProfilePageProps) {
             {!isTipster && (
               <button
                 onClick={handleBecomeTipster}
-                className="h-10 px-4 rounded-xl bg-[#ef4444] text-sm font-bold text-white hover:bg-[#dc2626] transition-colors flex items-center gap-1.5"
+                disabled={isNavigating}
+                className={cn(
+                  'h-10 px-4 rounded-xl text-sm font-bold text-white transition-colors flex items-center gap-1.5',
+                  isNavigating ? 'bg-white/10 text-[#71767b] cursor-wait' : 'bg-[#ef4444] hover:bg-[#dc2626]'
+                )}
               >
                 <Zap className="w-4 h-4" />
-                Become Tipster
+                {isNavigating ? 'Opening...' : 'Become Tipster'}
               </button>
             )}
             {isTipster && (

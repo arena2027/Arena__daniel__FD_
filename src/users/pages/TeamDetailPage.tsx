@@ -1,32 +1,17 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-  ArrowLeft, Trophy, Users, BarChart2,
-  Calendar, ChevronRight, Zap
-} from 'lucide-react';
-import { cn } from '../lib/utils';
+import { ArrowLeft, Trophy, Users, BarChart2, Calendar, ChevronRight, Zap } from 'lucide-react';
+import { cn } from '../../lib/utils';
+import { PlayerProfilePage } from './PlayerProfilePage';
+import { MatchDetailPage } from './Matchdetailpage';
+import { FollowButton } from '../../components/SharedComponents';
 
-// ── Mock Data ─────────────────────────────────────────────────
 const team = {
-  id: 't1',
-  name: 'Manchester City',
-  short: 'MCI',
-  league: 'Premier League',
-  country: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
-  color: '#6CABDD',
-  founded: 1880,
-  stadium: 'Etihad Stadium',
-  capacity: '53,400',
-  manager: 'Pep Guardiola',
-  followers: '3.8M',
-  position: 1,
-  played: 32,
-  won: 24,
-  drawn: 4,
-  lost: 4,
-  gf: 78,
-  ga: 32,
-  points: 76,
+  name: 'Manchester City', short: 'MCI', league: 'Premier League',
+  country: '🏴󠁧󠁢󠁥󠁮󠁧󠁿', color: '#6CABDD', founded: 1880,
+  stadium: 'Etihad Stadium', capacity: '53,400', manager: 'Pep Guardiola',
+  followers: '3.8M', position: 1, played: 32, won: 24, drawn: 4, lost: 4,
+  gf: 78, ga: 32, points: 76,
 };
 
 const squad = [
@@ -65,7 +50,6 @@ const teamStats = [
   { label: 'Clean Sheets', value: '14', rank: '2nd' },
 ];
 
-// ── Position color ────────────────────────────────────────────
 function posColor(pos: string) {
   if (pos === 'GK') return 'bg-yellow-500/20 text-yellow-400';
   if (['RB', 'CB', 'LB'].includes(pos)) return 'bg-blue-500/20 text-blue-400';
@@ -73,20 +57,24 @@ function posColor(pos: string) {
   return 'bg-[#ef4444]/20 text-[#ef4444]';
 }
 
-// ── Team Detail Page ──────────────────────────────────────────
 interface TeamDetailPageProps {
   onBack: () => void;
 }
 
 export function TeamDetailPage({ onBack }: TeamDetailPageProps) {
   const [activeTab, setActiveTab] = useState<'overview' | 'squad' | 'stats' | 'fixtures' | 'results'>('overview');
+  const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
+  const [selectedMatch, setSelectedMatch] = useState<string | null>(null);
+
+  if (selectedPlayer) return <PlayerProfilePage onBack={() => setSelectedPlayer(null)} />;
+  if (selectedMatch) return <MatchDetailPage onBack={() => setSelectedMatch(null)} />;
 
   const tabs = [
-    { key: 'overview',  label: 'Overview',  icon: Trophy },
-    { key: 'squad',     label: 'Squad',     icon: Users },
-    { key: 'stats',     label: 'Stats',     icon: BarChart2 },
-    { key: 'fixtures',  label: 'Fixtures',  icon: Calendar },
-    { key: 'results',   label: 'Results',   icon: Zap },
+    { key: 'overview', label: 'Overview', icon: Trophy },
+    { key: 'squad',    label: 'Squad',    icon: Users },
+    { key: 'stats',    label: 'Stats',    icon: BarChart2 },
+    { key: 'fixtures', label: 'Fixtures', icon: Calendar },
+    { key: 'results',  label: 'Results',  icon: Zap },
   ] as const;
 
   return (
@@ -96,31 +84,22 @@ export function TeamDetailPage({ onBack }: TeamDetailPageProps) {
         <button onClick={onBack} className="p-1.5 rounded-full hover:bg-white/10 transition-colors">
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>
-        <div
-          className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-white shrink-0"
-          style={{ backgroundColor: `${team.color}30`, border: `2px solid ${team.color}50` }}
-        >
+        <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black text-white shrink-0"
+          style={{ backgroundColor: `${team.color}30`, border: `2px solid ${team.color}50` }}>
           {team.short}
         </div>
         <div className="flex-1 min-w-0">
           <p className="font-black text-white text-sm">{team.name}</p>
           <p className="text-xs text-[#71767b]">{team.country} {team.league}</p>
         </div>
-        <button className="px-3 py-1.5 bg-[#ef4444] rounded-full text-xs font-bold text-white hover:bg-[#dc2626] transition-colors">
-          Follow
-        </button>
+        <FollowButton size="sm" />
       </div>
 
-      {/* Cover + Info */}
-      <div
-        className="h-28 flex items-end px-4 pb-4"
-        style={{ background: `linear-gradient(135deg, ${team.color}30, #000)` }}
-      >
+      {/* Cover */}
+      <div className="h-28 flex items-end px-4 pb-4" style={{ background: `linear-gradient(135deg, ${team.color}30, #000)` }}>
         <div className="flex items-end gap-4 w-full">
-          <div
-            className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shrink-0"
-            style={{ backgroundColor: `${team.color}40`, border: `2px solid ${team.color}60` }}
-          >
+          <div className="w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black text-white shrink-0"
+            style={{ backgroundColor: `${team.color}40`, border: `2px solid ${team.color}60` }}>
             {team.short}
           </div>
           <div className="flex-1 pb-1">
@@ -150,32 +129,19 @@ export function TeamDetailPage({ onBack }: TeamDetailPageProps) {
         {tabs.map(tab => {
           const Icon = tab.icon;
           return (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key)}
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all shrink-0',
-                activeTab === tab.key
-                  ? 'bg-[#ef4444] text-white'
-                  : 'text-[#71767b] hover:text-white hover:bg-white/5'
+            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
+              className={cn('flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all shrink-0',
+                activeTab === tab.key ? 'bg-[#ef4444] text-white' : 'text-[#71767b] hover:text-white hover:bg-white/5'
               )}
             >
-              <Icon className="w-3.5 h-3.5" />
-              {tab.label}
+              <Icon className="w-3.5 h-3.5" />{tab.label}
             </button>
           );
         })}
       </div>
 
-      {/* Content */}
       <AnimatePresence mode="wait">
-        <motion.div
-          key={activeTab}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.2 }}
-        >
+        <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
 
           {/* Overview */}
           {activeTab === 'overview' && (
@@ -195,7 +161,6 @@ export function TeamDetailPage({ onBack }: TeamDetailPageProps) {
                   </div>
                 ))}
               </div>
-
               <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-4">
                 <p className="font-bold text-white text-sm mb-3">Season Record</p>
                 <div className="grid grid-cols-3 gap-3">
@@ -221,14 +186,11 @@ export function TeamDetailPage({ onBack }: TeamDetailPageProps) {
           {activeTab === 'squad' && (
             <div>
               <div className="px-4 py-2 border-b border-[#1f1f1f]">
-                <p className="text-xs text-[#71767b]">{squad.length} players</p>
+                <p className="text-xs text-[#71767b]">{squad.length} players · tap to view profile</p>
               </div>
               {squad.map((player, i) => (
-                <motion.div
-                  key={player.id}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.04 }}
+                <motion.div key={player.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.04 }}
+                  onClick={() => setSelectedPlayer(player.id)}
                   className="flex items-center gap-3 px-4 py-3 border-b border-[#1f1f1f] hover:bg-white/[0.02] cursor-pointer transition-colors"
                 >
                   <div className="w-8 h-8 rounded-full bg-[#111] border border-[#1f1f1f] flex items-center justify-center text-xs font-black text-[#71767b] shrink-0">
@@ -252,19 +214,13 @@ export function TeamDetailPage({ onBack }: TeamDetailPageProps) {
             <div className="p-4 space-y-3">
               <p className="font-bold text-white text-sm">Season Statistics</p>
               {teamStats.map((stat, i) => (
-                <motion.div
-                  key={stat.label}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
+                <motion.div key={stat.label} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                   className="flex items-center justify-between bg-[#111] border border-[#1f1f1f] rounded-xl px-4 py-3"
                 >
                   <p className="text-sm text-[#71767b]">{stat.label}</p>
                   <div className="flex items-center gap-3">
                     <p className="text-lg font-black text-white">{stat.value}</p>
-                    <span className="text-[10px] bg-[#ef4444]/20 text-[#ef4444] px-2 py-0.5 rounded-full font-bold">
-                      {stat.rank}
-                    </span>
+                    <span className="text-[10px] bg-[#ef4444]/20 text-[#ef4444] px-2 py-0.5 rounded-full font-bold">{stat.rank}</span>
                   </div>
                 </motion.div>
               ))}
@@ -278,11 +234,7 @@ export function TeamDetailPage({ onBack }: TeamDetailPageProps) {
                 <p className="text-xs text-[#71767b]">Upcoming matches</p>
               </div>
               {fixtures.map((fix, i) => (
-                <motion.div
-                  key={fix.id}
-                  initial={{ opacity: 0, y: 4 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
+                <motion.div key={fix.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
                   className="px-4 py-3 border-b border-[#1f1f1f] hover:bg-white/[0.02] cursor-pointer transition-colors"
                 >
                   <div className="flex items-center justify-between mb-1">
@@ -303,7 +255,7 @@ export function TeamDetailPage({ onBack }: TeamDetailPageProps) {
           {activeTab === 'results' && (
             <div>
               <div className="px-4 py-2 border-b border-[#1f1f1f]">
-                <p className="text-xs text-[#71767b]">Recent results</p>
+                <p className="text-xs text-[#71767b]">Recent results · tap to view match detail</p>
               </div>
               {results.map((res, i) => {
                 const cityHome = res.home === team.name;
@@ -312,23 +264,17 @@ export function TeamDetailPage({ onBack }: TeamDetailPageProps) {
                 const won = cityScore > oppScore;
                 const drew = cityScore === oppScore;
                 return (
-                  <motion.div
-                    key={res.id}
-                    initial={{ opacity: 0, y: 4 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.05 }}
+                  <motion.div key={res.id} initial={{ opacity: 0, y: 4 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.05 }}
+                    onClick={() => setSelectedMatch(res.id)}
                     className="px-4 py-3 border-b border-[#1f1f1f] hover:bg-white/[0.02] cursor-pointer transition-colors"
                   >
                     <div className="flex items-center justify-between mb-1">
                       <span className="text-xs text-[#71767b]">{res.league}</span>
                       <div className="flex items-center gap-2">
                         <span className="text-xs text-[#71767b]">{res.date}</span>
-                        <span className={cn(
-                          'text-[10px] px-2 py-0.5 rounded-full font-black',
+                        <span className={cn('text-[10px] px-2 py-0.5 rounded-full font-black',
                           won ? 'bg-green-500/20 text-green-400' : drew ? 'bg-yellow-500/20 text-yellow-400' : 'bg-[#ef4444]/20 text-[#ef4444]'
-                        )}>
-                          {won ? 'W' : drew ? 'D' : 'L'}
-                        </span>
+                        )}>{won ? 'W' : drew ? 'D' : 'L'}</span>
                       </div>
                     </div>
                     <div className="flex items-center justify-between">

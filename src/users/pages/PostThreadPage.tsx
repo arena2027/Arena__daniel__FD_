@@ -4,7 +4,7 @@ import {
   ArrowLeft, Heart, MessageCircle, Repeat2,
   Bookmark, Share, MoreHorizontal, Zap, Send, Image, Smile
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
 // ── Types ─────────────────────────────────────────────────────
 interface Comment {

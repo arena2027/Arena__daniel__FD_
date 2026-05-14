@@ -6,11 +6,11 @@ import {
   Image, Smile, X, Plus, Video, BarChart2,
   MapPin, ChevronRight, Play
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 import { MatchDetailPage } from './Matchdetailpage';
 import { PostThreadPage } from './PostThreadPage';
 import { UserProfileView } from './UserProfileView';
-import { ShareSheet, MoreMenu, PollCreator } from '../components/SharedComponents';
+import { ShareSheet, MoreMenu, PollCreator } from '../../components/SharedComponents';
 
 // ── Live Games ────────────────────────────────────────────────
 const liveGames = [

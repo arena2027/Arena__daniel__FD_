@@ -1,17 +1,14 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import {
   X, Mail, Lock, User, Eye, EyeOff,
   ArrowRight, Zap, Trophy, ChevronRight, Check
 } from 'lucide-react';
-import { cn } from '../lib/utils';
-import type { UserRole } from '../App';
+import { cn } from '../../lib/utils';
+import { useAuth } from '../hooks/AuthContext';
 
 type Mode = 'landing' | 'signin' | 'signup' | 'tipster';
-
-interface AuthPageProps {
-  onComplete: (role: UserRole, name?: string, email?: string) => void;
-}
 
 const sports = ['Football', 'Basketball', 'Tennis', 'Cricket', 'Rugby', 'Baseball', 'MMA', 'F1'];
 
@@ -24,7 +21,9 @@ const perks = [
   'Featured on the leaderboard',
 ];
 
-export function AuthPage({ onComplete }: AuthPageProps) {
+export function AuthPage() {
+  const { login } = useAuth();
+  const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>('landing');
   const [showPassword, setShowPassword] = useState(false);
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
@@ -75,12 +74,32 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                   <p className="text-sm text-white/50 mt-1">The home of sports fans worldwide</p>
                 </div>
 
-                <button className="w-full flex items-center justify-center gap-3 bg-white text-black font-semibold text-sm py-3 rounded-full hover:bg-white/90 transition-all">
+                <button
+                  onClick={async () => {
+                    try {
+                      await login('google@arena.app', 'password');
+                      navigate('/');
+                    } catch (error) {
+                      console.error('Google login failed:', error);
+                    }
+                  }}
+                  className="w-full flex items-center justify-center gap-3 bg-white text-black font-semibold text-sm py-3 rounded-full hover:bg-white/90 transition-all"
+                >
                   <img src="https://www.svgrepo.com/show/475656/google-color.svg" className="w-5 h-5" alt="Google" />
                   Continue with Google
                 </button>
 
-                <button className="w-full flex items-center justify-center gap-3 bg-white text-black font-semibold text-sm py-3 rounded-full hover:bg-white/90 transition-all">
+                <button
+                  onClick={async () => {
+                    try {
+                      await login('apple@arena.app', 'password');
+                      navigate('/');
+                    } catch (error) {
+                      console.error('Apple login failed:', error);
+                    }
+                  }}
+                  className="w-full flex items-center justify-center gap-3 bg-white text-black font-semibold text-sm py-3 rounded-full hover:bg-white/90 transition-all"
+                >
                   <svg className="w-5 h-5" viewBox="0 0 24 24" fill="black">
                     <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z" />
                   </svg>
@@ -154,10 +173,22 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                     </button>
                   </div>
                   <div className="text-right">
-                    <button className="text-xs text-[#ef4444] hover:underline">Forgot password?</button>
+                    <button
+                      onClick={() => alert('Password reset is not available in this demo.')}
+                      className="text-xs text-[#ef4444] hover:underline"
+                    >
+                      Forgot password?
+                    </button>
                   </div>
                   <button
-                    onClick={() => onComplete('user', form.name || 'SportX Fan', form.email)}
+                    onClick={async () => {
+                      try {
+                        await login(form.email, form.password);
+                        navigate('/');
+                      } catch (error) {
+                        console.error('Sign in failed:', error);
+                      }
+                    }}
                     className="w-full bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white font-bold text-sm py-3 rounded-full hover:opacity-90 transition-all shadow-lg shadow-red-500/30"
                   >
                     Sign In
@@ -206,7 +237,14 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                     </button>
                   </div>
                   <button
-                    onClick={() => onComplete('user', form.name, form.email)}
+                    onClick={async () => {
+                      try {
+                        await login(form.email, form.password);
+                        navigate('/');
+                      } catch (error) {
+                        console.error('Sign up failed:', error);
+                      }
+                    }}
                     className="w-full bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white font-bold text-sm py-3 rounded-full hover:opacity-90 transition-all shadow-lg shadow-red-500/30"
                   >
                     Create Account
@@ -361,7 +399,14 @@ export function AuthPage({ onComplete }: AuthPageProps) {
                         </div>
                       </div>
                       <button
-                        onClick={() => onComplete('tipster', form.name, form.email)}
+                        onClick={async () => {
+                          try {
+                            await login(form.email, form.password);
+                            navigate('/dashboard');
+                          } catch (error) {
+                            console.error('Tipster registration failed:', error);
+                          }
+                        }}
                         className="w-full bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white font-bold text-sm py-3 rounded-full hover:opacity-90 transition-all shadow-lg shadow-red-500/30"
                       >
                         Submit Application

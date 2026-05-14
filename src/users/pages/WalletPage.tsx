@@ -5,8 +5,8 @@ import {
   CreditCard, Building, Phone, ChevronRight,
   TrendingUp, TrendingDown, Clock
 } from 'lucide-react';
-import { cn } from '../lib/utils';
-import type { UserRole } from '../App';
+import { cn } from '../../lib/utils';
+import type { UserRole } from '../../core/types';
 const transactions = [
   { id: 't1', type: 'credit', desc: 'Deposit via Card', amount: 5000, time: '2h ago', status: 'success' },
   { id: 't2', type: 'debit', desc: 'GoldTips VIP Subscription', amount: 2500, time: '1d ago', status: 'success' },

@@ -1,0 +1,89 @@
+// ── Authentication Context ────────────────────────────────────────────────────
+
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import type { AppUser } from '../../core/types';
+import { authService } from '../../services/auth/AuthService';
+
+interface AuthContextType {
+  user: AppUser | null;
+  login: (email: string, password: string) => Promise<void>;
+  logout: () => Promise<void>;
+  loading: boolean;
+  error: string | null;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export const useAuth = () => {
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
+};
+
+interface AuthProviderProps {
+  children: React.ReactNode;
+}
+
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [user, setUser] = useState<AppUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        const currentUser = authService.getCurrentUser();
+        if (currentUser) {
+          // Try to refresh token
+          const refreshedUser = await authService.refreshToken();
+          setUser(refreshedUser);
+        }
+      } catch (err) {
+        console.error('Auth initialization error:', err);
+        setUser(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
+  }, []);
+
+  const login = async (email: string, password: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const loggedInUser = await authService.login(email, password);
+      setUser(loggedInUser);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Login failed');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    try {
+      setLoading(true);
+      await authService.logout();
+      setUser(null);
+    } catch (err) {
+      console.error('Logout error:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const value: AuthContextType = {
+    user,
+    login,
+    logout,
+    loading,
+    error,
+  };
+
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+};

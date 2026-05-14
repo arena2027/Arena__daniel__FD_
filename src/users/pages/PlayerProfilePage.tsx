@@ -4,7 +4,7 @@ import {
   ArrowLeft, BarChart2, TrendingUp,
   RefreshCw, Trophy, Zap
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
 // ── Mock Data ─────────────────────────────────────────────────
 const player = {
@@ -66,6 +66,7 @@ interface PlayerProfilePageProps {
 
 export function PlayerProfilePage({ onBack }: PlayerProfilePageProps) {
   const [activeTab, setActiveTab] = useState<'season' | 'career' | 'transfers'>('season');
+  const [following, setFollowing] = useState(false);
 
   const tabs = [
     { key: 'season',    label: 'Season Stats', icon: BarChart2 },
@@ -84,8 +85,16 @@ export function PlayerProfilePage({ onBack }: PlayerProfilePageProps) {
           <p className="font-black text-white text-sm">{player.name}</p>
           <p className="text-xs text-[#71767b]">{player.nationality} {player.position} · {player.team}</p>
         </div>
-        <button className="px-3 py-1.5 bg-[#ef4444] rounded-full text-xs font-bold text-white hover:bg-[#dc2626] transition-colors">
-          Follow
+        <button
+          onClick={() => setFollowing(prev => !prev)}
+          className={cn(
+            'px-3 py-1.5 rounded-full text-xs font-bold transition-colors',
+            following
+              ? 'bg-white/10 text-white hover:bg-white/15'
+              : 'bg-[#ef4444] text-white hover:bg-[#dc2626]'
+          )}
+        >
+          {following ? 'Following' : 'Follow'}
         </button>
       </div>
 

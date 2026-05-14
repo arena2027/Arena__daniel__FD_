@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Search, TrendingUp, Users, Hash, Trophy, X, Zap
+  Search, TrendingUp, Hash, Trophy
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
+import { SearchBar, FilterTabs, SearchResultsList } from '../../components/SearchComponents';
 import { TeamDetailPage } from './TeamDetailPage';
 import { PlayerProfilePage } from './PlayerProfilePage';
-import { FollowButton } from '../components/SharedComponents';
 
 // ── Mock Data ─────────────────────────────────────────────────
 const trending = [
@@ -53,20 +53,10 @@ const players = [
   { id: '8', name: 'Max Verstappen', sport: 'F1', team: 'Red Bull', followers: '1.8M' },
 ];
 
-// ── Avatar ────────────────────────────────────────────────────
-function Avatar({ name }: { name: string }) {
-  const colors = ['bg-red-600', 'bg-blue-600', 'bg-green-600', 'bg-purple-600', 'bg-orange-600'];
-  const color = colors[name.charCodeAt(0) % colors.length];
-  return (
-    <div className={cn('w-10 h-10 rounded-full flex items-center justify-center font-black text-white text-sm shrink-0', color)}>
-      {name[0].toUpperCase()}
-    </div>
-  );
-}
-
 // ── Explore Page ──────────────────────────────────────────────
 export function ExplorePage() {
-  const [activeTab, setActiveTab] = useState<'trending' | 'sports' | 'teams' | 'players' | 'hashtags'>('trending');
+  const [activeTab, setActiveTab] = useState<'trending' | 'sports' | 'search' | 'hashtags'>('trending');
+  const [searchFilter, setSearchFilter] = useState<'teams' | 'players'>('teams');
   const [query, setQuery] = useState('');
   const [selectedTeam, setSelectedTeam] = useState<string | null>(null);
   const [selectedPlayer, setSelectedPlayer] = useState<string | null>(null);
@@ -81,31 +71,46 @@ export function ExplorePage() {
 
   const tabs = [
     { key: 'trending', label: 'Trending', icon: TrendingUp },
-    { key: 'sports',   label: 'Sports',   icon: Trophy },
-    { key: 'teams',    label: 'Teams',    icon: Users },
-    { key: 'players',  label: 'Players',  icon: Zap },
+    { key: 'sports', label: 'Sports', icon: Trophy },
+    { key: 'search', label: 'Search', icon: Search },
     { key: 'hashtags', label: 'Hashtags', icon: Hash },
   ] as const;
+
+  const filteredTeams = teams.filter(team => {
+    const term = query.toLowerCase();
+    return team.name.toLowerCase().includes(term) || team.league.toLowerCase().includes(term);
+  });
+
+  const filteredPlayers = players.filter(player => {
+    const term = query.toLowerCase();
+    return player.name.toLowerCase().includes(term)
+      || player.sport.toLowerCase().includes(term)
+      || player.team.toLowerCase().includes(term);
+  });
+
+  const searchResults = searchFilter === 'teams'
+    ? filteredTeams.map(item => ({
+        id: item.id,
+        title: item.name,
+        subtitle: `${item.league} · ${item.followers} followers`,
+      }))
+    : filteredPlayers.map(item => ({
+        id: item.id,
+        title: item.name,
+        subtitle: `${item.sport} · ${item.team} · ${item.followers} followers`,
+      }));
 
   return (
     <div>
       {/* Sticky Header */}
       <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
         <div className="px-4 pt-3 pb-2">
-          <div className="flex items-center gap-2 bg-[#111] rounded-full px-4 py-2.5 border border-[#1f1f1f] focus-within:border-[#ef4444]/30 transition-all">
-            <Search className="w-4 h-4 text-[#71767b] shrink-0" />
-            <input
-              value={query}
-              onChange={e => setQuery(e.target.value)}
-              placeholder="Search teams, players, hashtags..."
-              className="flex-1 bg-transparent text-sm text-white placeholder:text-[#71767b] outline-none"
-            />
-            {query && (
-              <button onClick={() => setQuery('')}>
-                <X className="w-4 h-4 text-[#71767b] hover:text-white transition-colors" />
-              </button>
-            )}
-          </div>
+          <SearchBar
+            value={query}
+            placeholder="Search teams and players..."
+            onChange={setQuery}
+            onClear={() => setQuery('')}
+          />
         </div>
 
         <div className="flex items-center gap-0 overflow-x-auto scrollbar-hide px-2 pb-2">
@@ -129,6 +134,17 @@ export function ExplorePage() {
             );
           })}
         </div>
+
+        {activeTab === 'search' && (
+          <FilterTabs
+            tabs={[
+              { key: 'teams', label: 'Teams' },
+              { key: 'players', label: 'Players' },
+            ]}
+            activeKey={searchFilter}
+            onChange={(key: string) => setSearchFilter(key as 'teams' | 'players')}
+          />
+        )}
       </div>
 
       {/* Content */}
@@ -193,66 +209,26 @@ export function ExplorePage() {
             </div>
           )}
 
-          {/* Teams */}
-          {activeTab === 'teams' && (
+          {/* Search */}
+          {activeTab === 'search' && (
             <div>
               <div className="px-4 py-3 border-b border-[#1f1f1f]">
-                <h2 className="text-base font-black text-white">Popular Teams</h2>
+                <h2 className="text-base font-black text-white">Search {searchFilter === 'teams' ? 'Teams' : 'Players'}</h2>
+                <p className="mt-1 text-xs text-[#71767b]">
+                  {query ? `Showing results for “${query}”` : `Browse the most followed ${searchFilter}.`}
+                </p>
               </div>
-              {teams.map((team, i) => (
-                <motion.div
-                  key={team.id}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                  onClick={() => setSelectedTeam(team.id)}
-                  className="flex items-center justify-between px-4 py-3 border-b border-[#1f1f1f] hover:bg-white/[0.02] cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-[#ef4444]/10 border border-[#ef4444]/20 flex items-center justify-center text-lg shrink-0">
-                      {team.emoji}
-                    </div>
-                    <div>
-                      <p className="font-bold text-sm text-white">{team.name}</p>
-                      <p className="text-xs text-[#71767b]">{team.league} · {team.followers} followers</p>
-                    </div>
-                  </div>
-                  <div onClick={e => e.stopPropagation()}>
-                    <FollowButton size="sm" />
-                  </div>
-                </motion.div>
-              ))}
-            </div>
-          )}
-
-          {/* Players */}
-          {activeTab === 'players' && (
-            <div>
-              <div className="px-4 py-3 border-b border-[#1f1f1f]">
-                <h2 className="text-base font-black text-white">Popular Players</h2>
-              </div>
-              {players.map((player, i) => (
-                <motion.div
-                  key={player.id}
-                  initial={{ opacity: 0, y: 6 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.04 }}
-                  onClick={() => setSelectedPlayer(player.id)}
-                  className="flex items-center justify-between px-4 py-3 border-b border-[#1f1f1f] hover:bg-white/[0.02] cursor-pointer transition-colors"
-                >
-                  <div className="flex items-center gap-3">
-                    <Avatar name={player.name} />
-                    <div>
-                      <p className="font-bold text-sm text-white">{player.name}</p>
-                      <p className="text-xs text-[#71767b]">{player.sport} · {player.team}</p>
-                      <p className="text-xs text-[#71767b]">{player.followers} followers</p>
-                    </div>
-                  </div>
-                  <div onClick={e => e.stopPropagation()}>
-                    <FollowButton size="sm" />
-                  </div>
-                </motion.div>
-              ))}
+              <SearchResultsList
+                items={searchResults}
+                emptyText={`No ${searchFilter} matched your search.`}
+                onSelect={(id: string) => {
+                  if (searchFilter === 'teams') {
+                    setSelectedTeam(id);
+                  } else {
+                    setSelectedPlayer(id);
+                  }
+                }}
+              />
             </div>
           )}
 

@@ -4,7 +4,7 @@ import {
   Search, ArrowLeft, Send, MoreHorizontal,
   Phone, Video, X
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
 // ── Types ─────────────────────────────────────────────────────
 interface Message {
@@ -111,6 +111,18 @@ function ChatView({ chat, onBack }: { chat: Chat; onBack: () => void }) {
     setInput('');
   };
 
+  const startCall = () => {
+    alert(`Calling ${chat.name}...`);
+  };
+
+  const startVideoCall = () => {
+    alert(`Starting video call with ${chat.name}...`);
+  };
+
+  const openChatOptions = () => {
+    alert('More chat actions will be added soon.');
+  };
+
   return (
     <div className="flex flex-col h-[calc(100vh-56px)]">
       <div className="flex items-center gap-3 px-4 py-3 border-b border-[#1f1f1f] bg-black/90 backdrop-blur shrink-0">
@@ -125,13 +137,22 @@ function ChatView({ chat, onBack }: { chat: Chat; onBack: () => void }) {
           </p>
         </div>
         <div className="flex items-center gap-1">
-          <button className="p-2 rounded-full hover:bg-white/5 text-[#71767b] hover:text-white transition-colors">
+          <button
+            onClick={startCall}
+            className="p-2 rounded-full hover:bg-white/5 text-[#71767b] hover:text-white transition-colors"
+          >
             <Phone className="w-4 h-4" />
           </button>
-          <button className="p-2 rounded-full hover:bg-white/5 text-[#71767b] hover:text-white transition-colors">
+          <button
+            onClick={startVideoCall}
+            className="p-2 rounded-full hover:bg-white/5 text-[#71767b] hover:text-white transition-colors"
+          >
             <Video className="w-4 h-4" />
           </button>
-          <button className="p-2 rounded-full hover:bg-white/5 text-[#71767b] hover:text-white transition-colors">
+          <button
+            onClick={openChatOptions}
+            className="p-2 rounded-full hover:bg-white/5 text-[#71767b] hover:text-white transition-colors"
+          >
             <MoreHorizontal className="w-4 h-4" />
           </button>
         </div>

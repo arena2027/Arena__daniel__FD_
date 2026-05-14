@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Clock, Calendar, Trophy, ChevronRight } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 import { MatchDetailPage } from './Matchdetailpage';
 
 // ── Types ─────────────────────────────────────────────────────

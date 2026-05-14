@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, TrendingUp, Zap, Star, Plus, X,
   Ticket, Lock, Check, ArrowLeft,
   Users, Smile, Mic, ChevronRight
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
 // ── Types ─────────────────────────────────────────────────────
 interface Match {
@@ -430,7 +431,7 @@ function AddModal({ onClose }: { onClose: () => void }) {
 }
 
 // ── Leaderboard ───────────────────────────────────────────────
-function Leaderboard() {
+function Leaderboard({ onSelect }: { onSelect: (name: string) => void }) {
   const tipsters = [
     { rank: 1, name: 'GoldTips VIP', winRate: '74%', streak: 8, members: 12400, badge: '🥇' },
     { rank: 2, name: 'Champions Elite', winRate: '71%', streak: 11, members: 22000, badge: '🥈' },
@@ -451,6 +452,8 @@ function Leaderboard() {
           initial={{ opacity: 0, y: 6 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: i * 0.05 }}
+          whileTap={{ scale: 0.99 }}
+          onClick={() => onSelect(t.name)}
           className="flex items-center gap-3 px-4 py-3 border-b border-[#1f1f1f] hover:bg-white/[0.02] cursor-pointer transition-colors"
         >
           <div className="w-8 text-center">
@@ -485,6 +488,7 @@ export function PredictionsPage() {
   const [query, setQuery] = useState('');
   const [showAdd, setShowAdd] = useState(false);
   const [tab, setTab] = useState<'channels' | 'leaderboard'>('channels');
+  const navigate = useNavigate();
 
   const activeChannel = channels.find(c => c.id === activeId) ?? null;
 
@@ -562,7 +566,7 @@ export function PredictionsPage() {
 
         {tab === 'leaderboard' && (
           <motion.div key="leaderboard" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <Leaderboard />
+            <Leaderboard onSelect={(name) => navigate(`/user/${encodeURIComponent(name)}`)} />
           </motion.div>
         )}
       </AnimatePresence>

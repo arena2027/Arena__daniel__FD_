@@ -1,11 +1,12 @@
 import { useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   ArrowLeft, Calendar, MapPin,
   Heart, MessageCircle, Repeat2, Bookmark,
   Share, MoreHorizontal, Zap
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 const mockUsers: Record<string, {
   name: string; handle: string; bio: string;
   location: string; joined: string; following: number;
@@ -33,6 +34,14 @@ function Avatar({ name, size = 'lg' }: { name: string; size?: 'sm' | 'md' | 'lg'
       {name[0].toUpperCase()}
     </div>
   );
+}
+
+export function UserProfileRoute() {
+  const params = useParams<{ name: string }>();
+  const navigate = useNavigate();
+  const userName = params.name ? decodeURIComponent(params.name) : 'Unknown';
+
+  return <UserProfileView userName={userName} onBack={() => navigate(-1)} />;
 }
 interface UserProfileViewProps {
   userName: string;

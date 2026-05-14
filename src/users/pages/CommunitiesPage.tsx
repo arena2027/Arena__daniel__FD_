@@ -4,8 +4,8 @@ import {
   Search, ArrowLeft, Users, Plus, Send,
   X, MessageCircle, Heart, Share, MoreHorizontal
 } from 'lucide-react';
-import { cn } from '../lib/utils';
-import { CreateCommunity } from '../components/SharedComponents';
+import { cn } from '../../lib/utils';
+import { CreateCommunity } from '../../components/SharedComponents';
 
 // ── Types ─────────────────────────────────────────────────────
 interface Community {

@@ -1,15 +1,11 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import {
   Trophy, Check, ChevronRight, Zap,
   Star, TrendingUp, Users, DollarSign
 } from 'lucide-react';
-import { cn } from '../lib/utils';
-
-// ── Types ─────────────────────────────────────────────────────
-interface BecomeTipsterPageProps {
-  onComplete: () => void;
-}
+import { cn } from '../../lib/utils';
 
 const sports = ['Football', 'Basketball', 'Tennis', 'Cricket', 'Rugby', 'Baseball', 'MMA', 'F1'];
 
@@ -23,7 +19,8 @@ const perks = [
 ];
 
 // ── Become Tipster Page ───────────────────────────────────────
-export function BecomeTipsterPage({ onComplete }: BecomeTipsterPageProps) {
+export function BecomeTipsterPage() {
+  const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
   const [form, setForm] = useState({
@@ -327,7 +324,7 @@ export function BecomeTipsterPage({ onComplete }: BecomeTipsterPageProps) {
                   Back
                 </button>
                 <button
-                  onClick={onComplete}
+                  onClick={() => navigate('/dashboard')}
                   disabled={!canProceedStep3}
                   className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white font-bold py-3 rounded-full hover:opacity-90 transition-all disabled:opacity-40 shadow-lg shadow-red-500/20"
                 >

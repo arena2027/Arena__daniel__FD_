@@ -5,8 +5,8 @@ import {
   Ticket, ChevronRight, ArrowUpRight,
   Check, Clock, Star
 } from 'lucide-react';
-import { cn } from '../lib/utils';
-import type { AppUser } from '../App';
+import { cn } from '../../lib/utils';
+import type { AppUser } from '../../core/types';
 const recentTickets = [
   { id: 't1', code: 'GOLD-7X2K', matches: 12, wins: 7, losses: 3, pending: 2, time: '2h ago', status: 'active' },
   { id: 't2', code: 'GOLD-6W9P', matches: 8, wins: 5, losses: 2, pending: 1, time: '1d ago', status: 'settled' },

@@ -4,7 +4,7 @@ import {
   Heart, MessageCircle, Repeat2,
   Bookmark, Share, Zap, Trash2
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn } from '../../lib/utils';
 
 const initialBookmarks = [
   { id: 'b1', user: { name: 'Transfer News', handle: '@transfernews', verified: true, tipster: false }, content: '🚨 BREAKING: Real Madrid are closing in on a summer deal. More details dropping in the next hour. #TransferNews', time: '3h ago', likes: 5621, comments: 892, reposts: 1203, tag: 'Transfers' },

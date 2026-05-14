@@ -5,8 +5,8 @@ import {
   ChevronRight, LogOut, Moon, Sun,
   Eye, EyeOff, Trash2, AlertTriangle
 } from 'lucide-react';
-import { cn } from '../lib/utils';
-import type { UserRole } from '../App';
+import { cn } from '../../lib/utils';
+import type { UserRole } from '../../core/types';
 function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
   return (
     <button onClick={() => onChange(!value)}
