@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+html {
+  background-color: #000000;
+  color: #e7e9ea;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -11,4 +16,9 @@
 body {
   background-color: #000000;
   color: #e7e9ea;
+}
+
+#root {
+  background-color: #000000;
+  min-height: 100vh;
 }

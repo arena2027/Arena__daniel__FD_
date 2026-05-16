@@ -45,21 +45,21 @@ const MainLayout: React.FC = () => {
   const navigationItems = getNavigationItems(user.role);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-black">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-black/90 border-b border-white/10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-xl font-bold text-gray-900">Arena</h1>
+              <h1 className="text-xl font-bold text-white">Arena</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <span className="text-sm text-gray-600">
+              <span className="text-sm text-white/60">
                 Welcome, {user.name} ({user.role})
               </span>
               <button
                 onClick={logout}
-                className="px-4 py-2 text-sm text-gray-700 hover:text-gray-900"
+                className="px-4 py-2 text-sm text-[#ef4444] hover:text-[#dc2626] transition-colors"
               >
                 Logout
               </button>
@@ -70,14 +70,14 @@ const MainLayout: React.FC = () => {
 
       <div className="flex">
         {/* Sidebar */}
-        <nav className="w-64 bg-white shadow-sm min-h-screen">
+        <nav className="w-64 bg-black/80 border-r border-white/10 min-h-screen">
           <div className="p-4">
             <ul className="space-y-2">
               {navigationItems.map((item) => (
                 <li key={item.path}>
                   <button
                     onClick={() => navigate(item.path)}
-                    className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                    className="w-full text-left px-4 py-2 text-sm text-white/70 hover:text-[#ef4444] hover:bg-[#ef4444]/10 rounded-md transition-colors"
                   >
                     {item.label}
                   </button>
@@ -88,7 +88,7 @@ const MainLayout: React.FC = () => {
         </nav>
 
         {/* Main Content */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 bg-black">
           <Suspense fallback={<LoadingFallback />}>
             <Routes>
               {/* Public Routes (accessible by all authenticated users) */}

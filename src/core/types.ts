@@ -101,9 +101,11 @@ export const ROUTE_ACCESS: Record<UserRole, string[]> = {
 export const API_ENDPOINTS = {
   AUTH: {
     LOGIN: '/api/auth/login',
+    SIGNUP: '/api/auth/signup',
     LOGOUT: '/api/auth/logout',
     REFRESH: '/api/auth/refresh',
     PROFILE: '/api/auth/profile',
+    RESET_PASSWORD: '/api/auth/reset-password',
   },
   USERS: {
     PROFILE: '/api/users/profile',

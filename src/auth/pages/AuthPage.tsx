@@ -22,7 +22,7 @@ const perks = [
 ];
 
 export function AuthPage() {
-  const { login } = useAuth();
+  const { login, requestOTP } = useAuth();
   const navigate = useNavigate();
   const [mode, setMode] = useState<Mode>('landing');
   const [showPassword, setShowPassword] = useState(false);
@@ -183,8 +183,8 @@ export function AuthPage() {
                   <button
                     onClick={async () => {
                       try {
-                        await login(form.email, form.password);
-                        navigate('/');
+                        await requestOTP(form.email, form.password);
+                        navigate('/auth/otp');
                       } catch (error) {
                         console.error('Sign in failed:', error);
                       }

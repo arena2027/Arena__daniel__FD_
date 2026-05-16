@@ -17,6 +17,7 @@ function LoadingFallback() {
 
 // Lazy load page components
 const AuthPage = lazy(() => import('./auth/pages/AuthPage').then(m => ({ default: m.AuthPage })));
+const OTPPage = lazy(() => import('./auth/pages/OTPPage').then(m => ({ default: m.OTPPage })));
 
 // ── App Content Component ─────────────────────────────────────────────────────
 function AppContent() {
@@ -31,6 +32,16 @@ function AppContent() {
           <AuthGuard user={user}>
             <Suspense fallback={<LoadingFallback />}>
               <AuthPage />
+            </Suspense>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/auth/otp"
+        element={
+          <AuthGuard user={user}>
+            <Suspense fallback={<LoadingFallback />}>
+              <OTPPage />
             </Suspense>
           </AuthGuard>
         }

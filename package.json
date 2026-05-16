@@ -7,7 +7,14 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "backend:dev": "tsx watch src/api/server.ts",
+    "backend:build": "tsc",
+    "backend:start": "node dist/server.js",
+    "backend:install": "npm install express cors helmet jsonwebtoken bcryptjs dotenv @types/express @types/cors @types/bcryptjs @types/jsonwebtoken tsx",
+    "fullstack:dev": "concurrently \"npm run backend:dev\" \"npm run dev\"",
+    "db:migrate": "echo 'Run your database migrations here'",
+    "db:seed": "echo 'Run your database seeding here'"
   },
   "dependencies": {
     "clsx": "^2.1.1",
@@ -25,12 +32,14 @@
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^4.7.0",
     "autoprefixer": "^10.5.0",
+    "concurrently": "^8.2.2",
     "eslint": "^9.39.4",
     "eslint-plugin-react-hooks": "^7.0.1",
     "eslint-plugin-react-refresh": "^0.5.2",
     "globals": "^17.4.0",
     "postcss": "^8.5.10",
     "tailwindcss": "^3.4.19",
+    "tsx": "^4.6.2",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.58.0",
     "vite": "^5.4.21"

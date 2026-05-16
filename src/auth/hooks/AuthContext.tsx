@@ -7,6 +7,8 @@ import { authService } from '../../services/auth/AuthService';
 interface AuthContextType {
   user: AppUser | null;
   login: (email: string, password: string) => Promise<void>;
+  signup: (email: string, password: string, name: string, role?: 'user' | 'tipster') => Promise<void>;
+  requestOTP: (email: string, password: string) => Promise<{ requiresOtp: true; email: string }>;
   logout: () => Promise<void>;
   loading: boolean;
   error: string | null;
@@ -65,6 +67,36 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const signup = async (email: string, password: string, name: string, role: 'user' | 'tipster' = 'user') => {
+    try {
+      setLoading(true);
+      setError(null);
+      const newUser = await authService.signup(email, password, name, role);
+      setUser(newUser);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Signup failed');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const requestOTP = async (email: string, password: string) => {
+    try {
+      setLoading(true);
+      setError(null);
+      const result = await authService.requestOTP(email, password);
+      return result;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'OTP request failed');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // (forgotPassword removed — previously added for reset flow)
+
   const logout = async () => {
     try {
       setLoading(true);
@@ -80,6 +112,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const value: AuthContextType = {
     user,
     login,
+    signup,
+    requestOTP,
     logout,
     loading,
     error,

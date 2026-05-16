@@ -389,6 +389,7 @@ export function HomePage() {
   const [showButton, setShowButton] = useState(true);
   const [posts, setPosts] = useState(mockPosts);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -452,37 +453,70 @@ export function HomePage() {
 
   return (
     <div>
-      {/* Sticky header */}
-      <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
-        <div className="flex items-center gap-1 px-4 pt-3 pb-2">
-          {tabs.map(tab => (
-            <button key={tab.key} onClick={() => setActiveTab(tab.key)}
-              className={cn('px-3 py-1.5 rounded-full text-xs font-bold transition-all',
-                activeTab === tab.key ? 'bg-[#ef4444] text-white' : 'text-[#71767b] hover:text-white hover:bg-white/5'
-              )}
-            >{tab.label}</button>
-          ))}
-        </div>
-        <div className="px-4 pb-3">
-          <div className="flex items-center gap-2 bg-[#111] rounded-full px-4 py-2 border border-[#1f1f1f] focus-within:border-[#ef4444]/30 transition-all">
-            <Search className="w-4 h-4 text-[#71767b] shrink-0" />
-            <input
-              value={searchQuery}
-              onChange={e => setSearchQuery(e.target.value)}
-              placeholder="Search Arena..."
-              className="flex-1 bg-transparent text-sm text-white placeholder:text-[#71767b] outline-none"
-            />
-            {searchQuery && (
-              <button onClick={() => setSearchQuery('')}>
-                <X className="w-4 h-4 text-[#71767b] hover:text-white" />
+      {/* Tabs nav row — pinned under header */}
+      <div className="sticky top-16 z-30 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
+        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2">
+            {tabs.map(tab => (
+              <button key={tab.key} onClick={() => { setActiveTab(tab.key); setShowSearch(false); }}
+                className={cn('px-4 py-2 rounded-md text-sm font-semibold transition-all relative overflow-visible',
+                  activeTab === tab.key ? 'text-white' : 'text-[#9aa0a6] hover:text-white hover:bg-white/2'
+                )}
+              >
+                <span className="relative z-20">{tab.label}</span>
+
+                {activeTab === tab.key && (
+                  <>
+                    <motion.span layoutId="active-tab-pill" transition={{ type: 'spring', stiffness: 700, damping: 40 }}
+                      className="absolute inset-0 rounded-md bg-white/4 z-0"
+                    />
+                    <motion.span layoutId="active-tab-indicator" transition={{ type: 'spring', stiffness: 700, damping: 35 }}
+                      className="absolute left-3 right-3 -bottom-1 h-1 bg-[#ef4444] rounded z-10"
+                    />
+                  </>
+                )}
               </button>
-            )}
+            ))}
+          </div>
+
+          <div className="flex items-center gap-2">
+            <button onClick={() => setShowSearch(s => !s)} className="p-2 rounded-md hover:bg-white/5 transition-colors">
+              <Search className="w-5 h-5 text-[#9aa0a6]" />
+            </button>
           </div>
         </div>
+
+        <AnimatePresence>
+          {showSearch && (
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="px-4 pb-3">
+              <div className="max-w-3xl mx-auto">
+                <div className="flex items-center gap-2 bg-[#111] rounded-full px-4 py-2 border border-[#1f1f1f] focus-within:border-[#ef4444]/30 transition-all">
+                  <Search className="w-4 h-4 text-[#71767b] shrink-0" />
+                  <input
+                    autoFocus
+                    value={searchQuery}
+                    onChange={e => setSearchQuery(e.target.value)}
+                    placeholder="Search Arena..."
+                    className="flex-1 bg-transparent text-sm text-white placeholder:text-[#71767b] outline-none"
+                  />
+                  {searchQuery ? (
+                    <button onClick={() => setSearchQuery('')}>
+                      <X className="w-4 h-4 text-[#71767b] hover:text-white" />
+                    </button>
+                  ) : (
+                    <button onClick={() => setShowSearch(false)} className="text-sm text-[#71767b] hover:text-white">Close</button>
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
 
-      {/* Live Ticker */}
-      <LiveTicker onMatchClick={setSelectedMatch} />
+      {/* Live Ticker — pulled tighter under tabs */}
+      <div className="-mt-2">
+        <LiveTicker onMatchClick={setSelectedMatch} />
+      </div>
 
       {/* Search label */}
       {searchQuery && (
