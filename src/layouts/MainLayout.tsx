@@ -1,10 +1,11 @@
 // ── Main Layout ───────────────────────────────────────────────────────────────
 
-import React, { Suspense } from 'react';
-import { useNavigate, Routes, Route, Navigate } from 'react-router-dom';
+import React, { Suspense, useEffect, useState } from 'react';
+import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../auth/hooks/AuthContext';
-import type { UserRole } from '../core/types';
 import { RouteGuard } from '../middleware/guards/RouteGuards';
+import { Header } from '../layout/Header';
+import { Sidebar } from '../layout/Sidebar';
 import TipsterDashboard from '../dashboard/tipster/TipsterDashboard';
 import AdminDashboard from '../admin/pages/AdminDashboard';
 
@@ -37,149 +38,115 @@ function LoadingFallback() {
 const MainLayout: React.FC = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    if (window.innerWidth >= 768) {
+      setSidebarOpen(true);
+    }
+  }, []);
 
   if (!user) {
     return <div>Loading...</div>; // Or redirect to auth
   }
 
-  const navigationItems = getNavigationItems(user.role);
+  const location = useLocation();
+  const activeTab = (
+    Object.entries({
+      Home: '/',
+      Explore: '/explore',
+      Live: '/live',
+      Predictions: '/predictions',
+    }) as [string, string][]
+  ).find(([, path]) => path === location.pathname)?.[0] ?? 'Home';
 
   return (
-    <div className="min-h-screen bg-black">
-      {/* Header */}
-      <header className="bg-black/90 border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center">
-              <h1 className="text-xl font-bold text-white">Arena</h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <span className="text-sm text-white/60">
-                Welcome, {user.name} ({user.role})
-              </span>
-              <button
-                onClick={logout}
-                className="px-4 py-2 text-sm text-[#ef4444] hover:text-[#dc2626] transition-colors"
-              >
-                Logout
-              </button>
-            </div>
-          </div>
-        </div>
-      </header>
+    <div className="min-h-screen bg-[#050505] text-white">
+      <Header
+        title="Arena"
+        activeTab={activeTab}
+        onTabChange={(tab: string) => {
+          const tabRoutes: Record<string, string> = {
+            Home: '/',
+            Explore: '/explore',
+            Live: '/live',
+            Predictions: '/predictions',
+          };
+          navigate(tabRoutes[tab] ?? '/');
+        }}
+        onMenuClick={() => setSidebarOpen((prev) => !prev)}
+      />
 
       <div className="flex">
-        {/* Sidebar */}
-        <nav className="w-64 bg-black/80 border-r border-white/10 min-h-screen">
-          <div className="p-4">
-            <ul className="space-y-2">
-              {navigationItems.map((item) => (
-                <li key={item.path}>
-                  <button
-                    onClick={() => navigate(item.path)}
-                    className="w-full text-left px-4 py-2 text-sm text-white/70 hover:text-[#ef4444] hover:bg-[#ef4444]/10 rounded-md transition-colors"
-                  >
-                    {item.label}
-                  </button>
-                </li>
-              ))}
-            </ul>
+        <Sidebar
+          open={sidebarOpen}
+          onClose={() => setSidebarOpen(false)}
+          onLogout={logout}
+          userRole={user.role}
+          appUser={user}
+        />
+
+        <main className={`flex-1 pt-6 pb-8 ${sidebarOpen ? 'md:ml-[13%]' : 'md:ml-0'}`}>
+          <div className="max-w-[680px] mx-auto px-4 sm:px-6">
+            <div className="border-x border-[#1f1f1f] bg-[#070708] min-h-[calc(100vh-92px)] rounded-[32px] overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.45)]">
+              <div className="px-4 py-6 sm:px-6">
+                <Suspense fallback={<LoadingFallback />}>
+                  <Routes>
+                    {/* Public Routes (accessible by all authenticated users) */}
+                    <Route path="/" element={<HomePage />} />
+                    <Route path="/explore" element={<ExplorePage />} />
+                    <Route path="/live" element={<LivePage />} />
+                    <Route path="/predictions" element={<PredictionsPage />} />
+                    <Route path="/communities" element={<CommunitiesPage />} />
+                    <Route path="/messages" element={<MessagesPage />} />
+                    <Route path="/notifications" element={<NotificationsPage />} />
+                    <Route path="/bookmarks" element={<BookmarksPage />} />
+                    <Route path="/wallet" element={<WalletPage userRole={user.role} />} />
+                    <Route path="/settings" element={<SettingsPage userRole={user.role} />} />
+                    <Route path="/profile" element={<ProfilePage appUser={user} />} />
+                    <Route path="/user/:name" element={<UserProfileView />} />
+
+                    {/* User-only Routes */}
+                    <Route
+                      path="/become-tipster"
+                      element={
+                        <RouteGuard user={user} allowedRoles={['user']}>
+                          <BecomeTipsterPage />
+                        </RouteGuard>
+                      }
+                    />
+
+                    {/* Tipster-only Routes */}
+                    <Route
+                      path="/dashboard"
+                      element={
+                        <RouteGuard user={user} allowedRoles={['tipster']}>
+                          <TipsterDashboard />
+                        </RouteGuard>
+                      }
+                    />
+
+                    {/* Admin-only Routes */}
+                    <Route
+                      path="/admin"
+                      element={
+                        <RouteGuard user={user} allowedRoles={['admin']}>
+                          <AdminDashboard />
+                        </RouteGuard>
+                      }
+                    />
+
+                    {/* Fallback */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </Suspense>
+              </div>
+            </div>
           </div>
-        </nav>
-
-        {/* Main Content */}
-        <main className="flex-1 p-6 bg-black">
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
-              {/* Public Routes (accessible by all authenticated users) */}
-              <Route path="/" element={<HomePage />} />
-              <Route path="/explore" element={<ExplorePage />} />
-              <Route path="/live" element={<LivePage />} />
-              <Route path="/predictions" element={<PredictionsPage />} />
-              <Route path="/communities" element={<CommunitiesPage />} />
-              <Route path="/messages" element={<MessagesPage />} />
-              <Route path="/notifications" element={<NotificationsPage />} />
-              <Route path="/bookmarks" element={<BookmarksPage />} />
-              <Route path="/wallet" element={<WalletPage userRole={user.role} />} />
-              <Route path="/settings" element={<SettingsPage userRole={user.role} />} />
-              <Route path="/profile" element={<ProfilePage appUser={user} />} />
-              <Route path="/user/:name" element={<UserProfileView />} />
-
-              {/* User-only Routes */}
-              <Route
-                path="/become-tipster"
-                element={
-                  <RouteGuard user={user} allowedRoles={['user']}>
-                    <BecomeTipsterPage />
-                  </RouteGuard>
-                }
-              />
-
-              {/* Tipster-only Routes */}
-              <Route
-                path="/dashboard"
-                element={
-                  <RouteGuard user={user} allowedRoles={['tipster']}>
-                    <TipsterDashboard />
-                  </RouteGuard>
-                }
-              />
-
-              {/* Admin-only Routes */}
-              <Route
-                path="/admin"
-                element={
-                  <RouteGuard user={user} allowedRoles={['admin']}>
-                    <AdminDashboard />
-                  </RouteGuard>
-                }
-              />
-
-              {/* Fallback */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </Suspense>
         </main>
       </div>
     </div>
   );
 };
-
-function getNavigationItems(role: UserRole) {
-  const baseItems = [
-    { path: '/', label: 'Home' },
-    { path: '/explore', label: 'Explore' },
-    { path: '/live', label: 'Live' },
-    { path: '/predictions', label: 'Predictions' },
-    { path: '/communities', label: 'Communities' },
-    { path: '/messages', label: 'Messages' },
-    { path: '/notifications', label: 'Notifications' },
-    { path: '/bookmarks', label: 'Bookmarks' },
-    { path: '/wallet', label: 'Wallet' },
-    { path: '/settings', label: 'Settings' },
-    { path: '/profile', label: 'Profile' },
-  ];
-
-  const tipsterItems = [
-    ...baseItems,
-    { path: '/dashboard', label: 'Dashboard' },
-  ];
-
-  const adminItems = [
-    ...tipsterItems,
-    { path: '/admin', label: 'Admin Panel' },
-  ];
-
-  switch (role) {
-    case 'user':
-      return baseItems;
-    case 'tipster':
-      return tipsterItems;
-    case 'admin':
-      return adminItems;
-    default:
-      return baseItems;
-  }
-}
 
 export default MainLayout;
