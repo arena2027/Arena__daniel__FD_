@@ -12,8 +12,8 @@ import {
   Wallet,
   Settings,
   Bookmark,
-  LogOut,
   X,
+  Video,
 } from 'lucide-react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
@@ -30,7 +30,6 @@ interface NavItem {
 interface SidebarProps {
   open: boolean;
   onClose: () => void;
-  onLogout: () => void;
   userRole: UserRole;
   appUser: AppUser;
 }
@@ -40,6 +39,7 @@ const userNavItems: NavItem[] = [
   { icon: Search, label: 'Explore', path: '/explore' },
   { icon: Zap, label: 'Live', path: '/live', isLive: true },
   { icon: Target, label: 'Predictions', path: '/predictions' },
+  { icon: Video, label: 'Videos', path: '/videos' },
   { icon: Users, label: 'Communities', path: '/communities' },
   { icon: Mail, label: 'Messages', path: '/messages', badge: 2 },
   { icon: Bell, label: 'Notifications', path: '/notifications', badge: 9 },
@@ -64,7 +64,7 @@ function getInitials(name: string) {
     .toUpperCase();
 }
 
-export function Sidebar({ open, onClose, onLogout, userRole, appUser }: SidebarProps) {
+export function Sidebar({ open, onClose, userRole, appUser }: SidebarProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const navItems = userRole === 'tipster' ? tipsterNavItems : userNavItems;
@@ -86,7 +86,7 @@ export function Sidebar({ open, onClose, onLogout, userRole, appUser }: SidebarP
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-72 bg-[#09090c] border-r border-[#1f1f1f] p-4 transition-transform duration-300 ease-out md:sticky md:top-0 md:h-screen md:overflow-y-auto',
+          'fixed inset-y-0 left-0 z-50 w-72 bg-[#09090c] border-r border-[#1f1f1f] p-4 transition-transform duration-300 ease-out md:sticky md:top-0 md:h-screen md:overflow-hidden md:flex md:flex-col',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -106,7 +106,7 @@ export function Sidebar({ open, onClose, onLogout, userRole, appUser }: SidebarP
           </button>
         </div>
 
-        <nav className="space-y-2">
+        <nav className="space-y-1.5 flex-1 overflow-y-auto">
           {navItems.map(item => {
             const Icon = item.icon;
             const isActive = location.pathname === item.path;
@@ -135,7 +135,7 @@ export function Sidebar({ open, onClose, onLogout, userRole, appUser }: SidebarP
           })}
         </nav>
 
-        <div className="mt-6 border-t border-white/10 pt-4 space-y-3">
+        <div className="shrink-0 border-t border-white/10 pt-4 mt-auto">
           <button
             onClick={() => {
               navigate('/profile');
@@ -150,14 +150,6 @@ export function Sidebar({ open, onClose, onLogout, userRole, appUser }: SidebarP
               <p className="text-sm font-bold text-white truncate">{appUser.name || 'Arena User'}</p>
               <p className="text-xs text-[#71767b] truncate">{appUser.handle || '@arena'}</p>
             </div>
-          </button>
-
-          <button
-            onClick={onLogout}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold text-[#ef4444] hover:bg-white/5 transition-colors"
-          >
-            <LogOut className="w-5 h-5" />
-            Sign Out
           </button>
         </div>
       </aside>

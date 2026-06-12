@@ -44,7 +44,7 @@ export function AuthPage() {
   return (
     <div className="relative min-h-screen w-full overflow-hidden flex items-center justify-center bg-black">
       <div className="absolute inset-0">
-        <div className="absolute inset-0 bg-[url('/auth-bg.jpg')] bg-cover bg-center opacity-30" />
+        <div className="absolute inset-0 bg-[linear-gradient(135deg,#111827_0%,#1f2937_45%,#0f172a_100%)] opacity-80" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-black/80" />
       </div>
 

@@ -207,27 +207,41 @@ function ChatView({ chat, onBack }: { chat: Chat; onBack: () => void }) {
 export function MessagesPage() {
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
   const [query, setQuery] = useState('');
+  const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 768 : false);
+
+  useEffect(() => {
+    const handleResize = () => setIsDesktop(window.innerWidth >= 768);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  useEffect(() => {
+    if (isDesktop && !activeChat) {
+      setActiveChat(chats[0]);
+    }
+  }, [isDesktop, activeChat]);
 
   const filtered = chats.filter(c =>
     c.name.toLowerCase().includes(query.toLowerCase()) ||
     c.handle.toLowerCase().includes(query.toLowerCase())
   );
 
-  if (activeChat) {
+  if (activeChat && !isDesktop) {
     return <ChatView chat={activeChat} onBack={() => setActiveChat(null)} />;
   }
 
   return (
-    <div>
-      <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
-        <div className="px-4 py-3">
+    <div className="h-[calc(100vh-56px)] flex overflow-hidden rounded-[28px] border border-[#1f1f1f] bg-[#070708] shadow-[0_25px_80px_rgba(0,0,0,0.45)]">
+      <aside className="w-full md:w-[380px] border-r border-[#1f1f1f] bg-[#08090b] flex flex-col">
+        <div className="border-b border-[#1f1f1f] bg-black/70 backdrop-blur-md px-4 py-4 shrink-0">
           <h1 className="text-lg font-black text-white mb-3">Messages</h1>
           <div className="flex items-center gap-2 bg-[#111] rounded-full px-4 py-2 border border-[#1f1f1f] focus-within:border-[#ef4444]/30 transition-all">
             <Search className="w-4 h-4 text-[#71767b] shrink-0" />
             <input
               value={query}
               onChange={e => setQuery(e.target.value)}
-              placeholder="Search messages..."
+              placeholder="Search conversations..."
               className="flex-1 bg-transparent text-sm text-white placeholder:text-[#71767b] outline-none"
             />
             {query && (
@@ -237,42 +251,52 @@ export function MessagesPage() {
             )}
           </div>
         </div>
-      </div>
 
-      <AnimatePresence>
-        {filtered.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-20 text-center px-8">
-            <p className="text-4xl mb-3">💬</p>
-            <p className="font-bold text-white mb-1">No messages found</p>
-            <p className="text-sm text-[#71767b]">Start a conversation with someone</p>
-          </div>
-        ) : filtered.map((chat, i) => (
-          <motion.div
-            key={chat.id}
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.04 }}
-            onClick={() => setActiveChat(chat)}
-            className="flex items-center gap-3 px-4 py-3 border-b border-[#1f1f1f] hover:bg-white/[0.02] cursor-pointer transition-colors"
-          >
-            <Avatar name={chat.name} online={chat.online} />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between mb-0.5">
-                <p className="font-bold text-sm text-white truncate">{chat.name}</p>
-                <span className="text-[11px] text-[#71767b] shrink-0 ml-2">{chat.time}</span>
+        <div className="flex-1 overflow-y-auto">
+          <AnimatePresence>
+            {filtered.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center px-8">
+                <p className="text-4xl mb-3">💬</p>
+                <p className="font-bold text-white mb-1">No messages found</p>
+                <p className="text-sm text-[#71767b]">Start a conversation with someone</p>
               </div>
-              <div className="flex items-center justify-between gap-2">
-                <p className="text-xs text-[#71767b] truncate flex-1">{chat.lastMessage}</p>
-                {chat.unread > 0 && (
-                  <span className="min-w-[18px] h-[18px] bg-[#ef4444] text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 shrink-0">
-                    {chat.unread}
-                  </span>
+            ) : filtered.map((chat, i) => (
+              <motion.button
+                key={chat.id}
+                type="button"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: i * 0.04 }}
+                onClick={() => setActiveChat(chat)}
+                className={cn(
+                  'w-full flex items-center gap-3 px-4 py-3 border-b border-[#1f1f1f] text-left transition-colors',
+                  activeChat?.id === chat.id ? 'bg-[#ef4444]/10' : 'hover:bg-white/[0.02]'
                 )}
-              </div>
-            </div>
-          </motion.div>
-        ))}
-      </AnimatePresence>
+              >
+                <Avatar name={chat.name} online={chat.online} />
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between mb-0.5">
+                    <p className="font-bold text-sm text-white truncate">{chat.name}</p>
+                    <span className="text-[11px] text-[#71767b] shrink-0 ml-2">{chat.time}</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <p className="text-xs text-[#71767b] truncate flex-1">{chat.lastMessage}</p>
+                    {chat.unread > 0 && (
+                      <span className="min-w-[18px] h-[18px] bg-[#ef4444] text-white text-[9px] font-black rounded-full flex items-center justify-center px-1 shrink-0">
+                        {chat.unread}
+                      </span>
+                    )}
+                  </div>
+                </div>
+              </motion.button>
+            ))}
+          </AnimatePresence>
+        </div>
+      </aside>
+
+      <section className="hidden md:flex flex-1 flex-col bg-[#0b141a]">
+        {activeChat ? <ChatView chat={activeChat} onBack={() => setActiveChat(null)} /> : <div className="flex h-full items-center justify-center text-[#71767b]">Select a conversation to view the thread.</div>}
+      </section>
     </div>
   );
 }

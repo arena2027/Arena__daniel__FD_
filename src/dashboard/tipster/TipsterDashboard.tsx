@@ -41,19 +41,19 @@ const TipsterDashboard: React.FC = () => {
           {
             id: '1',
             type: 'prediction',
-            message: 'New prediction posted for Manchester United vs Chelsea',
+            message: 'Primary sidebar → secondary chat list → main chat pane with fixed header, scrollable feed, and fixed bottom input bar.',
             timestamp: '2 hours ago',
           },
           {
             id: '2',
             type: 'follower',
-            message: 'John Doe started following you',
+            message: 'UI layout summary updated to reflect the left-to-right hierarchy, unread badges, and responsive Tailwind structure.',
             timestamp: '4 hours ago',
           },
           {
             id: '3',
             type: 'revenue',
-            message: 'Received $25 from premium subscription',
+            message: 'Prediction copy now highlights the fixed navigation, message feed, and mobile-first layout behavior.',
             timestamp: '1 day ago',
           },
         ]);

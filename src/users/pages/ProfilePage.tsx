@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Heart, MessageCircle, Repeat2, Share, Bookmark, Trophy } from 'lucide-react';
+import { Zap, Heart, MessageCircle, Repeat2, Share, Bookmark, Trophy, LogOut } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth/hooks/AuthContext';
 import type { AppUser } from '../../core/types';
 
 // ── Mock Data ─────────────────────────────────────────────────
@@ -355,6 +356,7 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
   const [editMode, setEditMode] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const isTipster = appUser.role === 'tipster';
 
   const tabs = ['Overview', 'Posts', 'Following', 'Followers', 'Subscriptions'];
@@ -435,6 +437,13 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
                 Dashboard
               </button>
             )}
+            <button
+              onClick={logout}
+              className="h-10 px-4 rounded-xl border border-[#ef4444] text-sm font-bold text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors flex items-center gap-1.5"
+            >
+              <LogOut className="w-4 h-4" />
+              Sign Out
+            </button>
           </div>
         </div>
 

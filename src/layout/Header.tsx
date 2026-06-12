@@ -29,10 +29,10 @@ export function Header({
 
   return (
     <header className={cn(
-      'sticky top-0 z-40 backdrop-blur-md transition-all duration-300',
+      'sticky top-0 z-40 backdrop-blur-md transition-all duration-300 h-14',
       scrolled ? 'bg-black/95 border-b border-[#ef4444]/20' : 'bg-black/70'
     )}>
-      <div className="border-b border-[#2f3336]">
+      <div className="border-b border-[#2f3336] h-full">
         <div className="flex items-center justify-between px-4 h-14">
           <div className="flex items-center gap-3">
             <button

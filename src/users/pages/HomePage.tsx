@@ -4,20 +4,15 @@ import {
   Search, Heart, MessageCircle, Repeat2,
   Bookmark, Share, MoreHorizontal, Zap,
   Image, Smile, X, Plus, Video, BarChart2,
-  MapPin, ChevronRight, Play
+  MapPin, Play
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { MatchDetailPage } from './Matchdetailpage';
 import { PostThreadPage } from './PostThreadPage';
 import { UserProfileView } from './UserProfileView';
 import { ShareSheet, MoreMenu, PollCreator } from '../../components/SharedComponents';
-
-// ── Live Games ────────────────────────────────────────────────
-const liveGames = [
-  { id: 'l1', home: 'Man City', away: 'Arsenal', homeScore: 2, awayScore: 1, minute: "67'", league: '🏴󠁧󠁢󠁥󠁮󠁧󠁿 PL' },
-  { id: 'l2', home: 'Real Madrid', away: 'Barca', homeScore: 3, awayScore: 2, minute: "78'", league: '🇪🇸 LaLiga' },
-  { id: 'l3', home: 'Lakers', away: 'Warriors', homeScore: 89, awayScore: 84, minute: 'Q3', league: '🏀 NBA' },
-];
+import { FeedProvider } from '../../stores/feedStore';
+import { FeedContainer } from '../../components/feed/FeedContainer';
 
 // ── Types ─────────────────────────────────────────────────────
 interface Post {
@@ -52,44 +47,6 @@ function Avatar({ name, size = 'md', onClick }: { name: string; size?: 'sm' | 'm
   return (
     <div onClick={onClick} className={cn('rounded-full flex items-center justify-center font-black text-white shrink-0', sizes[size], color, onClick && 'cursor-pointer')}>
       {name[0].toUpperCase()}
-    </div>
-  );
-}
-
-// ── Live Ticker ───────────────────────────────────────────────
-function LiveTicker({ onMatchClick }: { onMatchClick: (id: string) => void }) {
-  return (
-    <div className="px-4 py-2 border-b border-[#1f1f1f]">
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-1.5 h-1.5 rounded-full bg-[#ef4444] animate-pulse" />
-        <span className="text-xs font-black text-[#ef4444]">LIVE NOW</span>
-        <span className="text-xs text-[#71767b]">{liveGames.length} matches</span>
-      </div>
-      <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
-        {liveGames.map(game => (
-          <motion.button
-            key={game.id}
-            whileTap={{ scale: 0.97 }}
-            onClick={() => onMatchClick(game.id)}
-            className="shrink-0 bg-[#111] border border-[#ef4444]/20 rounded-xl px-3 py-2 flex items-center gap-2 hover:border-[#ef4444]/50 hover:bg-[#ef4444]/5 transition-all"
-          >
-            <div className="text-center shrink-0">
-              <p className="text-[10px] text-[#71767b] mb-0.5">{game.league}</p>
-              <div className="flex items-center gap-1.5">
-                <span className="text-xs font-bold text-white">{game.home}</span>
-                <div className="flex items-center gap-1 bg-[#ef4444]/20 rounded px-1.5 py-0.5">
-                  <span className="text-xs font-black text-[#ef4444]">{game.homeScore}</span>
-                  <span className="text-[10px] text-[#71767b]">-</span>
-                  <span className="text-xs font-black text-[#ef4444]">{game.awayScore}</span>
-                </div>
-                <span className="text-xs font-bold text-white">{game.away}</span>
-              </div>
-              <p className="text-[10px] text-[#ef4444] font-bold mt-0.5">{game.minute}</p>
-            </div>
-            <ChevronRight className="w-3 h-3 text-[#71767b] shrink-0" />
-          </motion.button>
-        ))}
-      </div>
     </div>
   );
 }
@@ -384,7 +341,7 @@ function PostCard({ post, onPostClick, onUserClick, onShare, onMore }: {
 
 // ── Home Page ─────────────────────────────────────────────────
 export function HomePage() {
-  const [activeTab, setActiveTab] = useState<'trending' | 'new' | 'following'>('trending');
+  const [activeTab, setActiveTab] = useState<'trending' | 'new' | 'following' | 'video'>('trending');
   const [showModal, setShowModal] = useState(false);
   const [showButton, setShowButton] = useState(true);
   const [posts, setPosts] = useState(mockPosts);
@@ -449,17 +406,18 @@ export function HomePage() {
     { key: 'trending', label: 'Trending' },
     { key: 'new', label: 'New' },
     { key: 'following', label: 'Following' },
+    { key: 'video', label: 'Video' },
   ] as const;
 
   return (
     <div>
       {/* Tabs nav row — pinned under header */}
-      <div className="sticky top-16 z-30 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
-        <div className="max-w-3xl mx-auto px-4 py-3 flex items-center justify-between gap-2">
+      <div className="sticky top-0 z-30 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
+        <div className="max-w-3xl mx-auto px-4 py-2 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             {tabs.map(tab => (
               <button key={tab.key} onClick={() => { setActiveTab(tab.key); setShowSearch(false); }}
-                className={cn('px-4 py-2 rounded-md text-sm font-semibold transition-all relative overflow-visible',
+                className={cn('px-3 py-1.5 rounded-md text-xs font-semibold transition-all relative overflow-visible',
                   activeTab === tab.key ? 'text-white' : 'text-[#9aa0a6] hover:text-white hover:bg-white/2'
                 )}
               >
@@ -471,7 +429,7 @@ export function HomePage() {
                       className="absolute inset-0 rounded-md bg-white/4 z-0"
                     />
                     <motion.span layoutId="active-tab-indicator" transition={{ type: 'spring', stiffness: 700, damping: 35 }}
-                      className="absolute left-3 right-3 -bottom-1 h-1 bg-[#ef4444] rounded z-10"
+                      className="absolute left-3 right-3 -bottom-1 h-0.5 bg-[#ef4444] rounded z-10"
                     />
                   </>
                 )}
@@ -480,31 +438,46 @@ export function HomePage() {
           </div>
 
           <div className="flex items-center gap-2">
-            <button onClick={() => setShowSearch(s => !s)} className="p-2 rounded-md hover:bg-white/5 transition-colors">
-              <Search className="w-5 h-5 text-[#9aa0a6]" />
+            <button onClick={() => setShowSearch(s => !s)} className="p-1.5 rounded-md hover:bg-white/5 transition-colors">
+              <Search className="w-4 h-4 text-[#9aa0a6]" />
             </button>
+          </div>
+        </div>
+
+        {/* Search bar always visible */}
+        <div className="px-4 py-2 border-t border-[#1f1f1f]">
+          <div className="max-w-3xl mx-auto">
+            <div className="flex items-center gap-2 bg-[#111] rounded-full px-3 py-1.5 border border-[#1f1f1f] focus-within:border-[#ef4444]/30 transition-all">
+              <Search className="w-3.5 h-3.5 text-[#71767b] shrink-0" />
+              <input
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search Arena..."
+                className="flex-1 bg-transparent text-xs text-white placeholder:text-[#71767b] outline-none"
+              />
+            </div>
           </div>
         </div>
 
         <AnimatePresence>
           {showSearch && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="px-4 pb-3">
+            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="px-4 pb-2">
               <div className="max-w-3xl mx-auto">
-                <div className="flex items-center gap-2 bg-[#111] rounded-full px-4 py-2 border border-[#1f1f1f] focus-within:border-[#ef4444]/30 transition-all">
-                  <Search className="w-4 h-4 text-[#71767b] shrink-0" />
+                <div className="flex items-center gap-2 bg-[#111] rounded-full px-3 py-1.5 border border-[#1f1f1f] focus-within:border-[#ef4444]/30 transition-all">
+                  <Search className="w-3.5 h-3.5 text-[#71767b] shrink-0" />
                   <input
                     autoFocus
                     value={searchQuery}
                     onChange={e => setSearchQuery(e.target.value)}
                     placeholder="Search Arena..."
-                    className="flex-1 bg-transparent text-sm text-white placeholder:text-[#71767b] outline-none"
+                    className="flex-1 bg-transparent text-xs text-white placeholder:text-[#71767b] outline-none"
                   />
                   {searchQuery ? (
                     <button onClick={() => setSearchQuery('')}>
-                      <X className="w-4 h-4 text-[#71767b] hover:text-white" />
+                      <X className="w-3.5 h-3.5 text-[#71767b] hover:text-white" />
                     </button>
                   ) : (
-                    <button onClick={() => setShowSearch(false)} className="text-sm text-[#71767b] hover:text-white">Close</button>
+                    <button onClick={() => setShowSearch(false)} className="text-xs text-[#71767b] hover:text-white">Close</button>
                   )}
                 </div>
               </div>
@@ -513,10 +486,8 @@ export function HomePage() {
         </AnimatePresence>
       </div>
 
-      {/* Live Ticker — pulled tighter under tabs */}
-      <div className="-mt-2">
-        <LiveTicker onMatchClick={setSelectedMatch} />
-      </div>
+      {/* Live Ticker — with proper spacing */}
+      {/* Removed: Live ticker section */}
 
       {/* Search label */}
       {searchQuery && (
@@ -529,24 +500,37 @@ export function HomePage() {
 
       {/* Feed */}
       <AnimatePresence mode="wait">
-        <motion.div key={activeTab + searchQuery} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-          {filteredPosts.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center px-8">
-              <p className="text-4xl mb-3">🔍</p>
-              <p className="font-bold text-white mb-1">No posts found</p>
-              <p className="text-sm text-[#71767b]">Try a different search term</p>
-            </div>
-          ) : filteredPosts.map(post => (
-            <PostCard
-              key={post.id}
-              post={post}
-              onPostClick={setSelectedPost}
-              onUserClick={setSelectedUser}
-              onShare={setSharePost}
-              onMore={setMorePost}
-            />
-          ))}
-        </motion.div>
+        {activeTab === 'video' ? (
+          <motion.div key="video-feed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            <FeedProvider>
+              <FeedContainer
+                filter="video"
+                onUserClick={(name: string) => setSelectedUser(name)}
+                onMatchClick={(matchId: string) => setSelectedMatch(matchId)}
+                onTagClick={(_tag: string) => {/* Handle tag click */}}
+              />
+            </FeedProvider>
+          </motion.div>
+        ) : (
+          <motion.div key={activeTab + searchQuery} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+            {filteredPosts.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 text-center px-8">
+                <p className="text-4xl mb-3">🔍</p>
+                <p className="font-bold text-white mb-1">No posts found</p>
+                <p className="text-sm text-[#71767b]">Try a different search term</p>
+              </div>
+            ) : filteredPosts.map(post => (
+              <PostCard
+                key={post.id}
+                post={post}
+                onPostClick={setSelectedPost}
+                onUserClick={setSelectedUser}
+                onShare={setSharePost}
+                onMore={setMorePost}
+              />
+            ))}
+          </motion.div>
+        )}
       </AnimatePresence>
 
       {/* Floating Post Button */}

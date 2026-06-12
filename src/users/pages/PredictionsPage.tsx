@@ -51,7 +51,7 @@ const channels: Channel[] = [
     id: 'ch1', name: 'GoldTips VIP', handle: '@goldtipster',
     verified: true, members: 12400, winRate: '74%', streak: 8,
     type: 'paid', price: '₦2,500/mo', lastPost: '2h ago',
-    lastMessage: '🎯 New ticket posted — 4.50x odds', unread: 3, joined: false,
+    lastMessage: 'Primary sidebar → chat list → main chat pane with fixed header and input bar.', unread: 3, joined: false,
     feed: [
       {
         id: 'f1', code: 'GOLD-7X2K', time: '2h ago',
@@ -80,7 +80,7 @@ const channels: Channel[] = [
     id: 'ch2', name: 'Arena Free Tips', handle: '@arenaofficial',
     verified: true, members: 48200, winRate: '61%', streak: 3,
     type: 'free', price: null, lastPost: '30m ago',
-    lastMessage: '⚽ Man City vs Arsenal — WIN ✅', unread: 12, joined: true,
+    lastMessage: 'Left-to-right hierarchy, unread badges, and responsive Tailwind layout summary.', unread: 12, joined: true,
     feed: [
       {
         id: 'f1', code: 'ARENA-MC1', time: '30m ago',
@@ -98,7 +98,7 @@ const channels: Channel[] = [
     id: 'ch3', name: 'LaLiga Insider', handle: '@spainexpert',
     verified: false, members: 5800, winRate: '69%', streak: 5,
     type: 'paid', price: '₦1,500/mo', lastPost: '4h ago',
-    lastMessage: '📊 Weekend analysis is live', unread: 0, joined: false,
+    lastMessage: 'Scrollable message feed and fixed footer structure for the main chat screen.', unread: 0, joined: false,
     feed: [
       {
         id: 'f1', code: 'LALIGA-RC1', time: '4h ago',
@@ -115,7 +115,7 @@ const channels: Channel[] = [
     id: 'ch4', name: 'NBA Picks Daily', handle: '@basketballpro',
     verified: true, members: 9100, winRate: '67%', streak: 6,
     type: 'free', price: null, lastPost: '1h ago',
-    lastMessage: '🏀 Lakers vs Warriors — ticket dropped', unread: 5, joined: true,
+    lastMessage: 'Navigation, conversation directory, and content pane arranged for mobile-first clarity.', unread: 5, joined: true,
     feed: [
       {
         id: 'f1', code: 'NBA-LW22', time: '1h ago',
@@ -133,7 +133,7 @@ const channels: Channel[] = [
     id: 'ch5', name: 'Champions Elite', handle: '@uclking',
     verified: true, members: 22000, winRate: '71%', streak: 11,
     type: 'paid', price: '₦3,500/mo', lastPost: '6h ago',
-    lastMessage: '🏆 UCL midweek picks loading...', unread: 0, joined: false,
+    lastMessage: 'Fixed sidebar, chat list, and main content area to resolve overlap and nested scrolling.', unread: 0, joined: false,
     feed: [
       {
         id: 'f1', code: 'UCL-QF01', time: '6h ago',

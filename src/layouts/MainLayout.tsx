@@ -3,9 +3,11 @@
 import React, { Suspense, useEffect, useState } from 'react';
 import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '../auth/hooks/AuthContext';
+import { cn } from '../lib/utils';
 import { RouteGuard } from '../middleware/guards/RouteGuards';
 import { Header } from '../layout/Header';
 import { Sidebar } from '../layout/Sidebar';
+import { FeedProvider } from '../stores/feedStore';
 import TipsterDashboard from '../dashboard/tipster/TipsterDashboard';
 import AdminDashboard from '../admin/pages/AdminDashboard';
 
@@ -13,6 +15,8 @@ import AdminDashboard from '../admin/pages/AdminDashboard';
 const HomePage = React.lazy(() => import('../users/pages/HomePage').then(m => ({ default: m.HomePage })));
 const ExplorePage = React.lazy(() => import('../users/pages/ExplorePage').then(m => ({ default: m.ExplorePage })));
 const LivePage = React.lazy(() => import('../users/pages/LivePage').then(m => ({ default: m.LivePage })));
+const FeedPage = React.lazy(() => import('../pages/FeedPage').then(m => ({ default: m.FeedPage })));
+const VideoPage = React.lazy(() => import('../pages/VideoPage').then(m => ({ default: m.VideoPage })));
 const PredictionsPage = React.lazy(() => import('../users/pages/PredictionsPage').then(m => ({ default: m.PredictionsPage })));
 const CommunitiesPage = React.lazy(() => import('../users/pages/CommunitiesPage').then(m => ({ default: m.CommunitiesPage })));
 const MessagesPage = React.lazy(() => import('../users/pages/MessagesPage').then(m => ({ default: m.MessagesPage })));
@@ -36,7 +40,7 @@ function LoadingFallback() {
 }
 
 const MainLayout: React.FC = () => {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
@@ -51,6 +55,7 @@ const MainLayout: React.FC = () => {
   }
 
   const location = useLocation();
+  const isFullBleedLayout = ['/messages', '/predictions'].includes(location.pathname);
   const activeTab = (
     Object.entries({
       Home: '/',
@@ -61,7 +66,7 @@ const MainLayout: React.FC = () => {
   ).find(([, path]) => path === location.pathname)?.[0] ?? 'Home';
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white">
+    <div className="min-h-screen bg-[#050505] text-white flex flex-col">
       <Header
         title="Arena"
         activeTab={activeTab}
@@ -77,18 +82,28 @@ const MainLayout: React.FC = () => {
         onMenuClick={() => setSidebarOpen((prev) => !prev)}
       />
 
-      <div className="flex">
+      <div className="flex flex-1 overflow-hidden">
         <Sidebar
           open={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
-          onLogout={logout}
           userRole={user.role}
           appUser={user}
         />
 
-        <main className={`flex-1 pt-6 pb-8 ${sidebarOpen ? 'md:ml-[13%]' : 'md:ml-0'}`}>
-          <div className="max-w-[680px] mx-auto px-4 sm:px-6">
-            <div className="border-x border-[#1f1f1f] bg-[#070708] min-h-[calc(100vh-92px)] rounded-[32px] overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.45)]">
+        <main className="flex-1 overflow-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <style>{`
+            main::-webkit-scrollbar {
+              width: 0 !important;
+              display: none !important;
+            }
+          `}</style>
+          <div className={cn('h-full', isFullBleedLayout ? 'w-full' : 'max-w-[680px] mx-auto px-4 sm:px-6 py-6')}>
+            <div className={cn(
+              'h-full',
+              isFullBleedLayout
+                ? 'bg-[#070708]'
+                : 'border-x border-[#1f1f1f] bg-[#070708] rounded-[32px] overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.45)] pb-6'
+            )}>
               <div className="px-4 py-6 sm:px-6">
                 <Suspense fallback={<LoadingFallback />}>
                   <Routes>
@@ -96,6 +111,8 @@ const MainLayout: React.FC = () => {
                     <Route path="/" element={<HomePage />} />
                     <Route path="/explore" element={<ExplorePage />} />
                     <Route path="/live" element={<LivePage />} />
+                    <Route path="/feed" element={<FeedProvider><FeedPage /></FeedProvider>} />
+                    <Route path="/videos" element={<VideoPage />} />
                     <Route path="/predictions" element={<PredictionsPage />} />
                     <Route path="/communities" element={<CommunitiesPage />} />
                     <Route path="/messages" element={<MessagesPage />} />
