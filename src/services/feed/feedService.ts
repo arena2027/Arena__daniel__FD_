@@ -276,12 +276,12 @@ export async function fetchFeedCards(
   // Simulate network delay
   await new Promise((resolve) => setTimeout(resolve, 800));
 
-  // Simulate occasional errors (commented out for demo)
-  // if (Math.random() < 0.1) {
-  //   throw new Error('Failed to fetch feed');
-  // }
+  // Cap at 30 items so scroll stops at the bottom
+  const MAX_ITEMS = 30;
+  if (offset >= MAX_ITEMS) return [];
+  const safeLimit = Math.min(limit, MAX_ITEMS - offset);
 
-  return generateMockCards(limit, offset, filter);
+  return generateMockCards(safeLimit, offset, filter);
 }
 
 // Get single card details

@@ -1,13 +1,10 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Home,
-  Search,
   Zap,
   Users,
   Trophy,
   Target,
-  Mail,
-  Bell,
   User,
   Wallet,
   Settings,
@@ -36,13 +33,10 @@ interface SidebarProps {
 
 const userNavItems: NavItem[] = [
   { icon: Home, label: 'Home', path: '/' },
-  { icon: Search, label: 'Explore', path: '/explore' },
   { icon: Zap, label: 'Live', path: '/live', isLive: true },
   { icon: Target, label: 'Predictions', path: '/predictions' },
   { icon: Video, label: 'Videos', path: '/videos' },
   { icon: Users, label: 'Communities', path: '/communities' },
-  { icon: Mail, label: 'Messages', path: '/messages', badge: 2 },
-  { icon: Bell, label: 'Notifications', path: '/notifications', badge: 9 },
   { icon: Wallet, label: 'Wallet', path: '/wallet' },
   { icon: Settings, label: 'Settings', path: '/settings' },
   { icon: Bookmark, label: 'Bookmarks', path: '/bookmarks' },
@@ -86,7 +80,7 @@ export function Sidebar({ open, onClose, userRole, appUser }: SidebarProps) {
 
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-50 w-72 bg-[#09090c] border-r border-[#1f1f1f] p-4 transition-transform duration-300 ease-out md:sticky md:top-0 md:h-screen md:overflow-hidden md:flex md:flex-col',
+          'fixed inset-y-0 left-0 z-50 w-72 bg-[#09090c] border-r border-[#1f1f1f] p-4 transition-transform duration-300 ease-out md:sticky md:top-0 md:h-screen md:overflow-y-auto md:flex md:flex-col',
           isOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -141,12 +135,12 @@ export function Sidebar({ open, onClose, userRole, appUser }: SidebarProps) {
               navigate('/profile');
               onClose();
             }}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors"
+            className="w-full flex items-start gap-3 px-4 py-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors duration-200"
           >
-            <div className="w-10 h-10 rounded-full bg-[#ef4444] flex items-center justify-center text-white font-black">
+            <div className="w-10 h-10 rounded-full bg-[#ef4444] flex items-center justify-center text-white font-black flex-shrink-0">
               {getInitials(appUser.name || 'A')}
             </div>
-            <div className="min-w-0 overflow-hidden">
+            <div className="min-w-0 flex-1 text-left">
               <p className="text-sm font-bold text-white truncate">{appUser.name || 'Arena User'}</p>
               <p className="text-xs text-[#71767b] truncate">{appUser.handle || '@arena'}</p>
             </div>

@@ -13,7 +13,6 @@ import AdminDashboard from '../admin/pages/AdminDashboard';
 
 // Lazy load page components
 const HomePage = React.lazy(() => import('../users/pages/HomePage').then(m => ({ default: m.HomePage })));
-const ExplorePage = React.lazy(() => import('../users/pages/ExplorePage').then(m => ({ default: m.ExplorePage })));
 const LivePage = React.lazy(() => import('../users/pages/LivePage').then(m => ({ default: m.LivePage })));
 const FeedPage = React.lazy(() => import('../pages/FeedPage').then(m => ({ default: m.FeedPage })));
 const VideoPage = React.lazy(() => import('../pages/VideoPage').then(m => ({ default: m.VideoPage })));
@@ -59,7 +58,6 @@ const MainLayout: React.FC = () => {
   const activeTab = (
     Object.entries({
       Home: '/',
-      Explore: '/explore',
       Live: '/live',
       Predictions: '/predictions',
     }) as [string, string][]
@@ -73,7 +71,6 @@ const MainLayout: React.FC = () => {
         onTabChange={(tab: string) => {
           const tabRoutes: Record<string, string> = {
             Home: '/',
-            Explore: '/explore',
             Live: '/live',
             Predictions: '/predictions',
           };
@@ -82,7 +79,7 @@ const MainLayout: React.FC = () => {
         onMenuClick={() => setSidebarOpen((prev) => !prev)}
       />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1">
         <Sidebar
           open={sidebarOpen}
           onClose={() => setSidebarOpen(false)}
@@ -90,26 +87,25 @@ const MainLayout: React.FC = () => {
           appUser={user}
         />
 
-        <main className="flex-1 overflow-hidden" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        <main className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
           <style>{`
             main::-webkit-scrollbar {
               width: 0 !important;
               display: none !important;
             }
           `}</style>
-          <div className={cn('h-full', isFullBleedLayout ? 'w-full' : 'max-w-[680px] mx-auto px-4 sm:px-6 py-6')}>
+          <div className={cn('w-full', isFullBleedLayout ? 'w-full' : 'max-w-[680px] mx-auto')}>
             <div className={cn(
-              'h-full',
+              'w-full',
               isFullBleedLayout
                 ? 'bg-[#070708]'
-                : 'border-x border-[#1f1f1f] bg-[#070708] rounded-[32px] overflow-hidden shadow-[0_25px_80px_rgba(0,0,0,0.45)] pb-6'
+                : 'border-x border-[#1f1f1f] bg-[#070708] border-x border-[#1f1f1f]'
             )}>
               <div className="px-4 py-6 sm:px-6">
                 <Suspense fallback={<LoadingFallback />}>
                   <Routes>
                     {/* Public Routes (accessible by all authenticated users) */}
                     <Route path="/" element={<HomePage />} />
-                    <Route path="/explore" element={<ExplorePage />} />
                     <Route path="/live" element={<LivePage />} />
                     <Route path="/feed" element={<FeedProvider><FeedPage /></FeedProvider>} />
                     <Route path="/videos" element={<VideoPage />} />

@@ -346,7 +346,6 @@ export function HomePage() {
   const [showButton, setShowButton] = useState(true);
   const [posts, setPosts] = useState(mockPosts);
   const [searchQuery, setSearchQuery] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<string | null>(null);
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [selectedUser, setSelectedUser] = useState<string | null>(null);
@@ -416,7 +415,7 @@ export function HomePage() {
         <div className="max-w-3xl mx-auto px-4 py-2 flex items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             {tabs.map(tab => (
-              <button key={tab.key} onClick={() => { setActiveTab(tab.key); setShowSearch(false); }}
+              <button key={tab.key} onClick={() => { setActiveTab(tab.key); }}
                 className={cn('px-3 py-1.5 rounded-md text-xs font-semibold transition-all relative overflow-visible',
                   activeTab === tab.key ? 'text-white' : 'text-[#9aa0a6] hover:text-white hover:bg-white/2'
                 )}
@@ -436,12 +435,6 @@ export function HomePage() {
               </button>
             ))}
           </div>
-
-          <div className="flex items-center gap-2">
-            <button onClick={() => setShowSearch(s => !s)} className="p-1.5 rounded-md hover:bg-white/5 transition-colors">
-              <Search className="w-4 h-4 text-[#9aa0a6]" />
-            </button>
-          </div>
         </div>
 
         {/* Search bar always visible */}
@@ -458,32 +451,6 @@ export function HomePage() {
             </div>
           </div>
         </div>
-
-        <AnimatePresence>
-          {showSearch && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="px-4 pb-2">
-              <div className="max-w-3xl mx-auto">
-                <div className="flex items-center gap-2 bg-[#111] rounded-full px-3 py-1.5 border border-[#1f1f1f] focus-within:border-[#ef4444]/30 transition-all">
-                  <Search className="w-3.5 h-3.5 text-[#71767b] shrink-0" />
-                  <input
-                    autoFocus
-                    value={searchQuery}
-                    onChange={e => setSearchQuery(e.target.value)}
-                    placeholder="Search Arena..."
-                    className="flex-1 bg-transparent text-xs text-white placeholder:text-[#71767b] outline-none"
-                  />
-                  {searchQuery ? (
-                    <button onClick={() => setSearchQuery('')}>
-                      <X className="w-3.5 h-3.5 text-[#71767b] hover:text-white" />
-                    </button>
-                  ) : (
-                    <button onClick={() => setShowSearch(false)} className="text-xs text-[#71767b] hover:text-white">Close</button>
-                  )}
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
       </div>
 
       {/* Live Ticker — with proper spacing */}
