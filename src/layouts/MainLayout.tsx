@@ -4,6 +4,7 @@ import React, { Suspense, useEffect, useState } from 'react';
 import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom';
 import { Home, Zap, Target, Plus, User } from 'lucide-react';
 import { useAuth } from '../auth/hooks/AuthContext';
+import { useDetailView } from '../contexts/DetailViewContext';
 import { cn } from '../lib/utils';
 import { RouteGuard } from '../middleware/guards/RouteGuards';
 import { Header } from '../layout/Header';
@@ -39,10 +40,33 @@ function LoadingFallback() {
   );
 }
 
+
 // ── Mobile Bottom Navigation ──────────────────────────────────────
 function MobileBottomNav() {
   const navigate = useNavigate();
   const location = useLocation();
+  const { showDetailView } = useDetailView();
+
+  // Pages where bottom nav should be hidden
+  const hideOnPaths = ['/profile'];
+  
+  // Check if we're on pages where we need to check for detail views
+  const isMessagesPage = location.pathname === '/messages';
+  const isNotificationsPage = location.pathname === '/notifications';
+  const isPredictionsPage = location.pathname === '/predictions';
+  
+  // Show on these pages, but hide if a detail view is open
+  const shouldShow = 
+    (isMessagesPage || isNotificationsPage || isPredictionsPage) && !showDetailView;
+
+  // Don't show if on paths that should be hidden
+  if (hideOnPaths.includes(location.pathname)) {
+    return null;
+  }
+
+  if (!shouldShow) {
+    return null;
+  }
 
   const navItems = [
     { icon: Home, label: 'Home', path: '/' },
@@ -117,7 +141,7 @@ const MainLayout: React.FC = () => {
   ).find(([, path]) => path === location.pathname)?.[0] ?? 'Home';
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col pb-20 md:pb-0">
+    <div className="min-h-screen bg-[#050505] text-white flex flex-col">
       <Header
         title="Arena"
         activeTab={activeTab}

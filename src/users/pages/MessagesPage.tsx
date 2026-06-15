@@ -6,6 +6,7 @@ import {
   Eye, AlertCircle, Trash2
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useDetailView } from '../../contexts/DetailViewContext';
 
 // ── Types ─────────────────────────────────────────────────────
 interface Message {
@@ -345,6 +346,7 @@ export function MessagesPage() {
   const [activeChat, setActiveChat] = useState<Chat | null>(null);
   const [query, setQuery] = useState('');
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 768 : false);
+  const { setShowDetailView } = useDetailView();
 
   useEffect(() => {
     const handleResize = () => setIsDesktop(window.innerWidth >= 768);
@@ -359,13 +361,23 @@ export function MessagesPage() {
     }
   }, [isDesktop, activeChat]);
 
+  // Update detail view state when chat is selected on mobile
+  useEffect(() => {
+    setShowDetailView(activeChat !== null && !isDesktop);
+  }, [activeChat, isDesktop, setShowDetailView]);
+
   const filtered = chats.filter(c =>
     c.name.toLowerCase().includes(query.toLowerCase()) ||
     c.handle.toLowerCase().includes(query.toLowerCase())
   );
 
+  const handleBackFromChat = () => {
+    setActiveChat(null);
+    setShowDetailView(false);
+  };
+
   if (activeChat && !isDesktop) {
-    return <ChatView chat={activeChat} onBack={() => setActiveChat(null)} />;
+    return <ChatView chat={activeChat} onBack={handleBackFromChat} />;
   }
 
   return (
