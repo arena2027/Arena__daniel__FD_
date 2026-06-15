@@ -2,6 +2,7 @@
 
 import React, { Suspense, useEffect, useState } from 'react';
 import { useNavigate, useLocation, Routes, Route, Navigate } from 'react-router-dom';
+import { Home, Zap, Target, Plus, User } from 'lucide-react';
 import { useAuth } from '../auth/hooks/AuthContext';
 import { cn } from '../lib/utils';
 import { RouteGuard } from '../middleware/guards/RouteGuards';
@@ -38,6 +39,58 @@ function LoadingFallback() {
   );
 }
 
+// ── Mobile Bottom Navigation ──────────────────────────────────────
+function MobileBottomNav() {
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const navItems = [
+    { icon: Home, label: 'Home', path: '/' },
+    { icon: Zap, label: 'Live', path: '/live' },
+    { icon: Target, label: 'Predictions', path: '/predictions' },
+    { icon: User, label: 'Profile', path: '/profile' },
+  ];
+
+  const handleCreatePost = () => {
+    navigate('/');
+    // Trigger post modal by dispatching an event or using a context
+    window.dispatchEvent(new CustomEvent('openPostModal'));
+  };
+
+  return (
+    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[#09090c] border-t border-[#1f1f1f]">
+      <div className="flex items-center justify-around h-16">
+        {navItems.map((item) => {
+          const Icon = item.icon;
+          const isActive = location.pathname === item.path;
+          return (
+            <button
+              key={item.path}
+              onClick={() => navigate(item.path)}
+              className={cn(
+                'flex-1 flex flex-col items-center justify-center py-2 transition-colors duration-200',
+                isActive ? 'text-[#ef4444]' : 'text-[#71767b] hover:text-white'
+              )}
+            >
+              <Icon className="w-6 h-6 mb-1" />
+              <span className="text-[10px] font-semibold">{item.label}</span>
+            </button>
+          );
+        })}
+        <button
+          onClick={handleCreatePost}
+          className="flex-1 flex flex-col items-center justify-center py-2 text-[#71767b] hover:text-[#ef4444] transition-colors duration-200"
+        >
+          <div className="w-10 h-10 rounded-full bg-[#ef4444] flex items-center justify-center mb-1 shadow-lg shadow-red-500/40">
+            <Plus className="w-5 h-5 text-white" />
+          </div>
+          <span className="text-[10px] font-semibold">Create</span>
+        </button>
+      </div>
+    </nav>
+  );
+}
+
 const MainLayout: React.FC = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -64,7 +117,7 @@ const MainLayout: React.FC = () => {
   ).find(([, path]) => path === location.pathname)?.[0] ?? 'Home';
 
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col">
+    <div className="min-h-screen bg-[#050505] text-white flex flex-col pb-20 md:pb-0">
       <Header
         title="Arena"
         activeTab={activeTab}
@@ -158,6 +211,7 @@ const MainLayout: React.FC = () => {
           </div>
         </main>
       </div>
+      <MobileBottomNav />
     </div>
   );
 };

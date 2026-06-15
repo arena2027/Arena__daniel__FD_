@@ -365,6 +365,13 @@ export function HomePage() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  // Listen for mobile create button click
+  useEffect(() => {
+    const handleOpenPostModal = () => setShowModal(true);
+    window.addEventListener('openPostModal', handleOpenPostModal);
+    return () => window.removeEventListener('openPostModal', handleOpenPostModal);
+  }, []);
+
   if (selectedMatch) return <MatchDetailPage onBack={() => setSelectedMatch(null)} />;
   if (selectedPost) return (
     <PostThreadPage
