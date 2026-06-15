@@ -47,22 +47,13 @@ function MobileBottomNav() {
   const location = useLocation();
   const { showDetailView } = useDetailView();
 
-  // Pages where bottom nav should be hidden
-  const hideOnPaths = ['/profile'];
+  // Pages where bottom nav should NOT appear at all
+  const hideOnPaths = ['/auth', '/auth/otp', '/admin'];
   
-  // Check if we're on pages where we need to check for detail views
-  const isMessagesPage = location.pathname === '/messages';
-  const isNotificationsPage = location.pathname === '/notifications';
-  const isPredictionsPage = location.pathname === '/predictions';
-  
-  // Show on these pages, but hide if a detail view is open
+  // Hide if on hidden paths or if a detail view is open
   const shouldShow = 
-    (isMessagesPage || isNotificationsPage || isPredictionsPage) && !showDetailView;
-
-  // Don't show if on paths that should be hidden
-  if (hideOnPaths.includes(location.pathname)) {
-    return null;
-  }
+    !hideOnPaths.includes(location.pathname) && 
+    !showDetailView;
 
   if (!shouldShow) {
     return null;
@@ -77,7 +68,6 @@ function MobileBottomNav() {
 
   const handleCreatePost = () => {
     navigate('/');
-    // Trigger post modal by dispatching an event or using a context
     window.dispatchEvent(new CustomEvent('openPostModal'));
   };
 

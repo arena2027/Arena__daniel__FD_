@@ -7,6 +7,7 @@ import {
   Users, Smile, Mic, ChevronRight
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { useDetailView } from '../../contexts/DetailViewContext';
 
 // ── Types ─────────────────────────────────────────────────────
 interface Match {
@@ -489,8 +490,20 @@ export function PredictionsPage() {
   const [showAdd, setShowAdd] = useState(false);
   const [tab, setTab] = useState<'channels' | 'leaderboard'>('channels');
   const navigate = useNavigate();
+  const { setShowDetailView } = useDetailView();
 
   const activeChannel = channels.find(c => c.id === activeId) ?? null;
+
+  // Update detail view state when channel is selected
+  const handleSelectChannel = (channelId: string) => {
+    setActiveId(channelId);
+    setShowDetailView(true);
+  };
+
+  const handleBackFromChannel = () => {
+    setActiveId(null);
+    setShowDetailView(false);
+  };
 
   const filtered = channels.filter(ch => {
     const q = query.toLowerCase();
@@ -498,7 +511,7 @@ export function PredictionsPage() {
   });
 
   if (activeChannel) {
-    return <ChannelFeed ch={activeChannel} onBack={() => setActiveId(null)} />;
+    return <ChannelFeed ch={activeChannel} onBack={handleBackFromChannel} />;
   }
 
   return (
@@ -559,7 +572,7 @@ export function PredictionsPage() {
                 <p className="font-bold text-sm text-white">No channels found</p>
               </div>
             ) : filtered.map(ch => (
-              <ChannelRow key={ch.id} ch={ch} active={activeId === ch.id} onTap={() => setActiveId(ch.id)} />
+              <ChannelRow key={ch.id} ch={ch} active={activeId === ch.id} onTap={() => handleSelectChannel(ch.id)} />
             ))}
           </motion.div>
         )}
