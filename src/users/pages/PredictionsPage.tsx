@@ -12,6 +12,17 @@ import { cn } from '../../lib/utils';
 import { useDetailView } from '../../contexts/DetailViewContext';
 import { useAuth } from '../../auth/hooks/AuthContext';
 import { CreatePredictionModal } from '../../components/modals/CreatePredictionModal';
+import { PremiumPredictionModal } from '../../components/modals/PremiumPredictionModal';
+import { MultiBetModal } from '../../components/modals/MultiBetModal';
+import { BettingSlipModal } from '../../components/modals/BettingSlipModal';
+import { MatchAnalysisModal } from '../../components/modals/MatchAnalysisModal';
+import { LivePredictionModal } from '../../components/modals/LivePredictionModal';
+import { ScreenshotUploadModal } from '../../components/modals/ScreenshotUploadModal';
+import { VideoUploadModal } from '../../components/modals/VideoUploadModal';
+import { SchedulePostModal } from '../../components/modals/SchedulePostModal';
+import { SubscriberUpdateModal } from '../../components/modals/SubscriberUpdateModal';
+import { PollModal } from '../../components/modals/PollModal';
+import { PromotePredictionModal } from '../../components/modals/PromotePredictionModal';
 
 // ── Types ─────────────────────────────────────────────────────
 interface Match {
@@ -251,6 +262,17 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [message, setMessage] = useState('');
   const [showCreatePredictionModal, setShowCreatePredictionModal] = useState(false);
+  const [showPremiumPredictionModal, setShowPremiumPredictionModal] = useState(false);
+  const [showMultiBetModal, setShowMultiBetModal] = useState(false);
+  const [showBettingSlipModal, setShowBettingSlipModal] = useState(false);
+  const [showMatchAnalysisModal, setShowMatchAnalysisModal] = useState(false);
+  const [showLivePredictionModal, setShowLivePredictionModal] = useState(false);
+  const [showScreenshotUploadModal, setShowScreenshotUploadModal] = useState(false);
+  const [showVideoUploadModal, setShowVideoUploadModal] = useState(false);
+  const [showSchedulePostModal, setShowSchedulePostModal] = useState(false);
+  const [showSubscriberUpdateModal, setShowSubscriberUpdateModal] = useState(false);
+  const [showPollModal, setShowPollModal] = useState(false);
+  const [showPromotePredictionModal, setShowPromotePredictionModal] = useState(false);
 
   return (
     <div className="flex flex-col h-[calc(100vh-56px)]">
@@ -428,9 +450,18 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
                     setShowActionMenu(false);
                     setShowCreatePredictionModal(true);
                   }} />
-                  <ActionMenuItem icon={<Star className="w-4 h-4" />} label="Premium Prediction" onClick={() => setShowActionMenu(false)} />
-                  <ActionMenuItem icon={<Layers className="w-4 h-4" />} label="Multi-Bet" onClick={() => setShowActionMenu(false)} />
-                  <ActionMenuItem icon={<Zap className="w-4 h-4" />} label="Live Prediction" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<Star className="w-4 h-4" />} label="Premium Prediction" onClick={() => {
+                    setShowActionMenu(false);
+                    setShowPremiumPredictionModal(true);
+                  }} />
+                  <ActionMenuItem icon={<Layers className="w-4 h-4" />} label="Multi-Bet" onClick={() => {
+                    setShowActionMenu(false);
+                    setShowMultiBetModal(true);
+                  }} />
+                  <ActionMenuItem icon={<Zap className="w-4 h-4" />} label="Live Prediction" onClick={() => {
+                    setShowActionMenu(false);
+                    setShowLivePredictionModal(true);
+                  }} />
                 </div>
 
                 <div className="h-px bg-[#1f1f1f] my-2" />
@@ -438,10 +469,22 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
                 {/* Content Section */}
                 <div className="mb-2">
                   <p className="text-[10px] font-bold text-[#71767b] uppercase px-2 py-1.5">Content</p>
-                  <ActionMenuItem icon={<FileText className="w-4 h-4" />} label="Match Analysis" onClick={() => setShowActionMenu(false)} />
-                  <ActionMenuItem icon={<Ticket className="w-4 h-4" />} label="Betting Slip" onClick={() => setShowActionMenu(false)} />
-                  <ActionMenuItem icon={<Image className="w-4 h-4" />} label="Upload Screenshot" onClick={() => setShowActionMenu(false)} />
-                  <ActionMenuItem icon={<Video className="w-4 h-4" />} label="Upload Video" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<FileText className="w-4 h-4" />} label="Match Analysis" onClick={() => {
+                    setShowActionMenu(false);
+                    setShowMatchAnalysisModal(true);
+                  }} />
+                  <ActionMenuItem icon={<Ticket className="w-4 h-4" />} label="Betting Slip" onClick={() => {
+                    setShowActionMenu(false);
+                    setShowBettingSlipModal(true);
+                  }} />
+                  <ActionMenuItem icon={<Image className="w-4 h-4" />} label="Upload Screenshot" onClick={() => {
+                    setShowActionMenu(false);
+                    setShowScreenshotUploadModal(true);
+                  }} />
+                  <ActionMenuItem icon={<Video className="w-4 h-4" />} label="Upload Video" onClick={() => {
+                    setShowActionMenu(false);
+                    setShowVideoUploadModal(true);
+                  }} />
                 </div>
 
                 <div className="h-px bg-[#1f1f1f] my-2" />
@@ -449,10 +492,22 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
                 {/* Engagement Section */}
                 <div>
                   <p className="text-[10px] font-bold text-[#71767b] uppercase px-2 py-1.5">Engagement</p>
-                  <ActionMenuItem icon={<MessageCircle className="w-4 h-4" />} label="Subscriber Update" onClick={() => setShowActionMenu(false)} />
-                  <ActionMenuItem icon={<Calendar className="w-4 h-4" />} label="Schedule Post" onClick={() => setShowActionMenu(false)} />
-                  <ActionMenuItem icon={<PieChart className="w-4 h-4" />} label="Poll" onClick={() => setShowActionMenu(false)} />
-                  <ActionMenuItem icon={<Rocket className="w-4 h-4" />} label="Promote Prediction" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<MessageCircle className="w-4 h-4" />} label="Subscriber Update" onClick={() => {
+                    setShowActionMenu(false);
+                    setShowSubscriberUpdateModal(true);
+                  }} />
+                  <ActionMenuItem icon={<Calendar className="w-4 h-4" />} label="Schedule Post" onClick={() => {
+                    setShowActionMenu(false);
+                    setShowSchedulePostModal(true);
+                  }} />
+                  <ActionMenuItem icon={<PieChart className="w-4 h-4" />} label="Poll" onClick={() => {
+                    setShowActionMenu(false);
+                    setShowPollModal(true);
+                  }} />
+                  <ActionMenuItem icon={<Rocket className="w-4 h-4" />} label="Promote Prediction" onClick={() => {
+                    setShowActionMenu(false);
+                    setShowPromotePredictionModal(true);
+                  }} />
                 </div>
               </div>
             </motion.div>
@@ -468,6 +523,116 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
           console.log('Prediction submitted:', data);
           setShowCreatePredictionModal(false);
           // TODO: Send to backend
+        }}
+      />
+
+      {/* Premium Prediction Modal */}
+      <PremiumPredictionModal
+        isOpen={showPremiumPredictionModal}
+        onClose={() => setShowPremiumPredictionModal(false)}
+        onSubmit={(data) => {
+          console.log('Premium prediction submitted:', data);
+          setShowPremiumPredictionModal(false);
+        }}
+      />
+
+      {/* Multi-Bet Modal */}
+      <MultiBetModal
+        isOpen={showMultiBetModal}
+        onClose={() => setShowMultiBetModal(false)}
+        onSubmit={(data) => {
+          console.log('Multi-bet submitted:', data);
+          setShowMultiBetModal(false);
+        }}
+      />
+
+      {/* Betting Slip Modal */}
+      <BettingSlipModal
+        isOpen={showBettingSlipModal}
+        onClose={() => setShowBettingSlipModal(false)}
+        onSubmit={(data) => {
+          console.log('Betting slip submitted:', data);
+          setShowBettingSlipModal(false);
+        }}
+      />
+
+      {/* Match Analysis Modal */}
+      <MatchAnalysisModal
+        isOpen={showMatchAnalysisModal}
+        onClose={() => setShowMatchAnalysisModal(false)}
+        onSubmit={(data) => {
+          console.log('Match analysis submitted:', data);
+          setShowMatchAnalysisModal(false);
+        }}
+      />
+
+      {/* Live Prediction Modal */}
+      <LivePredictionModal
+        isOpen={showLivePredictionModal}
+        onClose={() => setShowLivePredictionModal(false)}
+        onSubmit={(data) => {
+          console.log('Live prediction submitted:', data);
+          setShowLivePredictionModal(false);
+        }}
+      />
+
+      {/* Screenshot Upload Modal */}
+      <ScreenshotUploadModal
+        isOpen={showScreenshotUploadModal}
+        onClose={() => setShowScreenshotUploadModal(false)}
+        onSubmit={(data) => {
+          console.log('Screenshot upload submitted:', data);
+          setShowScreenshotUploadModal(false);
+        }}
+      />
+
+      {/* Video Upload Modal */}
+      <VideoUploadModal
+        isOpen={showVideoUploadModal}
+        onClose={() => setShowVideoUploadModal(false)}
+        onSubmit={(data) => {
+          console.log('Video upload submitted:', data);
+          setShowVideoUploadModal(false);
+        }}
+      />
+
+      {/* Schedule Post Modal */}
+      <SchedulePostModal
+        isOpen={showSchedulePostModal}
+        onClose={() => setShowSchedulePostModal(false)}
+        onSubmit={(data) => {
+          console.log('Schedule post submitted:', data);
+          setShowSchedulePostModal(false);
+        }}
+      />
+
+      {/* Subscriber Update Modal */}
+      <SubscriberUpdateModal
+        isOpen={showSubscriberUpdateModal}
+        onClose={() => setShowSubscriberUpdateModal(false)}
+        onSubmit={(data) => {
+          console.log('Subscriber update submitted:', data);
+          setShowSubscriberUpdateModal(false);
+        }}
+      />
+
+      {/* Poll Modal */}
+      <PollModal
+        isOpen={showPollModal}
+        onClose={() => setShowPollModal(false)}
+        onSubmit={(data) => {
+          console.log('Poll submitted:', data);
+          setShowPollModal(false);
+        }}
+      />
+
+      {/* Promote Prediction Modal */}
+      <PromotePredictionModal
+        isOpen={showPromotePredictionModal}
+        onClose={() => setShowPromotePredictionModal(false)}
+        onSubmit={(data) => {
+          console.log('Promote prediction submitted:', data);
+          setShowPromotePredictionModal(false);
         }}
       />
     </div>
