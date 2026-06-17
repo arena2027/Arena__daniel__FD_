@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Search, X } from 'lucide-react';
 import { cn } from '../../../lib/utils';
-import { Chat } from './types';
+import type { Chat } from './types';
 import { Avatar } from './Avatar';
 
 interface ConversationListProps {

@@ -1,4 +1,6 @@
-import { Message } from './MessageBubble';
+import type { Message } from './MessageBubble';
+
+export type { Message };
 
 export interface Chat {
   id: string;

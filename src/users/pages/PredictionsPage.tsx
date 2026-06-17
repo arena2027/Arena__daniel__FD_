@@ -179,7 +179,7 @@ function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' }) {
 }
 
 // ── Channel Row ───────────────────────────────────────────────
-function ChannelRow({ ch, active, onTap }: { ch: Channel; active: boolean; onTap: () => void }) {
+function ChannelRow({ ch, active, onTap, isTipster = false }: { ch: Channel; active: boolean; onTap: () => void; isTipster?: boolean }) {
   return (
     <motion.div
       whileTap={{ scale: 0.99 }}
@@ -196,7 +196,7 @@ function ChannelRow({ ch, active, onTap }: { ch: Channel; active: boolean; onTap
             <Star className="w-2.5 h-2.5 text-white fill-white" />
           </div>
         )}
-        {!ch.joined && ch.type === 'paid' && (
+        {isTipster && !ch.joined && ch.type === 'paid' && (
           <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-yellow-500 rounded-full flex items-center justify-center ring-2 ring-black">
             <Lock className="w-2.5 h-2.5 text-black" />
           </div>
@@ -206,10 +206,14 @@ function ChannelRow({ ch, active, onTap }: { ch: Channel; active: boolean; onTap
         <div className="flex items-center justify-between mb-0.5">
           <div className="flex items-center gap-1.5 min-w-0">
             <p className="text-sm font-bold truncate text-white">{ch.name}</p>
-            {ch.type === 'paid'
-              ? <span className="text-[9px] bg-yellow-500/20 text-yellow-400 px-1 rounded font-bold shrink-0">VIP</span>
-              : <span className="text-[9px] bg-green-500/20 text-green-400 px-1 rounded font-bold shrink-0">FREE</span>
-            }
+            {isTipster && (
+              <>
+                {ch.type === 'paid'
+                  ? <span className="text-[9px] bg-yellow-500/20 text-yellow-400 px-1 rounded font-bold shrink-0">VIP</span>
+                  : <span className="text-[9px] bg-green-500/20 text-green-400 px-1 rounded font-bold shrink-0">FREE</span>
+                }
+              </>
+            )}
           </div>
           <span className="text-[11px] text-[#71767b] shrink-0 ml-2">{ch.lastPost}</span>
         </div>
@@ -257,7 +261,7 @@ function ActionMenuItem({
 }
 
 // ── Channel Feed ──────────────────────────────────────────────
-function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
+function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: () => void; isTipster?: boolean }) {
   const [joined, setJoined] = useState(ch.joined);
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [message, setMessage] = useState('');
@@ -301,7 +305,7 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
                 : 'bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white hover:shadow-lg hover:shadow-red-500/30'
             )}
           >
-            {joined ? 'Joined ✓' : ch.type === 'paid' ? `Join · ${ch.price}` : 'Join Free'}
+            {joined ? 'Joined ✓' : isTipster ? (ch.type === 'paid' ? `Join · ${ch.price}` : 'Join Free') : 'Join'}
           </button>
         </div>
 
@@ -357,19 +361,21 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
           }));
 
           return (
-            <div key={post.id} className={cn(isBlurred && 'blur-sm pointer-events-none select-none')}>
-              <PredictionCard
-                code={post.code}
-                userName="Elite Tipster"
-                userHandle="elitetips"
-                userStats={{ wins: post.wins, losses: post.losses, streak: post.streak || 3 }}
-                verified={post.verified || false}
-                matches={matches}
-                totalOdds={post.total}
-                timestamp={post.time}
-                reactions={post.reactions}
-                comments={post.comments || 0}
-              />
+            <div key={post.id} className={cn('flex', isBlurred && 'blur-sm pointer-events-none select-none')}>
+              <div className="w-full max-w-xs">
+                <PredictionCard
+                  code={post.code}
+                  userName="Elite Tipster"
+                  userHandle="elitetips"
+                  userStats={{ wins: post.wins, losses: post.losses, streak: post.streak || 3 }}
+                  verified={post.verified || false}
+                  matches={matches}
+                  totalOdds={post.total}
+                  timestamp={post.time}
+                  reactions={post.reactions}
+                  comments={post.comments || 0}
+                />
+              </div>
             </div>
           );
         })}
@@ -377,13 +383,15 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
 
       <div className="relative">
         <div className="flex items-center gap-3 px-4 py-3 border-t border-[#1f1f1f] bg-gradient-to-t from-black/50 to-black/20 backdrop-blur shrink-0">
-          {/* Action Button */}
-          <button
-            onClick={() => setShowActionMenu(!showActionMenu)}
-            className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-[#ef4444]/20 to-[#dc2626]/10 border border-[#ef4444]/20 text-[#ef4444] hover:border-[#ef4444]/40 hover:bg-[#ef4444]/30 transition-all shrink-0"
-          >
-            <Plus className="w-5 h-5" />
-          </button>
+          {/* Action Button - Tipsters only */}
+          {isTipster && (
+            <button
+              onClick={() => setShowActionMenu(!showActionMenu)}
+              className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-[#ef4444]/20 to-[#dc2626]/10 border border-[#ef4444]/20 text-[#ef4444] hover:border-[#ef4444]/40 hover:bg-[#ef4444]/30 transition-all shrink-0"
+            >
+              <Plus className="w-5 h-5" />
+            </button>
+          )}
 
           {/* Message Input */}
           <div className="flex-1 flex items-center gap-2 bg-[#111] border border-[#1f1f1f] rounded-xl px-4 py-2.5 focus-within:border-[#ef4444]/30 transition-all">
@@ -798,7 +806,7 @@ export function PredictionsPage() {
   });
 
   if (activeChannel) {
-    return <ChannelFeed ch={activeChannel} onBack={handleBackFromChannel} />;
+    return <ChannelFeed ch={activeChannel} onBack={handleBackFromChannel} isTipster={isTipster} />;
   }
 
   return (
@@ -862,7 +870,7 @@ export function PredictionsPage() {
                 <p className="font-bold text-sm text-white">No channels found</p>
               </div>
             ) : filtered.map(ch => (
-              <ChannelRow key={ch.id} ch={ch} active={activeId === ch.id} onTap={() => handleSelectChannel(ch.id)} />
+              <ChannelRow key={ch.id} ch={ch} active={activeId === ch.id} onTap={() => handleSelectChannel(ch.id)} isTipster={isTipster} />
             ))}
           </motion.div>
         )}

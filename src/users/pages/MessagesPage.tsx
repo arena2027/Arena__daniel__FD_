@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useDetailView } from '../../contexts/DetailViewContext';
-import { Chat as ChatType } from '../components/messages/types';
+import type { Chat as ChatType } from '../components/messages/types';
 import { Chat, mockChats } from '../components/messages/Chat';
 
 export function MessagesPage() {
   const [activeChat, setActiveChat] = useState<ChatType | null>(null);
   const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 768 : false);
+  
   const { setShowDetailView } = useDetailView();
 
   useEffect(() => {
@@ -16,7 +17,7 @@ export function MessagesPage() {
   }, []);
 
   useEffect(() => {
-    if (isDesktop && !activeChat) {
+    if (isDesktop && !activeChat && mockChats.length > 0) {
       setActiveChat(mockChats[0]);
     }
   }, [isDesktop, activeChat]);

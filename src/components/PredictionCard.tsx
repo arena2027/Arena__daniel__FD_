@@ -43,7 +43,7 @@ export function PredictionCard({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-[#111] to-[#0d0d0d] border border-[#1f1f1f] rounded-2xl overflow-hidden hover:border-[#ef4444]/30 transition-all"
+      className="bg-gradient-to-br from-[#111] to-[#0d0d0d] border border-[#1f1f1f] rounded-2xl overflow-hidden hover:border-[#ef4444]/30 transition-all max-w-xs w-full max-h-[600px] overflow-y-auto"
     >
       {/* Header with User Info */}
       <div className="px-4 py-3 border-b border-[#1f1f1f] flex items-center gap-3">

@@ -1,5 +1,4 @@
-import { useState, useEffect } from 'react';
-import { Chat as ChatType } from './types';
+import type { Chat as ChatType } from './types';
 import { Conversation } from './Conversation';
 import { ChatWindow } from './ChatWindow';
 
@@ -54,7 +53,7 @@ export const mockChats: ChatType[] = [
 interface ChatProps {
   isDesktop: boolean;
   activeChat: ChatType | null;
-  onSelectChat: (chat: ChatType) => void;
+  onSelectChat: (chat: ChatType | null) => void;
   onBack: () => void;
 }
 

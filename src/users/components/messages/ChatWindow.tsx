@@ -5,8 +5,8 @@ import {
   Phone, Video, X, MessageSquare, Bell, Bookmark, Slash,
   Eye, AlertCircle, Trash2
 } from 'lucide-react';
-import { Message } from './MessageBubble';
-import { Chat } from './types';
+import type { Message } from './MessageBubble';
+import type { Chat } from './types';
 import { Avatar } from './Avatar';
 import { MessageBubble } from './MessageBubble';
 
