@@ -11,6 +11,7 @@ import {
 import { cn } from '../../lib/utils';
 import { useDetailView } from '../../contexts/DetailViewContext';
 import { useAuth } from '../../auth/hooks/AuthContext';
+import { CreatePredictionModal } from '../../components/modals/CreatePredictionModal';
 
 // ── Types ─────────────────────────────────────────────────────
 interface Match {
@@ -249,6 +250,7 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [message, setMessage] = useState('');
+  const [showCreatePredictionModal, setShowCreatePredictionModal] = useState(false);
 
   return (
     <div className="flex flex-col h-[calc(100vh-56px)]">
@@ -422,7 +424,10 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
                 {/* Predictions Section */}
                 <div className="mb-2">
                   <p className="text-[10px] font-bold text-[#71767b] uppercase px-2 py-1.5">Predictions</p>
-                  <ActionMenuItem icon={<BarChart3 className="w-4 h-4" />} label="Create Prediction" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<BarChart3 className="w-4 h-4" />} label="Create Prediction" onClick={() => {
+                    setShowActionMenu(false);
+                    setShowCreatePredictionModal(true);
+                  }} />
                   <ActionMenuItem icon={<Star className="w-4 h-4" />} label="Premium Prediction" onClick={() => setShowActionMenu(false)} />
                   <ActionMenuItem icon={<Layers className="w-4 h-4" />} label="Multi-Bet" onClick={() => setShowActionMenu(false)} />
                   <ActionMenuItem icon={<Zap className="w-4 h-4" />} label="Live Prediction" onClick={() => setShowActionMenu(false)} />
@@ -454,6 +459,17 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
           )}
         </AnimatePresence>
       </div>
+
+      {/* Create Prediction Modal */}
+      <CreatePredictionModal
+        isOpen={showCreatePredictionModal}
+        onClose={() => setShowCreatePredictionModal(false)}
+        onSubmit={(data) => {
+          console.log('Prediction submitted:', data);
+          setShowCreatePredictionModal(false);
+          // TODO: Send to backend
+        }}
+      />
     </div>
   );
 }
