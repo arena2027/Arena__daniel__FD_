@@ -11,6 +11,7 @@ import {
 import { cn } from '../../lib/utils';
 import { useDetailView } from '../../contexts/DetailViewContext';
 import { useAuth } from '../../auth/hooks/AuthContext';
+import { PredictionCard } from '../../components/PredictionCard';
 import { CreatePredictionModal } from '../../components/modals/CreatePredictionModal';
 import { PremiumPredictionModal } from '../../components/modals/PremiumPredictionModal';
 import { MultiBetModal } from '../../components/modals/MultiBetModal';
@@ -258,7 +259,6 @@ function ActionMenuItem({
 // ── Channel Feed ──────────────────────────────────────────────
 function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
   const [joined, setJoined] = useState(ch.joined);
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [showActionMenu, setShowActionMenu] = useState(false);
   const [message, setMessage] = useState('');
   const [showCreatePredictionModal, setShowCreatePredictionModal] = useState(false);
@@ -276,147 +276,140 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
 
   return (
     <div className="flex flex-col h-[calc(100vh-56px)]">
-      <div className="flex items-center gap-3 px-4 py-3 border-b border-[#1f1f1f] bg-black/90 backdrop-blur shrink-0">
-        <button onClick={onBack} className="p-1.5 rounded-full hover:bg-white/10 transition-colors">
-          <ArrowLeft className="w-5 h-5 text-white" />
-        </button>
-        <Avatar name={ch.name} size="sm" />
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-1">
-            <p className="font-bold text-sm text-white">{ch.name}</p>
-            {ch.verified && <Star className="w-3 h-3 text-[#ef4444] fill-[#ef4444]" />}
+      {/* Enhanced Header */}
+      <div className="bg-gradient-to-b from-black/60 to-black/30 backdrop-blur-xl border-b border-[#1f1f1f] shrink-0">
+        <div className="flex items-center gap-3 px-4 py-4">
+          <button onClick={onBack} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
+            <ArrowLeft className="w-5 h-5 text-white" />
+          </button>
+          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#ef4444] to-[#dc2626] flex items-center justify-center text-white font-black text-lg shrink-0">
+            {ch.name.charAt(0)}
           </div>
-          <p className="text-[11px] text-[#71767b]">{ch.members.toLocaleString()} members · {ch.winRate} win rate</p>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <p className="font-black text-lg text-white">{ch.name}</p>
+              {ch.verified && <Star className="w-4 h-4 text-[#ef4444] fill-[#ef4444]" />}
+            </div>
+            <p className="text-xs text-[#71767b]">{ch.members.toLocaleString()} members · {ch.winRate} win rate</p>
+          </div>
+          <button
+            onClick={() => setJoined(j => !j)}
+            className={cn(
+              'px-5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 whitespace-nowrap',
+              joined
+                ? 'border border-white/20 text-[#71767b] hover:border-[#ef4444]/50 hover:text-[#ef4444]'
+                : 'bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white hover:shadow-lg hover:shadow-red-500/30'
+            )}
+          >
+            {joined ? 'Joined ✓' : ch.type === 'paid' ? `Join · ${ch.price}` : 'Join Free'}
+          </button>
         </div>
-        <button
-          onClick={() => setJoined(j => !j)}
-          className={cn(
-            'px-4 py-1.5 rounded-full text-xs font-bold transition-all shrink-0',
-            joined
-              ? 'border border-white/20 text-[#71767b] hover:border-[#ef4444]/50 hover:text-[#ef4444]'
-              : 'bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white'
-          )}
-        >
-          {joined ? 'Joined ✓' : ch.type === 'paid' ? `Join · ${ch.price}` : 'Join Free'}
-        </button>
+
+        {/* Stats Row */}
+        <div className="flex items-center gap-6 px-4 py-3 border-t border-[#1f1f1f]">
+          <div className="flex items-center gap-2">
+            <TrendingUp className="w-4 h-4 text-green-400" />
+            <span className="text-xs font-bold">
+              <span className="text-green-400">{ch.winRate}</span>
+              <span className="text-[#71767b] ml-1">Win Rate</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-[#ef4444]" />
+            <span className="text-xs font-bold">
+              <span className="text-[#ef4444]">{ch.streak}</span>
+              <span className="text-[#71767b] ml-1">Streak</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Users className="w-4 h-4 text-[#71767b]" />
+            <span className="text-xs font-bold text-[#71767b]">{ch.members.toLocaleString()}</span>
+          </div>
+        </div>
       </div>
 
-      <div className="flex items-center gap-4 px-4 py-2 border-b border-[#1f1f1f] shrink-0">
-        <span className="flex items-center gap-1 text-[11px] text-green-400 font-bold">
-          <TrendingUp className="w-3 h-3" />{ch.winRate} Win Rate
-        </span>
-        <span className="flex items-center gap-1 text-[11px] text-[#ef4444] font-bold">
-          <Zap className="w-3 h-3" />{ch.streak} Streak
-        </span>
-        <span className="flex items-center gap-1 text-[11px] text-[#71767b]">
-          <Users className="w-3 h-3" />{ch.members.toLocaleString()}
-        </span>
-      </div>
-
-      <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3">
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
         {ch.type === 'paid' && !joined && (
-          <div className="p-5 rounded-2xl border border-yellow-500/20 bg-yellow-500/5 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="p-5 rounded-2xl border border-yellow-500/20 bg-gradient-to-br from-yellow-500/5 to-orange-500/5 text-center"
+          >
             <Lock className="w-8 h-8 text-yellow-400 mx-auto mb-2" />
             <p className="font-bold text-sm mb-1 text-white">VIP Channel</p>
             <p className="text-xs text-[#71767b] mb-3">Join to unlock all tips and predictions</p>
             <button
               onClick={() => setJoined(true)}
-              className="px-5 py-2 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-full text-sm font-bold text-white"
+              className="px-5 py-2 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-lg text-sm font-bold text-white hover:shadow-lg hover:shadow-red-500/30 transition-all"
             >
               Join for {ch.price}
             </button>
             <p className="text-[10px] text-[#71767b] mt-2">Preview below ↓</p>
-          </div>
+          </motion.div>
         )}
 
         {ch.feed.map((post, i) => {
-          const isExpanded = expanded[post.id];
-          const visible = isExpanded ? post.matches : post.matches.slice(0, 3);
           const isBlurred = ch.type === 'paid' && !joined && i > 0;
+          const matches = post.matches.map(m => ({
+            team: `${m.home} vs ${m.away}`,
+            odds: m.odds,
+            status: m.status as 'win' | 'loss' | 'pending',
+          }));
 
           return (
-            <motion.div
-              key={post.id}
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.06 }}
-              className={cn(isBlurred && 'blur-sm pointer-events-none select-none')}
-            >
-              <div className="bg-[#111] border border-[#ef4444]/20 rounded-xl p-3">
-                <div className="flex justify-between text-sm mb-2">
-                  <span className="font-bold text-white flex items-center gap-1.5">
-                    <Ticket className="w-3.5 h-3.5 text-[#ef4444]" />
-                    Code: {post.code}
-                  </span>
-                  <span className="text-[#71767b] text-xs">{post.time}</span>
-                </div>
-                <div className="text-xs text-[#71767b] mb-2 flex items-center gap-2">
-                  <span>Total: {post.total}</span>
-                  <span className="text-green-400 font-bold">✓ {post.wins}W</span>
-                  <span className="text-[#ef4444] font-bold">✗ {post.losses}L</span>
-                  <span className="text-yellow-400 font-bold">⏳ {post.pending}</span>
-                </div>
-                <div className="space-y-1.5 mb-3">
-                  {visible.map((m, idx) => (
-                    <div key={idx} className="flex justify-between items-center py-1 border-b border-white/[0.04] last:border-0">
-                      <span className="text-sm text-white/80">{m.home} vs {m.away}</span>
-                      <span className={cn('text-xs font-bold',
-                        m.status === 'win' && 'text-green-400',
-                        m.status === 'lost' && 'text-[#ef4444]',
-                        m.status === 'pending' && 'text-yellow-400'
-                      )}>
-                        {m.status === 'win' ? `✓ ${m.odds}` : m.status === 'lost' ? '✗ Lost' : `⏳ ${m.odds}`}
-                      </span>
-                    </div>
-                  ))}
-                </div>
-                {post.total > 3 && (
-                  <button
-                    onClick={() => setExpanded(e => ({ ...e, [post.id]: !e[post.id] }))}
-                    className="w-full text-center text-xs border border-[#ef4444]/30 rounded-lg py-2 text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors mb-3"
-                  >
-                    {isExpanded ? 'Show less ↑' : `View all ${post.total} games (+${post.total - 3} more)`}
-                  </button>
-                )}
-                <div className="flex items-center gap-4 text-xs text-[#71767b]">
-                  <span>👍 {post.reactions.like}</span>
-                  <span>❤️ {post.reactions.heart}</span>
-                  <span>🔥 {post.reactions.fire}</span>
-                  <span>😂 {post.reactions.laugh}</span>
-                  <span>😮 {post.reactions.wow}</span>
-                </div>
-              </div>
-            </motion.div>
+            <div key={post.id} className={cn(isBlurred && 'blur-sm pointer-events-none select-none')}>
+              <PredictionCard
+                code={post.code}
+                userName="Elite Tipster"
+                userHandle="elitetips"
+                userStats={{ wins: post.wins, losses: post.losses, streak: post.streak || 3 }}
+                verified={post.verified || false}
+                matches={matches}
+                totalOdds={post.total}
+                timestamp={post.time}
+                reactions={post.reactions}
+                comments={post.comments || 0}
+              />
+            </div>
           );
         })}
       </div>
 
       <div className="relative">
-        <div className="flex items-center gap-2 px-3 py-2 border-t border-[#1f1f1f] bg-black shrink-0">
+        <div className="flex items-center gap-3 px-4 py-3 border-t border-[#1f1f1f] bg-gradient-to-t from-black/50 to-black/20 backdrop-blur shrink-0">
           {/* Action Button */}
           <button
             onClick={() => setShowActionMenu(!showActionMenu)}
-            className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#111] border border-[#1f1f1f] text-[#71767b] hover:border-[#ef4444]/30 hover:text-white transition-all"
+            className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-[#ef4444]/20 to-[#dc2626]/10 border border-[#ef4444]/20 text-[#ef4444] hover:border-[#ef4444]/40 hover:bg-[#ef4444]/30 transition-all shrink-0"
           >
             <Plus className="w-5 h-5" />
           </button>
 
           {/* Message Input */}
-          <input
-            value={message}
-            onChange={e => setMessage(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter' && message.trim()) {
-                setMessage('');
-              }
-            }}
-            placeholder="Message..."
-            className="flex-1 bg-[#111] px-3 py-2 rounded-full text-sm outline-none text-white placeholder:text-[#71767b] border border-[#1f1f1f] focus:border-[#ef4444]/30 transition-all"
-          />
+          <div className="flex-1 flex items-center gap-2 bg-[#111] border border-[#1f1f1f] rounded-xl px-4 py-2.5 focus-within:border-[#ef4444]/30 transition-all">
+            <input
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter' && message.trim()) {
+                  setMessage('');
+                }
+              }}
+              placeholder="Share your thoughts..."
+              className="flex-1 bg-transparent text-sm outline-none text-white placeholder:text-[#71767b]"
+            />
+            {message.trim() && (
+              <Smile className="w-4 h-4 text-[#71767b] cursor-pointer hover:text-white transition-colors" />
+            )}
+          </div>
 
           {/* Emoji & Mic */}
-          <Smile className="w-5 h-5 text-[#71767b] cursor-pointer hover:text-white transition-colors" />
-          <Mic className="w-5 h-5 text-[#71767b] cursor-pointer hover:text-white transition-colors" />
+          <button className="p-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#71767b] hover:text-white transition-all">
+            <Smile className="w-5 h-5" />
+          </button>
+          <button className="p-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#71767b] hover:text-white transition-all">
+            <Mic className="w-5 h-5" />
+          </button>
 
           {/* Post Button */}
           <button
@@ -425,9 +418,14 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
                 setMessage('');
               }
             }}
-            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gradient-to-br from-[#dc2626] to-[#ef4444] text-white hover:shadow-lg hover:shadow-red-500/50 transition-all"
+            className={cn(
+              'w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0',
+              message.trim()
+                ? 'bg-gradient-to-br from-[#dc2626] to-[#ef4444] text-white hover:shadow-lg hover:shadow-red-500/40'
+                : 'bg-white/5 text-[#71767b] cursor-not-allowed'
+            )}
           >
-            <Send className="w-4 h-4" />
+            <Send className="w-5 h-5" />
           </button>
         </div>
 
@@ -439,7 +437,7 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.15 }}
-              className="absolute bottom-14 left-3 z-50 w-56 bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl shadow-xl overflow-hidden"
+              className="absolute bottom-16 left-4 z-50 w-56 bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl shadow-xl overflow-hidden"
               onClick={e => e.stopPropagation()}
             >
               <div className="p-2">
