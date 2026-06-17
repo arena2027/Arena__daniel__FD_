@@ -4,10 +4,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, TrendingUp, Zap, Star, Plus, X,
   Ticket, Lock, Check, ArrowLeft,
-  Users, Smile, Mic, ChevronRight
+  Users, Smile, Mic, ChevronRight, Send,
+  BarChart3, Layers, FileText, Image, Video,
+  MessageCircle, Calendar, PieChart, Rocket
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useDetailView } from '../../contexts/DetailViewContext';
+import { useAuth } from '../../auth/hooks/AuthContext';
 
 // ── Types ─────────────────────────────────────────────────────
 interface Match {
@@ -218,10 +221,34 @@ function ChannelRow({ ch, active, onTap }: { ch: Channel; active: boolean; onTap
   );
 }
 
+// ── Action Menu Item ─────────────────────────────────────────
+function ActionMenuItem({
+  icon,
+  label,
+  onClick
+}: {
+  icon: React.ReactNode;
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-white/5 transition-colors text-sm text-white group"
+    >
+      <span className="text-[#ef4444] group-hover:text-white transition-colors">{icon}</span>
+      <span className="text-left">{label}</span>
+      <ChevronRight className="w-3.5 h-3.5 text-[#71767b] group-hover:text-[#ef4444] transition-colors ml-auto" />
+    </button>
+  );
+}
+
 // ── Channel Feed ──────────────────────────────────────────────
 function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
   const [joined, setJoined] = useState(ch.joined);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [showActionMenu, setShowActionMenu] = useState(false);
+  const [message, setMessage] = useState('');
 
   return (
     <div className="flex flex-col h-[calc(100vh-56px)]">
@@ -340,14 +367,92 @@ function ChannelFeed({ ch, onBack }: { ch: Channel; onBack: () => void }) {
         })}
       </div>
 
-      <div className="flex items-center gap-2 px-3 py-2 border-t border-[#1f1f1f] bg-black shrink-0">
-        <Plus className="w-5 h-5 text-[#71767b]" />
-        <input
-          placeholder="Message..."
-          className="flex-1 bg-[#111] px-3 py-2 rounded-full text-sm outline-none text-white placeholder:text-[#71767b] border border-[#1f1f1f]"
-        />
-        <Smile className="w-5 h-5 text-[#71767b] cursor-pointer hover:text-white transition-colors" />
-        <Mic className="w-5 h-5 text-[#71767b] cursor-pointer hover:text-white transition-colors" />
+      <div className="relative">
+        <div className="flex items-center gap-2 px-3 py-2 border-t border-[#1f1f1f] bg-black shrink-0">
+          {/* Action Button */}
+          <button
+            onClick={() => setShowActionMenu(!showActionMenu)}
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-[#111] border border-[#1f1f1f] text-[#71767b] hover:border-[#ef4444]/30 hover:text-white transition-all"
+          >
+            <Plus className="w-5 h-5" />
+          </button>
+
+          {/* Message Input */}
+          <input
+            value={message}
+            onChange={e => setMessage(e.target.value)}
+            onKeyDown={e => {
+              if (e.key === 'Enter' && message.trim()) {
+                setMessage('');
+              }
+            }}
+            placeholder="Message..."
+            className="flex-1 bg-[#111] px-3 py-2 rounded-full text-sm outline-none text-white placeholder:text-[#71767b] border border-[#1f1f1f] focus:border-[#ef4444]/30 transition-all"
+          />
+
+          {/* Emoji & Mic */}
+          <Smile className="w-5 h-5 text-[#71767b] cursor-pointer hover:text-white transition-colors" />
+          <Mic className="w-5 h-5 text-[#71767b] cursor-pointer hover:text-white transition-colors" />
+
+          {/* Post Button */}
+          <button
+            onClick={() => {
+              if (message.trim()) {
+                setMessage('');
+              }
+            }}
+            className="w-8 h-8 flex items-center justify-center rounded-lg bg-gradient-to-br from-[#dc2626] to-[#ef4444] text-white hover:shadow-lg hover:shadow-red-500/50 transition-all"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
+
+        {/* Action Menu */}
+        <AnimatePresence>
+          {showActionMenu && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              transition={{ duration: 0.15 }}
+              className="absolute bottom-14 left-3 z-50 w-56 bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl shadow-xl overflow-hidden"
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="p-2">
+                {/* Predictions Section */}
+                <div className="mb-2">
+                  <p className="text-[10px] font-bold text-[#71767b] uppercase px-2 py-1.5">Predictions</p>
+                  <ActionMenuItem icon={<BarChart3 className="w-4 h-4" />} label="Create Prediction" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<Star className="w-4 h-4" />} label="Premium Prediction" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<Layers className="w-4 h-4" />} label="Multi-Bet" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<Zap className="w-4 h-4" />} label="Live Prediction" onClick={() => setShowActionMenu(false)} />
+                </div>
+
+                <div className="h-px bg-[#1f1f1f] my-2" />
+
+                {/* Content Section */}
+                <div className="mb-2">
+                  <p className="text-[10px] font-bold text-[#71767b] uppercase px-2 py-1.5">Content</p>
+                  <ActionMenuItem icon={<FileText className="w-4 h-4" />} label="Match Analysis" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<Ticket className="w-4 h-4" />} label="Betting Slip" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<Image className="w-4 h-4" />} label="Upload Screenshot" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<Video className="w-4 h-4" />} label="Upload Video" onClick={() => setShowActionMenu(false)} />
+                </div>
+
+                <div className="h-px bg-[#1f1f1f] my-2" />
+
+                {/* Engagement Section */}
+                <div>
+                  <p className="text-[10px] font-bold text-[#71767b] uppercase px-2 py-1.5">Engagement</p>
+                  <ActionMenuItem icon={<MessageCircle className="w-4 h-4" />} label="Subscriber Update" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<Calendar className="w-4 h-4" />} label="Schedule Post" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<PieChart className="w-4 h-4" />} label="Poll" onClick={() => setShowActionMenu(false)} />
+                  <ActionMenuItem icon={<Rocket className="w-4 h-4" />} label="Promote Prediction" onClick={() => setShowActionMenu(false)} />
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );
@@ -491,6 +596,9 @@ export function PredictionsPage() {
   const [tab, setTab] = useState<'channels' | 'leaderboard'>('channels');
   const navigate = useNavigate();
   const { setShowDetailView } = useDetailView();
+  const { user } = useAuth();
+
+  const isTipster = user?.role === 'tipster';
 
   const activeChannel = channels.find(c => c.id === activeId) ?? null;
 
@@ -519,12 +627,15 @@ export function PredictionsPage() {
       <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
         <div className="flex items-center gap-2 px-4 py-3">
           <h1 className="text-lg font-black text-white flex-1">Predictions</h1>
-          <button
-            onClick={() => setShowAdd(true)}
-            className="w-8 h-8 bg-gradient-to-br from-[#dc2626] to-[#ef4444] rounded-xl flex items-center justify-center shadow-md shadow-red-500/30"
-          >
-            <Plus className="w-4 h-4 text-white" />
-          </button>
+          {isTipster && (
+            <button
+              onClick={() => setShowAdd(true)}
+              title="Create a new prediction channel (Tipsters only)"
+              className="w-8 h-8 bg-gradient-to-br from-[#dc2626] to-[#ef4444] rounded-xl flex items-center justify-center shadow-md shadow-red-500/30 hover:shadow-lg hover:shadow-red-500/50 transition-all"
+            >
+              <Plus className="w-4 h-4 text-white" />
+            </button>
+          )}
         </div>
 
         <div className="flex items-center gap-1 px-4 pb-2">
