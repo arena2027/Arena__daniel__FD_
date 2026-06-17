@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import type { UserRole } from '../../core/types';
+import { useAuth } from '../../auth/hooks/AuthContext';
 function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
   return (
     <button onClick={() => onChange(!value)}
@@ -49,6 +50,7 @@ interface SettingsPageProps {
 }
 export function SettingsPage({ userRole }: SettingsPageProps) {
   const isTipster = userRole === 'tipster';
+  const { logout } = useAuth();
   const [activeTab, setActiveTab] = useState<'account' | 'privacy' | 'notifications' | 'display' | 'security'>('account');
   const [name, setName] = useState('SportX Fan');
   const [email, setEmail] = useState('sportxfan@gmail.com');
@@ -144,7 +146,7 @@ export function SettingsPage({ userRole }: SettingsPageProps) {
               <SettingRow label="Deactivate Account" desc="Temporarily disable your account" onClick={() => {}} danger />
               <SettingRow label="Delete Account" desc="Permanently delete your account and data" onClick={() => {}} danger />
               <div className="p-4">
-                <button className="w-full flex items-center justify-center gap-2 py-3 border border-[#ef4444]/30 rounded-full text-[#ef4444] text-sm font-bold hover:bg-[#ef4444]/10 transition-all">
+                <button onClick={logout} className="w-full flex items-center justify-center gap-2 py-3 border border-[#ef4444]/30 rounded-full text-[#ef4444] text-sm font-bold hover:bg-[#ef4444]/10 transition-all">
                   <LogOut className="w-4 h-4" /> Sign Out
                 </button>
               </div>

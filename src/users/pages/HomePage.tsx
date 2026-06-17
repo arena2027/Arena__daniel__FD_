@@ -513,7 +513,7 @@ export function HomePage() {
           <motion.button
             initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
             whileTap={{ scale: 0.9 }} onClick={() => setShowModal(true)}
-            className="fixed bottom-24 right-4 md:bottom-8 md:right-8 w-14 h-14 bg-gradient-to-br from-[#dc2626] to-[#ef4444] rounded-full flex items-center justify-center shadow-xl shadow-red-500/40 z-20"
+            className="hidden md:flex fixed bottom-8 right-8 w-14 h-14 bg-gradient-to-br from-[#dc2626] to-[#ef4444] rounded-full items-center justify-center shadow-xl shadow-red-500/40 z-20"
           >
             <Plus className="w-6 h-6 text-white" />
           </motion.button>

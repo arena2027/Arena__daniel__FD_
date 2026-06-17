@@ -9,10 +9,10 @@ export function VideoPage() {
 
   return (
     <FeedProvider>
-      <div className="min-h-screen bg-[#0a0a0a]">
+      <div className="w-full">
         {/* Header */}
         <div className="sticky top-0 z-30 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
-          <div className="max-w-4xl mx-auto px-4 py-4 flex items-center gap-3">
+          <div className="px-4 py-4 flex items-center gap-3">
             <button
               onClick={() => navigate(-1)}
               className="p-2 rounded-full hover:bg-white/10 transition-colors"

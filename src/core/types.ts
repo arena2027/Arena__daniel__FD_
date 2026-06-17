@@ -10,6 +10,7 @@ export interface AppUser {
   role: UserRole;
   subscriptionStatus?: 'free' | 'premium';
   createdAt: string;
+  profilePicture?: string;
 }
 
 export interface TipsterProfile {
@@ -93,9 +94,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
 };
 
 export const ROUTE_ACCESS: Record<UserRole, string[]> = {
-  user: ['/', '/explore', '/live', '/predictions', '/communities', '/messages', '/notifications', '/bookmarks', '/wallet', '/settings', '/profile', '/user/*'],
-  tipster: ['/', '/explore', '/live', '/predictions', '/communities', '/messages', '/notifications', '/bookmarks', '/wallet', '/settings', '/profile', '/dashboard', '/user/*'],
-  admin: ['/', '/explore', '/live', '/predictions', '/communities', '/messages', '/notifications', '/bookmarks', '/wallet', '/settings', '/profile', '/dashboard', '/admin', '/user/*'],
+  user: ['/', '/explore', '/live', '/videos', '/predictions', '/communities', '/messages', '/notifications', '/bookmarks', '/wallet', '/settings', '/profile', '/become-tipster', '/user/*'],
+  tipster: ['/', '/explore', '/live', '/videos', '/predictions', '/communities', '/messages', '/notifications', '/bookmarks', '/wallet', '/settings', '/profile', '/dashboard', '/user/*'],
+  admin: ['/', '/explore', '/live', '/videos', '/predictions', '/communities', '/messages', '/notifications', '/bookmarks', '/wallet', '/settings', '/profile', '/dashboard', '/admin', '/user/*'],
 };
 
 export const API_ENDPOINTS = {

@@ -3,12 +3,14 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { AppUser } from '../../core/types';
 import { authService } from '../../services/auth/AuthService';
+import { tipsterService, type CreateTipsterRequest } from '../../services/tipster/TipsterService';
 
 interface AuthContextType {
   user: AppUser | null;
   login: (email: string, password: string) => Promise<void>;
   signup: (email: string, password: string, name: string, role?: 'user' | 'tipster') => Promise<void>;
   requestOTP: (email: string, password: string) => Promise<{ requiresOtp: true; email: string }>;
+  becomeTipster: (data: CreateTipsterRequest) => Promise<void>;
   logout: () => Promise<void>;
   loading: boolean;
   error: string | null;
@@ -95,6 +97,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const becomeTipster = async (data: CreateTipsterRequest) => {
+    try {
+      setLoading(true);
+      setError(null);
+      await tipsterService.createTipsterProfile(data);
+      // Update user role to tipster
+      if (user) {
+        const updatedUser = { ...user, role: 'tipster' as const };
+        setUser(updatedUser);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to become tipster');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // (forgotPassword removed — previously added for reset flow)
 
   const logout = async () => {
@@ -114,6 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     signup,
     requestOTP,
+    becomeTipster,
     logout,
     loading,
     error,

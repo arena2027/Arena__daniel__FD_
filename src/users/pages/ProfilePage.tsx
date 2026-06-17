@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Heart, MessageCircle, Repeat2, Share, Bookmark, Trophy, LogOut } from 'lucide-react';
+import { Zap, Heart, MessageCircle, Repeat2, Share, Bookmark, Trophy, Upload, X } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../auth/hooks/AuthContext';
 import type { AppUser } from '../../core/types';
 
 // ── Mock Data ─────────────────────────────────────────────────
@@ -44,7 +43,7 @@ const subscriptions = [
 ];
 
 // ── Avatar ────────────────────────────────────────────────────
-function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' | 'lg' | 'xl' }) {
+function Avatar({ name, size = 'md', image }: { name: string; size?: 'sm' | 'md' | 'lg' | 'xl'; image?: string }) {
   const colors = ['bg-red-600', 'bg-blue-600', 'bg-green-600', 'bg-purple-600', 'bg-orange-600'];
   const color = colors[name.charCodeAt(0) % colors.length];
   const sizes = {
@@ -53,6 +52,17 @@ function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' | 'lg'
     lg: 'w-12 h-12 text-base',
     xl: 'w-[88px] h-[88px] text-3xl',
   };
+
+  if (image) {
+    return (
+      <img
+        src={image}
+        alt={name}
+        className={cn('rounded-full object-cover shrink-0', sizes[size])}
+      />
+    );
+  }
+
   return (
     <div className={cn('rounded-full flex items-center justify-center font-black text-white shrink-0', sizes[size], color)}>
       {name[0].toUpperCase()}
@@ -355,8 +365,14 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
   const [activeTab, setActiveTab] = useState('Overview');
   const [editMode, setEditMode] = useState(false);
   const [isNavigating, setIsNavigating] = useState(false);
+  const [editForm, setEditForm] = useState({
+    name: appUser.name,
+    bio: 'Sports fan. Love predictions and good vibes.',
+    profilePicture: appUser.profilePicture,
+  });
+  const [uploading, setUploading] = useState(false);
+  const [previewImage, setPreviewImage] = useState<string | undefined>(appUser.profilePicture);
   const navigate = useNavigate();
-  const { logout } = useAuth();
   const isTipster = appUser.role === 'tipster';
 
   const tabs = ['Overview', 'Posts', 'Following', 'Followers', 'Subscriptions'];
@@ -365,6 +381,43 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
     if (isNavigating) return;
     setIsNavigating(true);
     navigate('/become-tipster');
+  };
+
+  const handlePictureChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      alert('Please select a valid image file');
+      return;
+    }
+
+    // Validate file size (5MB max)
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Image must be less than 5MB');
+      return;
+    }
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      const result = event.target?.result as string;
+      setPreviewImage(result);
+      setEditForm(prev => ({ ...prev, profilePicture: result }));
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemovePicture = () => {
+    setPreviewImage(undefined);
+    setEditForm(prev => ({ ...prev, profilePicture: undefined }));
+  };
+
+  const handleSaveProfile = () => {
+    // Here you would call the API to save the profile
+    // For now, just close edit mode
+    setEditMode(false);
   };
 
   return (
@@ -380,8 +433,20 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
       {/* Profile Header */}
       <div className="bg-[#12121A] border-b border-[#1f1f1f] px-4 pb-4">
         <div className="flex flex-col md:flex-row gap-4 items-start md:items-end -mt-10 mb-4">
-          <div className="ring-4 ring-[#12121A] rounded-full">
-            <Avatar name={appUser.name || 'U'} size="xl" />
+          <div className="ring-4 ring-[#12121A] rounded-full relative group">
+            <Avatar name={appUser.name || 'U'} size="xl" image={previewImage} />
+            {editMode && (
+              <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handlePictureChange}
+                  className="hidden"
+                  disabled={uploading}
+                />
+                <Upload className="w-8 h-8 text-white" />
+              </label>
+            )}
           </div>
           <div className="flex-1 mt-2 md:mt-0 md:pb-1">
             <div className="flex items-center gap-2 mb-0.5">
@@ -413,7 +478,7 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
               onClick={() => setEditMode(e => !e)}
               className="h-10 px-4 rounded-xl border border-[#1f1f1f] text-sm font-bold text-white hover:border-white/20 transition-colors"
             >
-              Edit Profile
+              {editMode ? 'Done' : 'Edit Profile'}
             </button>
             {!isTipster && (
               <button
@@ -437,13 +502,7 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
                 Dashboard
               </button>
             )}
-            <button
-              onClick={logout}
-              className="h-10 px-4 rounded-xl border border-[#ef4444] text-sm font-bold text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors flex items-center gap-1.5"
-            >
-              <LogOut className="w-4 h-4" />
-              Sign Out
-            </button>
+
           </div>
         </div>
 
@@ -455,19 +514,59 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
               exit={{ opacity: 0, height: 0 }}
               className="space-y-3 border-t border-[#1f1f1f] pt-4"
             >
-              <input
-                defaultValue={appUser.name}
-                className="w-full bg-[#0d0d0d] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition-all"
-                placeholder="Display Name"
-              />
-              <textarea
-                defaultValue="Sports fan. Love predictions and good vibes."
-                rows={2}
-                className="w-full bg-[#0d0d0d] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-2.5 text-sm text-white outline-none resize-none transition-all"
-                placeholder="Bio"
-              />
+              {/* Profile Picture Upload */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1">
+                  <p className="text-xs font-bold text-[#71767b] mb-2 block">Profile Picture</p>
+                  <label className="flex items-center justify-center gap-2 py-6 border-2 border-dashed border-[#1f1f1f] rounded-xl hover:border-[#ef4444]/50 transition-colors cursor-pointer bg-[#0d0d0d]">
+                    <Upload className="w-4 h-4 text-[#71767b]" />
+                    <span className="text-sm text-[#71767b]">Click to upload or drag and drop</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePictureChange}
+                      className="hidden"
+                      disabled={uploading}
+                    />
+                  </label>
+                  {previewImage && (
+                    <p className="text-xs text-green-400 mt-2">✓ Image selected</p>
+                  )}
+                </div>
+                {previewImage && (
+                  <button
+                    onClick={handleRemovePicture}
+                    type="button"
+                    className="h-10 px-3 rounded-xl border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+
+              <div>
+                <p className="text-xs font-bold text-[#71767b] mb-2 block">Display Name</p>
+                <input
+                  value={editForm.name}
+                  onChange={e => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                  className="w-full bg-[#0d0d0d] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition-all"
+                  placeholder="Display Name"
+                />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-[#71767b] mb-2 block">Bio</p>
+                <textarea
+                  value={editForm.bio}
+                  onChange={e => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
+                  rows={2}
+                  className="w-full bg-[#0d0d0d] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-2.5 text-sm text-white outline-none resize-none transition-all"
+                  placeholder="Bio"
+                />
+              </div>
               <div className="flex gap-2">
-                <button onClick={() => setEditMode(false)} className="flex-1 py-2 bg-[#ef4444] rounded-full text-sm font-bold text-white hover:bg-[#dc2626] transition-colors">Save</button>
+                <button onClick={handleSaveProfile} disabled={uploading} className="flex-1 py-2 bg-[#ef4444] rounded-full text-sm font-bold text-white hover:bg-[#dc2626] transition-colors disabled:opacity-50">
+                  {uploading ? 'Saving...' : 'Save'}
+                </button>
                 <button onClick={() => setEditMode(false)} className="flex-1 py-2 border border-[#1f1f1f] rounded-full text-sm font-bold text-[#71767b] hover:text-white transition-colors">Cancel</button>
               </div>
             </motion.div>

@@ -1,26 +1,29 @@
 import { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
-import {
-  Trophy, Check, ChevronRight, Zap,
-  Star, TrendingUp, Users, DollarSign
-} from 'lucide-react';
-import { cn } from '../../lib/utils';
-
-const sports = ['Football', 'Basketball', 'Tennis', 'Cricket', 'Rugby', 'Baseball', 'MMA', 'F1'];
+import { useAuth } from '@/auth/hooks/AuthContext';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Trophy, Check, ChevronRight, Zap, AlertCircle, Loader } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 const perks = [
-  { icon: Zap, label: 'Post official match tickets with codes' },
-  { icon: DollarSign, label: 'Earn from paid channel subscriptions' },
-  { icon: Star, label: 'Verified tipster badge on your profile' },
-  { icon: TrendingUp, label: 'Access to tipster analytics dashboard' },
-  { icon: Users, label: 'Build and manage your own channels' },
-  { icon: Trophy, label: 'Featured on the global leaderboard' },
+  { icon: Trophy, label: 'Monetize your expertise' },
+  { icon: Zap, label: 'Real-time prediction engine' },
+  { icon: Check, label: 'Performance analytics' },
+  { icon: Check, label: 'Subscriber management' },
+  { icon: Check, label: 'Revenue dashboard' },
+  { icon: Check, label: 'Premium badges' },
 ];
 
-// ── Become Tipster Page ───────────────────────────────────────
-export function BecomeTipsterPage() {
+const sports = [
+  'Football', 'Basketball', 'Tennis',
+  'Cricket', 'Baseball', 'Ice Hockey',
+  'Volleyball', 'Rugby'
+];
+
+export default function BecomeTipsterPage() {
   const navigate = useNavigate();
+  const { becomeTipster } = useAuth();
+
   const [step, setStep] = useState(1);
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
   const [form, setForm] = useState({
@@ -29,23 +32,50 @@ export function BecomeTipsterPage() {
     channelName: '',
     agreed: false,
   });
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const update = (field: string, value: string | boolean) =>
-    setForm(f => ({ ...f, [field]: value }));
+  const update = (key: string, value: any) => {
+    setForm(prev => ({ ...prev, [key]: value }));
+    setSubmitError(null);
+  };
 
-  const toggleSport = (sport: string) =>
+  const toggleSport = (sport: string) => {
     setSelectedSports(prev =>
       prev.includes(sport)
         ? prev.filter(s => s !== sport)
         : [...prev, sport]
     );
+  };
 
   const canProceedStep2 = selectedSports.length > 0 && form.bio.trim();
   const canProceedStep3 = form.channelName.trim() && form.agreed;
 
+  const handleBecomeTipster = async () => {
+    if (!canProceedStep3) return;
+
+    setSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      await becomeTipster({
+        bio: form.bio,
+        experience: form.experience,
+        channelName: form.channelName,
+        specialties: selectedSports,
+      });
+
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 500);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : 'Failed to become tipster');
+      setSubmitting(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-black text-white">
-
       {/* Header */}
       <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-4">
         <div className="flex items-center gap-3 mb-4">
@@ -53,29 +83,25 @@ export function BecomeTipsterPage() {
             <Trophy className="w-5 h-5 text-[#ef4444]" />
           </div>
           <div>
-            <h1 className="text-lg font-black text-white">Become a Tipster</h1>
+            <h1 className="text-sm font-black text-white">Become a Tipster</h1>
             <p className="text-xs text-[#71767b]">Step {step} of 3</p>
           </div>
         </div>
 
         {/* Progress bar */}
-        <div className="flex items-center gap-2">
-          {[1, 2, 3].map(s => (
-            <div
-              key={s}
-              className={cn(
-                'h-1.5 flex-1 rounded-full transition-all duration-500',
-                s <= step ? 'bg-[#ef4444]' : 'bg-[#1f1f1f]'
-              )}
-            />
-          ))}
+        <div className="w-full h-1 bg-[#1f1f1f] rounded-full overflow-hidden">
+          <motion.div
+            className="h-full bg-[#ef4444]"
+            initial={{ width: '0%' }}
+            animate={{ width: `${(step / 3) * 100}%` }}
+            transition={{ duration: 0.3 }}
+          />
         </div>
       </div>
 
       <div className="max-w-lg mx-auto px-4 py-6">
         <AnimatePresence mode="wait">
-
-          {/* ── Step 1 — Why become a tipster ── */}
+          {/* Step 1 */}
           {step === 1 && (
             <motion.div
               key="step1"
@@ -152,7 +178,7 @@ export function BecomeTipsterPage() {
             </motion.div>
           )}
 
-          {/* ── Step 2 — Speciality & Bio ── */}
+          {/* Step 2 */}
           {step === 2 && (
             <motion.div
               key="step2"
@@ -171,50 +197,43 @@ export function BecomeTipsterPage() {
                 <label className="text-xs font-bold text-[#71767b] mb-2 block">
                   Sports Speciality <span className="text-[#ef4444]">*</span>
                 </label>
-                <div className="grid grid-cols-2 gap-2">
+                <div className="grid grid-cols-2 gap-2 mb-4">
                   {sports.map(sport => (
                     <button
                       key={sport}
                       onClick={() => toggleSport(sport)}
                       className={cn(
-                        'py-2.5 px-3 rounded-xl text-sm font-semibold border transition-all text-left',
+                        'py-2 px-3 text-xs font-bold rounded-xl transition-all border',
                         selectedSports.includes(sport)
-                          ? 'bg-[#ef4444]/15 border-[#ef4444]/40 text-[#ef4444]'
-                          : 'bg-[#111] border-[#1f1f1f] text-[#71767b] hover:border-white/20 hover:text-white'
+                          ? 'bg-[#ef4444] border-[#ef4444] text-white'
+                          : 'bg-[#111] border-[#1f1f1f] text-[#71767b] hover:border-[#ef4444]/50'
                       )}
                     >
-                      {selectedSports.includes(sport) && (
-                        <Check className="w-3 h-3 inline mr-1.5" />
-                      )}
+                      {selectedSports.includes(sport) && <Check className="w-3 h-3 inline mr-1" />}
                       {sport}
                     </button>
                   ))}
                 </div>
-                {selectedSports.length > 0 && (
-                  <p className="text-xs text-[#ef4444] mt-2 font-semibold">
-                    {selectedSports.length} selected: {selectedSports.join(', ')}
-                  </p>
-                )}
               </div>
 
               {/* Bio */}
               <div className="mb-4">
                 <label className="text-xs font-bold text-[#71767b] mb-2 block">
-                  Your Bio <span className="text-[#ef4444]">*</span>
+                  Bio <span className="text-[#ef4444]">*</span>
                 </label>
                 <textarea
                   value={form.bio}
                   onChange={e => update('bio', e.target.value)}
-                  placeholder="Tell users about yourself and your prediction experience..."
+                  placeholder="Tell us about yourself and your expertise..."
                   rows={4}
                   className="w-full bg-[#111] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#71767b] outline-none resize-none transition-all"
                 />
               </div>
 
               {/* Experience */}
-              <div className="mb-6">
+              <div className="mb-4">
                 <label className="text-xs font-bold text-[#71767b] mb-2 block">
-                  Years of Experience
+                  Experience <span className="text-[#ef4444]">*</span>
                 </label>
                 <input
                   type="text"
@@ -243,7 +262,7 @@ export function BecomeTipsterPage() {
             </motion.div>
           )}
 
-          {/* ── Step 3 — Channel Setup & Confirm ── */}
+          {/* Step 3 */}
           {step === 3 && (
             <motion.div
               key="step3"
@@ -297,6 +316,18 @@ export function BecomeTipsterPage() {
                 </div>
               </div>
 
+              {/* Error message */}
+              {submitError && (
+                <motion.div
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="bg-[#ef4444]/10 border border-[#ef4444]/30 rounded-xl p-3 mb-4 flex gap-2 items-start"
+                >
+                  <AlertCircle className="w-4 h-4 text-[#ef4444] shrink-0 mt-0.5" />
+                  <p className="text-xs text-[#ef4444]">{submitError}</p>
+                </motion.div>
+              )}
+
               {/* Agreement checkbox */}
               <button
                 onClick={() => update('agreed', !form.agreed)}
@@ -319,17 +350,27 @@ export function BecomeTipsterPage() {
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep(2)}
-                  className="flex-1 py-3 border border-[#1f1f1f] rounded-full text-sm font-bold text-[#71767b] hover:border-white hover:text-white transition-all"
+                  disabled={submitting}
+                  className="flex-1 py-3 border border-[#1f1f1f] rounded-full text-sm font-bold text-[#71767b] hover:border-white hover:text-white transition-all disabled:opacity-50"
                 >
                   Back
                 </button>
                 <button
-                  onClick={() => navigate('/dashboard')}
-                  disabled={!canProceedStep3}
+                  onClick={handleBecomeTipster}
+                  disabled={!canProceedStep3 || submitting}
                   className="flex-1 flex items-center justify-center gap-2 bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white font-bold py-3 rounded-full hover:opacity-90 transition-all disabled:opacity-40 shadow-lg shadow-red-500/20"
                 >
-                  <Trophy className="w-4 h-4" />
-                  Become Tipster
+                  {submitting ? (
+                    <>
+                      <Loader className="w-4 h-4 animate-spin" />
+                      Creating...
+                    </>
+                  ) : (
+                    <>
+                      <Trophy className="w-4 h-4" />
+                      Become Tipster
+                    </>
+                  )}
                 </button>
               </div>
 
@@ -338,7 +379,6 @@ export function BecomeTipsterPage() {
               </p>
             </motion.div>
           )}
-
         </AnimatePresence>
       </div>
     </div>

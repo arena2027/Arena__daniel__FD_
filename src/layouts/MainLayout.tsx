@@ -9,6 +9,7 @@ import { cn } from '../lib/utils';
 import { RouteGuard } from '../middleware/guards/RouteGuards';
 import { Header } from '../layout/Header';
 import { Sidebar } from '../layout/Sidebar';
+import { RightSidebar } from '../layout/RightSidebar';
 import { FeedProvider } from '../stores/feedStore';
 import TipsterDashboard from '../dashboard/tipster/TipsterDashboard';
 import AdminDashboard from '../admin/pages/AdminDashboard';
@@ -26,7 +27,6 @@ const ProfilePage = React.lazy(() => import('../users/pages/ProfilePage').then(m
 const WalletPage = React.lazy(() => import('../users/pages/WalletPage').then(m => ({ default: m.WalletPage })));
 const SettingsPage = React.lazy(() => import('../users/pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
 const BookmarksPage = React.lazy(() => import('../users/pages/BookmarksPage').then(m => ({ default: m.BookmarksPage })));
-const BecomeTipsterPage = React.lazy(() => import('../users/pages/BecomeTipsterPage').then(m => ({ default: m.BecomeTipsterPage })));
 const UserProfileView = React.lazy(() => import('../users/pages/UserProfileView').then(m => ({ default: m.UserProfileRoute })));
 
 function LoadingFallback() {
@@ -146,28 +146,37 @@ const MainLayout: React.FC = () => {
         onMenuClick={() => setSidebarOpen((prev) => !prev)}
       />
 
-      <div className="flex flex-1">
-        <Sidebar
-          open={sidebarOpen}
-          onClose={() => setSidebarOpen(false)}
-          userRole={user.role}
-          appUser={user}
-        />
+      {/* 3-Column Layout with Fixed Sidebar */}
+      <div className="flex flex-1 overflow-hidden pr-0 xl:pr-80">
+        {/* Left Sidebar - LOCKED (no scrolling) */}
+        <div className="hidden md:block md:w-64 lg:w-72 md:border-r md:border-[#1f1f1f] md:h-[calc(100vh-56px)] md:overflow-hidden">
+          <Sidebar
+            open={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            userRole={user.role}
+            appUser={user}
+          />
+        </div>
 
-        <main className="flex-1 overflow-y-auto" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <style>{`
-            main::-webkit-scrollbar {
-              width: 0 !important;
-              display: none !important;
-            }
-          `}</style>
-          <div className={cn('w-full', isFullBleedLayout ? 'w-full' : 'max-w-[680px] mx-auto')}>
-            <div className={cn(
-              'w-full',
-              isFullBleedLayout
-                ? 'bg-[#070708]'
-                : 'border-x border-[#1f1f1f] bg-[#070708] border-x border-[#1f1f1f]'
-            )}>
+        {/* Mobile Sidebar Overlay */}
+        {sidebarOpen && (
+          <div className="fixed inset-0 z-40 bg-black/60 md:hidden" onClick={() => setSidebarOpen(false)}>
+            <div onClick={e => e.stopPropagation()}>
+              <Sidebar
+                open={sidebarOpen}
+                onClose={() => setSidebarOpen(false)}
+                userRole={user.role}
+                appUser={user}
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Center + Right Container */}
+        <div className="flex flex-1 h-[calc(100vh-56px)] relative">
+          {/* Center Main Feed - Scrollable */}
+          <main className="flex-1 overflow-y-auto border-r border-[#1f1f1f]" style={{ msOverflowStyle: 'auto', scrollbarWidth: 'none' }}>
+            <div className={cn('w-full', isFullBleedLayout ? 'w-full' : 'max-w-2xl mx-auto')}>
               <div className="px-4 py-6 sm:px-6">
                 <Suspense fallback={<LoadingFallback />}>
                   <Routes>
@@ -185,16 +194,6 @@ const MainLayout: React.FC = () => {
                     <Route path="/settings" element={<SettingsPage userRole={user.role} />} />
                     <Route path="/profile" element={<ProfilePage appUser={user} />} />
                     <Route path="/user/:name" element={<UserProfileView />} />
-
-                    {/* User-only Routes */}
-                    <Route
-                      path="/become-tipster"
-                      element={
-                        <RouteGuard user={user} allowedRoles={['user']}>
-                          <BecomeTipsterPage />
-                        </RouteGuard>
-                      }
-                    />
 
                     {/* Tipster-only Routes */}
                     <Route
@@ -222,9 +221,16 @@ const MainLayout: React.FC = () => {
                 </Suspense>
               </div>
             </div>
+          </main>
+
+          {/* Right Sidebar - Fully Independent Scrolling */}
+          <div className="hidden xl:flex xl:fixed xl:top-14 xl:right-0 xl:w-80 xl:h-[calc(100vh-56px)] xl:overflow-y-auto xl:border-l xl:border-[#1f1f1f] xl:bg-[#050505]" style={{ scrollbarWidth: 'none' }}>
+            <RightSidebar />
           </div>
-        </main>
+        </div>
       </div>
+
+      {/* Mobile Bottom Navigation */}
       <MobileBottomNav />
     </div>
   );
