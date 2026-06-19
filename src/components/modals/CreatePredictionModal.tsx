@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Plus, Trash2, Send } from 'lucide-react';
+import { X, Trash2, Send } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface SelectedGame {

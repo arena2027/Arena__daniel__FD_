@@ -59,7 +59,7 @@ export function UserProfileView({ userName, onBack }: UserProfileViewProps) {
   const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
   return (
     <div>
-      <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-3 flex items-center gap-3">
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-3 flex items-center gap-3">
         <button onClick={onBack} className="p-1.5 rounded-full hover:bg-white/10 transition-colors">
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>

@@ -4,7 +4,7 @@ import {
   Search, Heart, MessageCircle, Repeat2,
   Bookmark, Share, MoreHorizontal, Zap,
   Image, Smile, X, Plus, Video, BarChart2,
-  MapPin, Play
+  MapPin, Play, Flag, VolumeX, UserMinus, EyeOff
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { MatchDetailPage } from './Matchdetailpage';
@@ -31,12 +31,70 @@ interface Post {
 
 // ── Mock Posts ────────────────────────────────────────────────
 const mockPosts: Post[] = [
-  { id: '1', user: { name: 'John Pulse', handle: '@johnpulse', verified: true, tipster: true }, content: 'Man City are going to destroy Arsenal tonight. The form difference is massive right now 🔴🔵', time: '2m ago', likes: 847, comments: 134, reposts: 56, tag: 'Football' },
-  { id: '2', user: { name: 'Sarah Kicks', handle: '@sarahkicks', verified: false, tipster: false }, content: 'Unpopular opinion: Liverpool will finish above Arsenal this season 🏆', time: '15m ago', likes: 312, comments: 89, reposts: 23, tag: 'Football' },
-  { id: '3', user: { name: 'NBA Central', handle: '@nbacentral', verified: true, tipster: true }, content: 'Lakers vs Warriors tonight is going to be a classic. Who you got? 👇🏀', time: '32m ago', likes: 1204, comments: 341, reposts: 178, tag: 'NBA' },
-  { id: '4', user: { name: 'Transfer News', handle: '@transfernews', verified: true, tipster: false }, content: '🚨 BREAKING: Real Madrid are closing in on a summer deal. #TransferNews', time: '1h ago', likes: 5621, comments: 892, reposts: 1203, tag: 'Transfers' },
-  { id: '5', user: { name: 'Messi Watch', handle: '@messiwatch', verified: false, tipster: false }, content: 'Messi at Inter Miami is genuinely must-watch football. GOAT conversation over 🐐', time: '2h ago', likes: 9872, comments: 1432, reposts: 2341, tag: 'MLS' },
-  { id: '6', user: { name: 'UCL King', handle: '@uclking', verified: true, tipster: true }, content: 'Champions League quarterfinals: Bayern vs Real Madrid is the tie of the round ⚽🏆', time: '3h ago', likes: 2341, comments: 445, reposts: 312, tag: 'UCL' },
+  {
+    id: '1',
+    user: { name: 'John Pulse', handle: '@johnpulse', verified: true, tipster: true },
+    content: 'Man City are going to destroy Arsenal tonight. The form difference is massive right now 🔴🔵',
+    time: '2m ago',
+    likes: 847,
+    comments: 134,
+    reposts: 56,
+    tag: 'Football',
+    image: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=600'
+  },
+  {
+    id: '2',
+    user: { name: 'Sarah Kicks', handle: '@sarahkicks', verified: false, tipster: false },
+    content: 'Unpopular opinion: Liverpool will finish above Arsenal this season 🏆',
+    time: '15m ago',
+    likes: 312,
+    comments: 89,
+    reposts: 23,
+    tag: 'Football'
+  },
+  {
+    id: '3',
+    user: { name: 'NBA Central', handle: '@nbacentral', verified: true, tipster: true },
+    content: 'Lakers vs Warriors tonight is going to be a classic. Who you got? 👇🏀',
+    time: '32m ago',
+    likes: 1204,
+    comments: 341,
+    reposts: 178,
+    tag: 'NBA',
+    video: 'https://assets.mixkit.co/videos/preview/mixkit-playing-basketball-in-an-outdoor-court-3435-large.mp4'
+  },
+  {
+    id: '4',
+    user: { name: 'Transfer News', handle: '@transfernews', verified: true, tipster: false },
+    content: '🚨 BREAKING: Real Madrid are closing in on a summer deal. #TransferNews',
+    time: '1h ago',
+    likes: 5621,
+    comments: 892,
+    reposts: 1203,
+    tag: 'Transfers',
+    image: 'https://images.unsplash.com/photo-1540747737956-378724044282?q=80&w=600'
+  },
+  {
+    id: '5',
+    user: { name: 'Messi Watch', handle: '@messiwatch', verified: false, tipster: false },
+    content: 'Messi at Inter Miami is genuinely must-watch football. GOAT conversation over 🐐',
+    time: '2h ago',
+    likes: 9872,
+    comments: 1432,
+    reposts: 2341,
+    tag: 'MLS'
+  },
+  {
+    id: '6',
+    user: { name: 'UCL King', handle: '@uclking', verified: true, tipster: true },
+    content: 'Champions League quarterfinals: Bayern vs Real Madrid is the tie of the round ⚽🏆',
+    time: '3h ago',
+    likes: 2341,
+    comments: 445,
+    reposts: 312,
+    tag: 'UCL',
+    video: 'https://assets.mixkit.co/videos/preview/mixkit-soccer-ball-kicked-into-the-goal-41764-large.mp4'
+  },
 ];
 
 // ── Avatar ────────────────────────────────────────────────────
@@ -229,16 +287,17 @@ function PostModal({ onClose, onPost, onOpenPoll }: {
 }
 
 // ── Post Card ─────────────────────────────────────────────────
-function PostCard({ post, onPostClick, onUserClick, onShare, onMore }: {
+function PostCard({ post, onPostClick, onUserClick, onShare }: {
   post: Post;
   onPostClick: (post: Post) => void;
   onUserClick: (name: string) => void;
   onShare: (post: Post) => void;
-  onMore: (post: Post) => void;
+  onMore?: (post: Post) => void;
 }) {
   const [liked, setLiked] = useState(false);
   const [bookmarked, setBookmarked] = useState(false);
   const [reposted, setReposted] = useState(false);
+  const [showDropdown, setShowDropdown] = useState(false);
   const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
 
   return (
@@ -264,12 +323,76 @@ function PostCard({ post, onPostClick, onUserClick, onShare, onMore }: {
               )}
               <span className="text-[#71767b] text-xs">{post.user.handle} · {post.time}</span>
             </div>
-            <button
-              onClick={e => { e.stopPropagation(); onMore(post); }}
-              className="p-1 rounded-full hover:bg-white/5 text-[#71767b] shrink-0"
-            >
-              <MoreHorizontal className="w-4 h-4" />
-            </button>
+            
+            {/* Pop-up Action Menu Bubble */}
+            <div className="relative">
+              <button
+                onClick={e => { e.stopPropagation(); setShowDropdown(!showDropdown); }}
+                className="p-1 rounded-full hover:bg-white/5 text-[#71767b] shrink-0"
+              >
+                <MoreHorizontal className="w-4 h-4" />
+              </button>
+              <AnimatePresence>
+                {showDropdown && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={e => { e.stopPropagation(); setShowDropdown(false); }} />
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.95, y: -5 }}
+                      animate={{ opacity: 1, scale: 1, y: 0 }}
+                      exit={{ opacity: 0, scale: 0.95, y: -5 }}
+                      transition={{ duration: 0.1 }}
+                      className="absolute right-0 top-7 w-44 bg-[#0d0d0d] border border-[#1f1f1f] rounded-xl shadow-2xl py-1 z-40 overflow-hidden"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          setShowDropdown(false);
+                          alert(`Reported post from ${post.user.name}`);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-white hover:bg-white/5 transition-colors text-left font-semibold"
+                      >
+                        <Flag className="w-3.5 h-3.5 text-[#ef4444] shrink-0" />
+                        <span>Report Post</span>
+                      </button>
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          setShowDropdown(false);
+                          alert(`Muted ${post.user.handle}`);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-white hover:bg-white/5 transition-colors text-left font-semibold"
+                      >
+                        <VolumeX className="w-3.5 h-3.5 text-[#71767b] shrink-0" />
+                        <span>Mute {post.user.handle}</span>
+                      </button>
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          setShowDropdown(false);
+                          alert(`Unfollowed ${post.user.handle}`);
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-white hover:bg-white/5 transition-colors text-left font-semibold"
+                      >
+                        <UserMinus className="w-3.5 h-3.5 text-[#71767b] shrink-0" />
+                        <span>Unfollow {post.user.handle}</span>
+                      </button>
+                      <button
+                        onClick={e => {
+                          e.stopPropagation();
+                          setShowDropdown(false);
+                          alert("Marked as not interested");
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 text-xs text-white hover:bg-white/5 transition-colors text-left font-semibold"
+                      >
+                        <EyeOff className="w-3.5 h-3.5 text-[#71767b] shrink-0" />
+                        <span>Not interested</span>
+                      </button>
+                    </motion.div>
+                  </>
+                )}
+              </AnimatePresence>
+            </div>
           </div>
 
           {post.tag && (
@@ -288,21 +411,22 @@ function PostCard({ post, onPostClick, onUserClick, onShare, onMore }: {
 
           {post.video && (
             <div className="mb-3 rounded-2xl overflow-hidden border border-[#1f1f1f]" onClick={e => e.stopPropagation()}>
-              <video src={post.video} controls className="w-full max-h-80 rounded-2xl" />
+              <video src={post.video} controls className="w-full h-auto rounded-2xl" />
             </div>
           )}
 
           {post.poll && <PollDisplay poll={post.poll} />}
 
-          <div className="flex items-center justify-between text-[#71767b]" onClick={e => e.stopPropagation()}>
-            <button onClick={() => onPostClick(post)} className="flex items-center gap-1.5 hover:text-[#ef4444] transition-colors group">
+          {/* Twitter-style interaction alignment, constrained with max-width to remove excess space */}
+          <div className="flex items-center justify-between text-[#71767b] max-w-sm w-full mt-2 select-none" onClick={e => e.stopPropagation()}>
+            <button onClick={() => onPostClick(post)} className="flex items-center gap-1 hover:text-[#ef4444] transition-colors group">
               <div className="p-1.5 rounded-full group-hover:bg-[#ef4444]/10 transition-colors">
                 <MessageCircle className="w-4 h-4" />
               </div>
               <span className="text-xs">{fmt(post.comments)}</span>
             </button>
             <button onClick={() => setReposted(r => !r)}
-              className={cn('flex items-center gap-1.5 transition-colors group', reposted ? 'text-green-500' : 'hover:text-green-500')}
+              className={cn('flex items-center gap-1 transition-colors group', reposted ? 'text-green-500' : 'hover:text-green-500')}
             >
               <div className="p-1.5 rounded-full group-hover:bg-green-500/10 transition-colors">
                 <Repeat2 className="w-4 h-4" />
@@ -310,7 +434,7 @@ function PostCard({ post, onPostClick, onUserClick, onShare, onMore }: {
               <span className="text-xs">{fmt(post.reposts + (reposted ? 1 : 0))}</span>
             </button>
             <button onClick={() => setLiked(l => !l)}
-              className={cn('flex items-center gap-1.5 transition-colors group', liked ? 'text-[#ef4444]' : 'hover:text-[#ef4444]')}
+              className={cn('flex items-center gap-1 transition-colors group', liked ? 'text-[#ef4444]' : 'hover:text-[#ef4444]')}
             >
               <div className="p-1.5 rounded-full group-hover:bg-[#ef4444]/10 transition-colors">
                 <Heart className={cn('w-4 h-4', liked && 'fill-[#ef4444]')} />
@@ -318,7 +442,7 @@ function PostCard({ post, onPostClick, onUserClick, onShare, onMore }: {
               <span className="text-xs">{fmt(post.likes + (liked ? 1 : 0))}</span>
             </button>
             <button onClick={() => setBookmarked(b => !b)}
-              className={cn('flex items-center gap-1.5 transition-colors group', bookmarked ? 'text-[#ef4444]' : 'hover:text-[#ef4444]')}
+              className={cn('flex items-center gap-1 transition-colors group', bookmarked ? 'text-[#ef4444]' : 'hover:text-[#ef4444]')}
             >
               <div className="p-1.5 rounded-full group-hover:bg-[#ef4444]/10 transition-colors">
                 <Bookmark className={cn('w-4 h-4', bookmarked && 'fill-[#ef4444]')} />
@@ -326,7 +450,7 @@ function PostCard({ post, onPostClick, onUserClick, onShare, onMore }: {
             </button>
             <button
               onClick={() => onShare(post)}
-              className="flex items-center gap-1.5 hover:text-[#ef4444] transition-colors group"
+              className="flex items-center gap-1 hover:text-[#ef4444] transition-colors group"
             >
               <div className="p-1.5 rounded-full group-hover:bg-[#ef4444]/10 transition-colors">
                 <Share className="w-4 h-4" />

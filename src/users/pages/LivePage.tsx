@@ -147,7 +147,7 @@ export function LivePage() {
   return (
     <div>
       {/* Sticky Header */}
-      <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
         <div className="px-4 py-3">
           <h1 className="text-lg font-black text-white mb-3">Matches</h1>
           <div className="flex items-center gap-1.5">

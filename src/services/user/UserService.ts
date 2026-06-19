@@ -1,5 +1,5 @@
-import { ApiClient } from '@/api/clients/ApiClient';
-import type { AppUser } from '@/core/types';
+import { apiClient } from '../../api/clients/ApiClient';
+import type { AppUser } from '../../core/types';
 
 export interface UpdateProfileRequest {
   name?: string;
@@ -9,7 +9,7 @@ export interface UpdateProfileRequest {
 
 class UserService {
   private static instance: UserService;
-  private apiClient = ApiClient.getInstance();
+  private apiClient = apiClient;
 
   private constructor() {}
 

@@ -43,7 +43,7 @@ export function DashboardPage({ appUser }: DashboardPageProps) {
   ] as const;
   return (
     <div>
-      <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
         <div className="px-4 py-3">
           <div className="flex items-center gap-2 mb-3">
             <div>

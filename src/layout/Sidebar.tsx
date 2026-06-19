@@ -173,6 +173,24 @@ export function Sidebar({ open, onClose, userRole, appUser }: SidebarProps) {
             </div>
           </div>
 
+          {/* Post Action Button - Desktop/Tablet only */}
+          <div className="mt-4 px-4 hidden md:block">
+            <button
+              onClick={() => {
+                if (location.pathname !== '/') {
+                  navigate('/');
+                }
+                setTimeout(() => {
+                  window.dispatchEvent(new CustomEvent('openPostModal'));
+                }, 100);
+                onClose();
+              }}
+              className="w-full py-2.5 bg-gradient-to-r from-[#dc2626] to-[#ef4444] hover:opacity-95 text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-red-500/20 flex items-center justify-center gap-2"
+            >
+              <span>Post</span>
+            </button>
+          </div>
+
           {/* User Profile Section - always at bottom */}
           <div className="shrink-0 border-t border-white/10 pt-4 mt-auto">
             <button

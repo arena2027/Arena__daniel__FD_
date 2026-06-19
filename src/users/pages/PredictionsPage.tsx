@@ -6,7 +6,7 @@ import {
   Ticket, Lock, Check, ArrowLeft,
   Users, Smile, Mic, ChevronRight, Send,
   BarChart3, Layers, FileText, Image, Video,
-  MessageCircle, Calendar, PieChart, Rocket
+  MessageCircle, Calendar, PieChart, Rocket, CreditCard
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useDetailView } from '../../contexts/DetailViewContext';
@@ -60,6 +60,9 @@ interface Channel {
   unread: number;
   joined: boolean;
   feed: FeedPost[];
+  bio: string;
+  sports: string[];
+  creationDate: string;
 }
 
 // ── Mock Data ─────────────────────────────────────────────────
@@ -69,6 +72,9 @@ const channels: Channel[] = [
     verified: true, members: 12400, winRate: '74%', streak: 8,
     type: 'paid', price: '₦2,500/mo', lastPost: '2h ago',
     lastMessage: 'Primary sidebar → chat list → main chat pane with fixed header and input bar.', unread: 3, joined: false,
+    bio: 'Premium football and tennis predictions. 80%+ historical accuracy on daily rollover bets. Joined by pro tipsters worldwide.',
+    sports: ['⚽ Football', '🎾 Tennis', '🏀 Basketball'],
+    creationDate: 'Jan 2026',
     feed: [
       {
         id: 'f1', code: 'GOLD-7X2K', time: '2h ago',
@@ -98,6 +104,9 @@ const channels: Channel[] = [
     verified: true, members: 48200, winRate: '61%', streak: 3,
     type: 'free', price: null, lastPost: '30m ago',
     lastMessage: 'Left-to-right hierarchy, unread badges, and responsive Tailwind layout summary.', unread: 12, joined: true,
+    bio: 'Official free predictions channel for Arena. Get daily free singles, match insights, and community polls.',
+    sports: ['⚽ Football', '🏀 Basketball', '🏐 Volleyball'],
+    creationDate: 'Dec 2025',
     feed: [
       {
         id: 'f1', code: 'ARENA-MC1', time: '30m ago',
@@ -116,6 +125,9 @@ const channels: Channel[] = [
     verified: false, members: 5800, winRate: '69%', streak: 5,
     type: 'paid', price: '₦1,500/mo', lastPost: '4h ago',
     lastMessage: 'Scrollable message feed and fixed footer structure for the main chat screen.', unread: 0, joined: false,
+    bio: 'Spanish football specialist. In-depth analysis of LaLiga, Copa del Rey, and European competitions.',
+    sports: ['⚽ Football'],
+    creationDate: 'Feb 2026',
     feed: [
       {
         id: 'f1', code: 'LALIGA-RC1', time: '4h ago',
@@ -133,6 +145,9 @@ const channels: Channel[] = [
     verified: true, members: 9100, winRate: '67%', streak: 6,
     type: 'free', price: null, lastPost: '1h ago',
     lastMessage: 'Navigation, conversation directory, and content pane arranged for mobile-first clarity.', unread: 5, joined: true,
+    bio: 'Daily basketball spreadsheets, player props, and game totals. Focus on NBA, NCAA, and EuroLeague.',
+    sports: ['🏀 Basketball'],
+    creationDate: 'Nov 2025',
     feed: [
       {
         id: 'f1', code: 'NBA-LW22', time: '1h ago',
@@ -151,6 +166,9 @@ const channels: Channel[] = [
     verified: true, members: 22000, winRate: '71%', streak: 11,
     type: 'paid', price: '₦3,500/mo', lastPost: '6h ago',
     lastMessage: 'Fixed sidebar, chat list, and main content area to resolve overlap and nested scrolling.', unread: 0, joined: false,
+    bio: 'Exclusive VIP channel covering Champions League, Europa League, and top 5 European leagues.',
+    sports: ['⚽ Football', '🎾 Tennis'],
+    creationDate: 'Oct 2025',
     feed: [
       {
         id: 'f1', code: 'UCL-QF01', time: '6h ago',
@@ -277,6 +295,8 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
   const [showSubscriberUpdateModal, setShowSubscriberUpdateModal] = useState(false);
   const [showPollModal, setShowPollModal] = useState(false);
   const [showPromotePredictionModal, setShowPromotePredictionModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [showChannelInfoModal, setShowChannelInfoModal] = useState(false);
 
   return (
     <div className="flex flex-col h-[calc(100vh-56px)]">
@@ -286,18 +306,36 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
           <button onClick={onBack} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
             <ArrowLeft className="w-5 h-5 text-white" />
           </button>
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#ef4444] to-[#dc2626] flex items-center justify-center text-white font-black text-lg shrink-0">
-            {ch.name.charAt(0)}
-          </div>
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <p className="font-black text-lg text-white">{ch.name}</p>
-              {ch.verified && <Star className="w-4 h-4 text-[#ef4444] fill-[#ef4444]" />}
+          
+          {/* Clickable Channel Profile Header */}
+          <div 
+            onClick={() => setShowChannelInfoModal(true)}
+            className="flex flex-1 items-center gap-3 cursor-pointer hover:opacity-85 select-none min-w-0"
+          >
+            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#ef4444] to-[#dc2626] flex items-center justify-center text-white font-black text-lg shrink-0">
+              {ch.name.charAt(0)}
             </div>
-            <p className="text-xs text-[#71767b]">{ch.members.toLocaleString()} members · {ch.winRate} win rate</p>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="font-black text-lg text-white truncate">{ch.name}</p>
+                {ch.verified && <Star className="w-4 h-4 text-[#ef4444] fill-[#ef4444] shrink-0" />}
+              </div>
+              <p className="text-xs text-[#71767b]">{ch.members.toLocaleString()} members · {ch.winRate} win rate</p>
+            </div>
           </div>
+
           <button
-            onClick={() => setJoined(j => !j)}
+            onClick={() => {
+              if (joined) {
+                setJoined(false);
+              } else {
+                if (ch.type === 'paid') {
+                  setShowPaymentModal(true);
+                } else {
+                  setJoined(true);
+                }
+              }
+            }}
             className={cn(
               'px-5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 whitespace-nowrap',
               joined
@@ -343,7 +381,7 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
             <p className="font-bold text-sm mb-1 text-white">VIP Channel</p>
             <p className="text-xs text-[#71767b] mb-3">Join to unlock all tips and predictions</p>
             <button
-              onClick={() => setJoined(true)}
+              onClick={() => setShowPaymentModal(true)}
               className="px-5 py-2 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-lg text-sm font-bold text-white hover:shadow-lg hover:shadow-red-500/30 transition-all"
             >
               Join for {ch.price}
@@ -365,15 +403,14 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
               <div className="w-full max-w-xs">
                 <PredictionCard
                   code={post.code}
-                  userName="Elite Tipster"
-                  userHandle="elitetips"
-                  userStats={{ wins: post.wins, losses: post.losses, streak: post.streak || 3 }}
-                  verified={post.verified || false}
+                  userName={ch.name}
+                  userHandle={ch.handle}
+                  userStats={{ wins: post.wins, losses: post.losses, streak: ch.streak }}
+                  verified={ch.verified}
                   matches={matches}
                   totalOdds={post.total}
                   timestamp={post.time}
                   reactions={post.reactions}
-                  comments={post.comments || 0}
                 />
               </div>
             </div>
@@ -382,60 +419,65 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
       </div>
 
       <div className="relative">
-        <div className="flex items-center gap-3 px-4 py-3 border-t border-[#1f1f1f] bg-gradient-to-t from-black/50 to-black/20 backdrop-blur shrink-0">
-          {/* Action Button - Tipsters only */}
-          {isTipster && (
+        {isTipster ? (
+          <div className="flex items-center gap-3 px-4 py-3 border-t border-[#1f1f1f] bg-gradient-to-t from-black/50 to-black/20 backdrop-blur shrink-0">
+            {/* Action Button - Tipsters only */}
             <button
               onClick={() => setShowActionMenu(!showActionMenu)}
               className="w-10 h-10 flex items-center justify-center rounded-xl bg-gradient-to-br from-[#ef4444]/20 to-[#dc2626]/10 border border-[#ef4444]/20 text-[#ef4444] hover:border-[#ef4444]/40 hover:bg-[#ef4444]/30 transition-all shrink-0"
             >
               <Plus className="w-5 h-5" />
             </button>
-          )}
 
-          {/* Message Input */}
-          <div className="flex-1 flex items-center gap-2 bg-[#111] border border-[#1f1f1f] rounded-xl px-4 py-2.5 focus-within:border-[#ef4444]/30 transition-all">
-            <input
-              value={message}
-              onChange={e => setMessage(e.target.value)}
-              onKeyDown={e => {
-                if (e.key === 'Enter' && message.trim()) {
+            {/* Message Input */}
+            <div className="flex-1 flex items-center gap-2 bg-[#111] border border-[#1f1f1f] rounded-xl px-4 py-2.5 focus-within:border-[#ef4444]/30 transition-all">
+              <input
+                value={message}
+                onChange={e => setMessage(e.target.value)}
+                onKeyDown={e => {
+                  if (e.key === 'Enter' && message.trim()) {
+                    setMessage('');
+                  }
+                }}
+                placeholder="Broadcast a new tip or update..."
+                className="flex-1 bg-transparent text-sm outline-none text-white placeholder:text-[#71767b]"
+              />
+              {message.trim() && (
+                <Smile className="w-4 h-4 text-[#71767b] cursor-pointer hover:text-white transition-colors" />
+              )}
+            </div>
+
+            {/* Emoji & Mic */}
+            <button className="p-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#71767b] hover:text-white transition-all">
+              <Smile className="w-5 h-5" />
+            </button>
+            <button className="p-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#71767b] hover:text-white transition-all">
+              <Mic className="w-5 h-5" />
+            </button>
+
+            {/* Post Button */}
+            <button
+              onClick={() => {
+                if (message.trim()) {
                   setMessage('');
                 }
               }}
-              placeholder="Share your thoughts..."
-              className="flex-1 bg-transparent text-sm outline-none text-white placeholder:text-[#71767b]"
-            />
-            {message.trim() && (
-              <Smile className="w-4 h-4 text-[#71767b] cursor-pointer hover:text-white transition-colors" />
-            )}
+              className={cn(
+                'w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0',
+                message.trim()
+                  ? 'bg-gradient-to-br from-[#dc2626] to-[#ef4444] text-white hover:shadow-lg hover:shadow-red-500/40'
+                  : 'bg-white/5 text-[#71767b] cursor-not-allowed'
+              )}
+            >
+              <Send className="w-5 h-5" />
+            </button>
           </div>
-
-          {/* Emoji & Mic */}
-          <button className="p-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#71767b] hover:text-white transition-all">
-            <Smile className="w-5 h-5" />
-          </button>
-          <button className="p-2.5 rounded-lg bg-white/5 hover:bg-white/10 text-[#71767b] hover:text-white transition-all">
-            <Mic className="w-5 h-5" />
-          </button>
-
-          {/* Post Button */}
-          <button
-            onClick={() => {
-              if (message.trim()) {
-                setMessage('');
-              }
-            }}
-            className={cn(
-              'w-10 h-10 flex items-center justify-center rounded-xl transition-all shrink-0',
-              message.trim()
-                ? 'bg-gradient-to-br from-[#dc2626] to-[#ef4444] text-white hover:shadow-lg hover:shadow-red-500/40'
-                : 'bg-white/5 text-[#71767b] cursor-not-allowed'
-            )}
-          >
-            <Send className="w-5 h-5" />
-          </button>
-        </div>
+        ) : (
+          <div className="flex items-center justify-center gap-2 px-4 py-3.5 border-t border-[#1f1f1f] bg-black text-[#71767b] shrink-0 text-xs font-bold select-none">
+            <Lock className="w-4 h-4 text-[#ef4444]" />
+            <span>Only channel admins can post messages in this channel.</span>
+          </div>
+        )}
 
         {/* Action Menu */}
         <AnimatePresence>
@@ -641,7 +683,339 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
           setShowPromotePredictionModal(false);
         }}
       />
+
+      {/* Subscription Payment Modal */}
+      <SubscriptionPaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        channelName={ch.name}
+        price={ch.price || '₦2,500/mo'}
+        onSuccess={() => setJoined(true)}
+      />
+
+      {/* Channel Info Modal */}
+      <ChannelInfoModal
+        isOpen={showChannelInfoModal}
+        onClose={() => setShowChannelInfoModal(false)}
+        ch={ch}
+        joined={joined}
+        onJoinToggle={() => {
+          if (joined) {
+            setJoined(false);
+          } else {
+            if (ch.type === 'paid') {
+              setShowPaymentModal(true);
+            } else {
+              setJoined(true);
+            }
+          }
+        }}
+      />
     </div>
+  );
+}
+
+interface SubscriptionPaymentModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  channelName: string;
+  price: string;
+  onSuccess: () => void;
+}
+
+function SubscriptionPaymentModal({ isOpen, onClose, channelName, price, onSuccess }: SubscriptionPaymentModalProps) {
+  const [step, setStep] = useState<'details' | 'processing' | 'success'>('details');
+  const [selectedMethod, setSelectedMethod] = useState<'wallet' | 'card' | 'bank'>('wallet');
+  const [walletBalance] = useState(4500); // Mock wallet balance
+
+  const handlePay = () => {
+    setStep('processing');
+    setTimeout(() => {
+      setStep('success');
+      setTimeout(() => {
+        onSuccess();
+        onClose();
+        // Reset steps for future opens
+        setStep('details');
+      }, 1500);
+    }, 2000);
+  };
+
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+          />
+
+          {/* Modal Container */}
+          <motion.div
+            initial={{ scale: 0.95, y: 15, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.95, y: 15, opacity: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl relative z-10"
+          >
+            {step === 'details' && (
+              <div className="p-6 space-y-5">
+                <div className="flex items-center justify-between border-b border-[#1f1f1f] pb-3">
+                  <h3 className="text-base font-black text-white">Subscribe to VIP</h3>
+                  <button onClick={onClose} className="p-1 rounded-lg hover:bg-white/5 text-[#71767b] hover:text-white transition-colors">
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="bg-[#151515] border border-[#1f1f1f] rounded-xl p-4 flex flex-col text-center">
+                  <p className="text-[10px] text-[#71767b] uppercase font-black tracking-wider mb-1">Channel</p>
+                  <p className="text-base font-bold text-white mb-2">{channelName}</p>
+                  <div className="h-px bg-[#1f1f1f] my-2" />
+                  <p className="text-2xl font-black text-[#ef4444]">{price}</p>
+                  <p className="text-[10px] text-[#71767b] mt-1">Billed monthly. Cancel anytime.</p>
+                </div>
+
+                <div className="space-y-2">
+                  <p className="text-xs font-bold text-[#71767b] px-1">Payment Method</p>
+                  
+                  {/* Pay via Wallet */}
+                  <button
+                    onClick={() => setSelectedMethod('wallet')}
+                    className={cn(
+                      "w-full flex items-center justify-between p-3.5 rounded-xl border transition-all text-left",
+                      selectedMethod === 'wallet'
+                        ? "border-[#ef4444] bg-[#ef4444]/5"
+                        : "border-[#1f1f1f] bg-[#090909] hover:bg-white/[0.02]"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <CreditCard className="w-5 h-5 text-[#ef4444]" />
+                      <div>
+                        <p className="text-sm font-bold text-white">Pay with Wallet Balance</p>
+                        <p className="text-xs text-[#71767b]">Available: ₦{walletBalance.toLocaleString()}</p>
+                      </div>
+                    </div>
+                    <div className={cn(
+                      "w-4 h-4 rounded-full border flex items-center justify-center shrink-0",
+                      selectedMethod === 'wallet' ? "border-[#ef4444]" : "border-[#71767b]"
+                    )}>
+                      {selectedMethod === 'wallet' && <div className="w-2.5 h-2.5 bg-[#ef4444] rounded-full" />}
+                    </div>
+                  </button>
+
+                  {/* Pay via Card */}
+                  <button
+                    onClick={() => setSelectedMethod('card')}
+                    className={cn(
+                      "w-full flex items-center justify-between p-3.5 rounded-xl border transition-all text-left",
+                      selectedMethod === 'card'
+                        ? "border-[#ef4444] bg-[#ef4444]/5"
+                        : "border-[#1f1f1f] bg-[#090909] hover:bg-white/[0.02]"
+                    )}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Layers className="w-5 h-5 text-blue-400" />
+                      <div>
+                        <p className="text-sm font-bold text-white">Debit / Credit Card</p>
+                        <p className="text-xs text-[#71767b]">Visa, Mastercard, Verve</p>
+                      </div>
+                    </div>
+                    <div className={cn(
+                      "w-4 h-4 rounded-full border flex items-center justify-center shrink-0",
+                      selectedMethod === 'card' ? "border-[#ef4444]" : "border-[#71767b]"
+                    )}>
+                      {selectedMethod === 'card' && <div className="w-2.5 h-2.5 bg-[#ef4444] rounded-full" />}
+                    </div>
+                  </button>
+                </div>
+
+                <button
+                  onClick={handlePay}
+                  className="w-full py-3 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-xl text-sm font-bold text-white hover:shadow-lg hover:shadow-red-500/30 hover:scale-[1.01] transition-all"
+                >
+                  Subscribe Now
+                </button>
+              </div>
+            )}
+
+            {step === 'processing' && (
+              <div className="p-10 flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-12 h-12 rounded-full border-4 border-[#ef4444] border-t-transparent animate-spin" />
+                <div>
+                  <p className="font-bold text-white">Processing Subscription</p>
+                  <p className="text-xs text-[#71767b] mt-1">Verifying secure transaction...</p>
+                </div>
+              </div>
+            )}
+
+            {step === 'success' && (
+              <div className="p-10 flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-16 h-16 rounded-full bg-green-500/10 border border-green-500 flex items-center justify-center text-green-500">
+                  <Check className="w-8 h-8" />
+                </div>
+                <div>
+                  <p className="font-bold text-white text-lg">Subscription Active!</p>
+                  <p className="text-xs text-[#71767b] mt-1">Welcome to {channelName}</p>
+                </div>
+              </div>
+            )}
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
+  );
+}
+
+// ── Channel Info Modal ────────────────────────────────────────
+interface ChannelInfoModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  ch: Channel;
+  joined: boolean;
+  onJoinToggle: () => void;
+}
+
+function ChannelInfoModal({ isOpen, onClose, ch, joined, onJoinToggle }: ChannelInfoModalProps) {
+  return (
+    <AnimatePresence>
+      {isOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={onClose}
+            className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+          />
+
+          {/* Modal Container */}
+          <motion.div
+            initial={{ scale: 0.95, y: 15, opacity: 0 }}
+            animate={{ scale: 1, y: 0, opacity: 1 }}
+            exit={{ scale: 0.95, y: 15, opacity: 0 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+            onClick={(e) => e.stopPropagation()}
+            className="w-full max-w-md bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl relative z-10"
+          >
+            {/* Header Profile Cover (Gradient) */}
+            <div className="h-28 bg-gradient-to-r from-[#dc2626] to-[#ef4444] relative flex items-end px-6">
+              <button 
+                onClick={onClose} 
+                className="absolute top-4 right-4 p-1.5 rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Profile Avatar Overlay */}
+            <div className="px-6 relative -mt-10 mb-4 flex items-end justify-between">
+              <div className="relative">
+                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#ef4444] to-[#dc2626] border-4 border-[#0d0d0d] flex items-center justify-center text-white font-black text-3xl shadow-xl">
+                  {ch.name.charAt(0)}
+                </div>
+                {ch.verified && (
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#ef4444] rounded-full flex items-center justify-center ring-4 ring-[#0d0d0d]">
+                    <Star className="w-3.5 h-3.5 text-white fill-white" />
+                  </div>
+                )}
+              </div>
+              
+              <button
+                onClick={() => {
+                  onJoinToggle();
+                }}
+                className={cn(
+                  'px-6 py-2 rounded-xl text-xs font-bold transition-all whitespace-nowrap shadow-md',
+                  joined
+                    ? 'border border-white/20 text-[#71767b] hover:border-[#ef4444]/50 hover:text-[#ef4444] hover:bg-white/5'
+                    : 'bg-white text-black hover:bg-white/90 hover:shadow-lg'
+                )}
+              >
+                {joined ? 'Joined ✓' : ch.type === 'paid' ? `Join for ${ch.price}` : 'Join Free'}
+              </button>
+            </div>
+
+            {/* Profile Details */}
+            <div className="px-6 pb-6 space-y-5">
+              <div>
+                <h3 className="text-xl font-black text-white flex items-center gap-2">
+                  {ch.name}
+                </h3>
+                <p className="text-sm text-[#71767b] font-bold">{ch.handle}</p>
+              </div>
+
+              {/* Bio Description */}
+              <div className="bg-[#151515] border border-[#1f1f1f] rounded-xl p-4 space-y-2">
+                <p className="text-[10px] text-[#71767b] uppercase font-black tracking-wider">Bio</p>
+                <p className="text-xs text-white leading-relaxed">{ch.bio}</p>
+              </div>
+
+              {/* Stats Grid */}
+              <div className="grid grid-cols-3 gap-3">
+                <div className="bg-[#151515] border border-[#1f1f1f] rounded-xl p-3 text-center">
+                  <p className="text-[9px] text-[#71767b] uppercase font-black tracking-wider mb-1">Win Rate</p>
+                  <p className="text-sm font-black text-green-400 flex items-center justify-center gap-1">
+                    <TrendingUp className="w-3.5 h-3.5" /> {ch.winRate}
+                  </p>
+                </div>
+                <div className="bg-[#151515] border border-[#1f1f1f] rounded-xl p-3 text-center">
+                  <p className="text-[9px] text-[#71767b] uppercase font-black tracking-wider mb-1">Streak</p>
+                  <p className="text-sm font-black text-[#ef4444] flex items-center justify-center gap-1">
+                    <Zap className="w-3.5 h-3.5" /> {ch.streak}
+                  </p>
+                </div>
+                <div className="bg-[#151515] border border-[#1f1f1f] rounded-xl p-3 text-center">
+                  <p className="text-[9px] text-[#71767b] uppercase font-black tracking-wider mb-1">Members</p>
+                  <p className="text-sm font-black text-white flex items-center justify-center gap-1">
+                    <Users className="w-3.5 h-3.5 text-[#71767b]" /> {ch.members.toLocaleString()}
+                  </p>
+                </div>
+              </div>
+
+              {/* Sports & Access Info */}
+              <div className="space-y-3">
+                <div>
+                  <p className="text-[10px] text-[#71767b] uppercase font-black tracking-wider mb-2">Sports Covered</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {ch.sports.map((sport) => (
+                      <span key={sport} className="px-2.5 py-1 bg-white/5 border border-white/10 rounded-full text-xs font-bold text-white">
+                        {sport}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="h-px bg-[#1f1f1f]" />
+
+                {/* Permissions & Premium Locks */}
+                <div className="flex items-start gap-3 bg-blue-500/5 border border-blue-500/20 rounded-xl p-3">
+                  <Lock className="w-4 h-4 text-blue-400 mt-0.5 shrink-0" />
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold text-white">Telegram Premium Structure</p>
+                    <p className="text-[11px] text-[#71767b] leading-normal">
+                      This channel is locked. Only the verified tipster and platform admins can send messages. Subscribers have read-only access to view daily predictions, slips, and analysis.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-[#71767b]">
+                  <span>Created: {ch.creationDate}</span>
+                  <span className="flex items-center gap-1">
+                    Status: <span className={cn("font-bold", joined ? "text-green-400" : "text-yellow-400")}>{joined ? "Active Member" : "Not Subscribed"}</span>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </motion.div>
+        </div>
+      )}
+    </AnimatePresence>
   );
 }
 
@@ -785,7 +1159,7 @@ export function PredictionsPage() {
   const { setShowDetailView } = useDetailView();
   const { user } = useAuth();
 
-  const isTipster = user?.role === 'tipster';
+  const isTipster = user?.role === 'tipster' || user?.role === 'admin';
 
   const activeChannel = channels.find(c => c.id === activeId) ?? null;
 
@@ -811,18 +1185,16 @@ export function PredictionsPage() {
 
   return (
     <div>
-      <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
         <div className="flex items-center gap-2 px-4 py-3">
           <h1 className="text-lg font-black text-white flex-1">Predictions</h1>
-          {isTipster && (
-            <button
-              onClick={() => setShowAdd(true)}
-              title="Create a new prediction channel (Tipsters only)"
-              className="w-8 h-8 bg-gradient-to-br from-[#dc2626] to-[#ef4444] rounded-xl flex items-center justify-center shadow-md shadow-red-500/30 hover:shadow-lg hover:shadow-red-500/50 transition-all"
-            >
-              <Plus className="w-4 h-4 text-white" />
-            </button>
-          )}
+          <button
+            onClick={() => setShowAdd(true)}
+            title="Join a Channel"
+            className="w-8 h-8 bg-gradient-to-br from-[#dc2626] to-[#ef4444] rounded-xl flex items-center justify-center shadow-md shadow-red-500/30 hover:shadow-lg hover:shadow-red-500/50 transition-all"
+          >
+            <Plus className="w-4 h-4 text-white" />
+          </button>
         </div>
 
         <div className="flex items-center gap-1 px-4 pb-2">

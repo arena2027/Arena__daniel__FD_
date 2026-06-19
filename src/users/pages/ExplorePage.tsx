@@ -103,7 +103,7 @@ export function ExplorePage() {
   return (
     <div>
       {/* Sticky Header */}
-      <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
         <div className="px-4 pt-3 pb-2">
           <SearchBar
             value={query}

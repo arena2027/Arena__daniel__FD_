@@ -1,4 +1,5 @@
 import { Trophy, Zap, TrendingUp, Users } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { cn } from '../lib/utils';
 
 interface TopTipster {
@@ -31,6 +32,7 @@ const trendingCommunities: TrendingCommunity[] = [
 ];
 
 export function RightSidebar() {
+  const navigate = useNavigate();
   return (
     <aside className="w-full p-4" style={{ scrollbarWidth: 'none' }}>
       <div>
@@ -78,7 +80,7 @@ export function RightSidebar() {
           <h3 className="text-sm font-bold text-white">Trending Communities</h3>
         </div>
         <div className="space-y-2">
-          {trendingCommunities.map((community, idx) => (
+          {trendingCommunities.map((community) => (
             <div
               key={community.id}
               className="p-3 rounded-xl bg-[#0d0d0d] border border-[#1f1f1f] hover:border-[#ef4444]/30 transition-colors cursor-pointer"
@@ -102,7 +104,10 @@ export function RightSidebar() {
         <p className="text-xs text-[#71767b] mb-3 leading-relaxed">
           Join thousands of experts sharing predictions and earning from your expertise.
         </p>
-        <button className="w-full py-2 bg-[#ef4444] text-white font-bold text-xs rounded-lg hover:bg-[#dc2626] transition-colors">
+        <button
+          onClick={() => navigate('/become-tipster')}
+          className="w-full py-2 bg-[#ef4444] text-white font-bold text-xs rounded-lg hover:bg-[#dc2626] transition-colors"
+        >
           Learn More
         </button>
       </div>

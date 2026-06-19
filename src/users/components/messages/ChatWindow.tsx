@@ -49,6 +49,19 @@ export function ChatWindow({ chat, onBack }: ChatWindowProps) {
     setInput('');
   };
 
+  const handleReact = (messageId: string, emoji: string) => {
+    setMessages(prev => prev.map(msg => {
+      if (msg.id === messageId) {
+        return { ...msg, reaction: msg.reaction === emoji ? undefined : emoji };
+      }
+      return msg;
+    }));
+  };
+
+  const handleDelete = (messageId: string) => {
+    setMessages(prev => prev.filter(msg => msg.id !== messageId));
+  };
+
   const startCall = () => {
     alert(`Calling ${chat.name}...`);
   };
@@ -221,7 +234,13 @@ export function ChatWindow({ chat, onBack }: ChatWindowProps) {
       {/* Messages */}
       <div className="flex-1 overflow-y-auto px-4 py-4 space-y-3">
         {messages.map((msg, i) => (
-          <MessageBubble key={msg.id} message={msg} index={i} />
+          <MessageBubble 
+            key={msg.id} 
+            message={msg} 
+            index={i} 
+            onReact={handleReact} 
+            onDelete={handleDelete} 
+          />
         ))}
         <div ref={bottomRef} />
       </div>

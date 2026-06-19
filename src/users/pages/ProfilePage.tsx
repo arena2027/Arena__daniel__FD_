@@ -370,7 +370,7 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
     bio: 'Sports fan. Love predictions and good vibes.',
     profilePicture: appUser.profilePicture,
   });
-  const [uploading, setUploading] = useState(false);
+  const [uploading, _setUploading] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | undefined>(appUser.profilePicture);
   const navigate = useNavigate();
   const isTipster = appUser.role === 'tipster';

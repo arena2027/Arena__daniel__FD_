@@ -46,7 +46,7 @@ export function WalletPage({ userRole }: WalletPageProps) {
   const [selectedMethod, setSelectedMethod] = useState<string | null>(null);
   return (
     <div>
-      <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
         <div className="px-4 py-3">
           <h1 className="text-lg font-black text-white mb-3">Wallet</h1>
           <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
@@ -204,9 +204,8 @@ export function WalletPage({ userRole }: WalletPageProps) {
                   <input placeholder="Account Name" className="w-full bg-[#111] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-3 text-sm text-white placeholder:text-[#71767b] outline-none transition-all" />
                 </div>
               </div>
-₦{amount ? Number(amount).toLocaleString() : '0'}
               <button disabled={!amount} className="w-full py-3 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-full text-sm font-bold text-white hover:opacity-90 transition-all disabled:opacity-40">
-                Withdraw 
+                Withdraw ₦{amount ? Number(amount).toLocaleString() : '0'}
               </button>
               <p className="text-xs text-[#71767b] text-center">Withdrawals are processed within 24 hours</p>
             </div>

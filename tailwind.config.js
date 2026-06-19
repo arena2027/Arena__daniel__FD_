@@ -23,6 +23,9 @@ export default {
           text: "#e7e9ea",
         },
       },
+      fontFamily: {
+        sans: ["Outfit", "Inter", "sans-serif"],
+      },
     },
   },
 

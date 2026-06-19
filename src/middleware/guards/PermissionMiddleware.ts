@@ -4,6 +4,7 @@
 
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { User } from '../../database/models/User';
 import type { UserModel } from '../../database/models/User';
 import { ROLE_PERMISSIONS } from '../../core/types';
 

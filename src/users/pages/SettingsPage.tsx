@@ -1,13 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   User, Lock, Bell, Monitor, Shield,
   ChevronRight, LogOut, Moon, Sun,
-  Eye, EyeOff, Trash2, AlertTriangle
+  Eye, EyeOff, Trash2, AlertTriangle, X
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import type { UserRole } from '../../core/types';
 import { useAuth } from '../../auth/hooks/AuthContext';
+import { apiClient } from '../../api/clients/ApiClient';
 function Toggle({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) {
   return (
     <button onClick={() => onChange(!value)}
@@ -55,6 +56,21 @@ export function SettingsPage({ userRole }: SettingsPageProps) {
   const [name, setName] = useState('SportX Fan');
   const [email, setEmail] = useState('sportxfan@gmail.com');
   const [handle, setHandle] = useState('@sportxfan');
+  const [showPriceModal, setShowPriceModal] = useState(false);
+  const [channelPrice, setChannelPrice] = useState('2500');
+  const [savingPrice, setSavingPrice] = useState(false);
+
+  useEffect(() => {
+    if (isTipster) {
+      apiClient.get<{ data: any }>('/tipster/profile')
+        .then(res => {
+          if (res?.data?.premiumPrice !== undefined) {
+            setChannelPrice(String(res.data.premiumPrice || 0));
+          }
+        })
+        .catch(err => console.error('Failed to load tipster profile price:', err));
+    }
+  }, [isTipster]);
   const [privateAccount, setPrivateAccount] = useState(false);
   const [showActivity, setShowActivity] = useState(true);
   const [allowMessages, setAllowMessages] = useState(true);
@@ -82,7 +98,7 @@ export function SettingsPage({ userRole }: SettingsPageProps) {
   ] as const;
   return (
     <div>
-      <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
         <div className="px-4 py-3">
           <h1 className="text-lg font-black text-white mb-3">Settings</h1>
           <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
@@ -135,7 +151,7 @@ export function SettingsPage({ userRole }: SettingsPageProps) {
                   <SectionHeader title="Tipster Settings" />
                   <SettingRow label="Payout Account" desc="Manage your bank account for payouts" onClick={() => {}} />
                   <SettingRow label="Channel Settings" desc="Manage your prediction channels" onClick={() => {}} />
-                  <SettingRow label="Subscription Pricing" desc="Set prices for your paid channels" onClick={() => {}} />
+                  <SettingRow label="Subscription Pricing" desc="Set prices for your paid channels" onClick={() => setShowPriceModal(true)} />
                 </>
               )}
               <SectionHeader title="Account Actions" />
@@ -250,6 +266,76 @@ export function SettingsPage({ userRole }: SettingsPageProps) {
             </div>
           )}
         </motion.div>
+      </AnimatePresence>
+
+      {/* Price Management Modal */}
+      <AnimatePresence>
+        {showPriceModal && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowPriceModal(false)}
+              className="fixed inset-0 bg-black/80 backdrop-blur-sm"
+            />
+
+            {/* Modal */}
+            <motion.div
+              initial={{ scale: 0.95, y: 15, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: 15, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl p-6 shadow-2xl relative z-10 space-y-4"
+            >
+              <div className="flex items-center justify-between border-b border-[#1f1f1f] pb-3">
+                <h3 className="text-base font-black text-white">Subscription Pricing</h3>
+                <button onClick={() => setShowPriceModal(false)} className="p-1 rounded-lg hover:bg-white/5 text-[#71767b] hover:text-white transition-colors">
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div>
+                <label className="text-xs text-[#71767b] font-semibold mb-2 block">Monthly VIP Subscription Price (₦)</label>
+                <div className="flex items-center gap-2 bg-[#111] border border-[#1f1f1f] focus-within:border-[#ef4444]/50 rounded-xl px-4 py-3 transition-all">
+                  <span className="text-white font-bold shrink-0">₦</span>
+                  <input
+                    type="number"
+                    value={channelPrice}
+                    onChange={(e) => setChannelPrice(e.target.value)}
+                    placeholder="e.g. 2500"
+                    className="flex-1 bg-transparent text-sm text-white placeholder:text-[#71767b] outline-none"
+                  />
+                </div>
+                <p className="text-[10px] text-[#71767b] mt-1.5 leading-relaxed">
+                  Enter the price subscribers will pay monthly to join your VIP channel. Set to 0 or leave empty for a free channel.
+                </p>
+              </div>
+
+              <button
+                onClick={async () => {
+                  setSavingPrice(true);
+                  try {
+                    const priceNum = Number(channelPrice) || 0;
+                    await apiClient.put('/tipster/profile', { premiumPrice: priceNum });
+                    alert('VIP channel price updated successfully!');
+                    setShowPriceModal(false);
+                  } catch (error) {
+                    console.error('Failed to update price:', error);
+                    alert('Failed to save changes. Please try again.');
+                  } finally {
+                    setSavingPrice(false);
+                  }
+                }}
+                disabled={savingPrice}
+                className="w-full py-3 bg-gradient-to-r from-[#dc2626] to-[#ef4444] rounded-xl text-sm font-bold text-white hover:shadow-lg hover:shadow-red-500/30 hover:scale-[1.01] transition-all disabled:opacity-50"
+              >
+                {savingPrice ? 'Saving Changes...' : 'Save Settings'}
+              </button>
+            </motion.div>
+          </div>
+        )}
       </AnimatePresence>
     </div>
   );

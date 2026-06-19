@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Send, TrendingUp } from 'lucide-react';
+import { X, Send } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 interface MatchAnalysisModalProps {

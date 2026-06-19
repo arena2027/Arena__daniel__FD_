@@ -41,38 +41,104 @@ CREATE INDEX idx_tipster_profiles_followers ON tipster_profiles(followers DESC);
 CREATE INDEX idx_tipster_profiles_rating ON tipster_profiles(rating DESC);
 `;
 
-// Model methods (would be implemented in your ORM)
+const tipsterProfilesTable: TipsterProfileModel[] = [];
+
+// Seed tipster profile
+tipsterProfilesTable.push({
+  userId: 'tipster-uuid-1111-2222',
+  bio: 'Professional football analyst. 5+ years experience in predicting sports outcomes.',
+  winRate: 74,
+  followers: 12400,
+  premiumPrice: 2500,
+  verifiedStatus: true,
+  totalPredictions: 45,
+  successfulPredictions: 33,
+  streak: 8,
+  rating: 4.8,
+  createdAt: new Date(),
+  updatedAt: new Date()
+});
+
 export class TipsterProfile {
   static async findByUserId(userId: string): Promise<TipsterProfileModel | null> {
-    // Implementation depends on your ORM
-    // Example with Prisma: return prisma.tipsterProfile.findUnique({ where: { userId } });
-    throw new Error('Implement with your ORM');
+    const profile = tipsterProfilesTable.find(p => p.userId === userId);
+    return profile ? { ...profile } : null;
   }
 
   static async create(data: Omit<TipsterProfileModel, 'createdAt' | 'updatedAt'>): Promise<TipsterProfileModel> {
-    // Implementation depends on your ORM
-    throw new Error('Implement with your ORM');
+    const newProfile: TipsterProfileModel = {
+      ...data,
+      createdAt: new Date(),
+      updatedAt: new Date()
+    };
+    tipsterProfilesTable.push(newProfile);
+    return { ...newProfile };
   }
 
   static async updateByUserId(userId: string, data: Partial<TipsterProfileModel>): Promise<TipsterProfileModel> {
-    // Implementation depends on your ORM
-    throw new Error('Implement with your ORM');
+    const index = tipsterProfilesTable.findIndex(p => p.userId === userId);
+    if (index === -1) {
+      const newProfile: TipsterProfileModel = {
+        userId,
+        bio: data.bio || '',
+        winRate: data.winRate || 0,
+        followers: data.followers || 0,
+        premiumPrice: data.premiumPrice || null,
+        verifiedStatus: data.verifiedStatus || false,
+        totalPredictions: data.totalPredictions || 0,
+        successfulPredictions: data.successfulPredictions || 0,
+        streak: data.streak || 0,
+        rating: data.rating || 0,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      tipsterProfilesTable.push(newProfile);
+      return { ...newProfile };
+    }
+    const updatedProfile = {
+      ...tipsterProfilesTable[index],
+      ...data,
+      updatedAt: new Date()
+    };
+    tipsterProfilesTable[index] = updatedProfile;
+    return { ...updatedProfile };
   }
 
   static async incrementFollowers(userId: string): Promise<void> {
-    // Implementation depends on your ORM
-    throw new Error('Implement with your ORM');
+    const index = tipsterProfilesTable.findIndex(p => p.userId === userId);
+    if (index !== -1) {
+      tipsterProfilesTable[index].followers += 1;
+      tipsterProfilesTable[index].updatedAt = new Date();
+    }
+  }
+
+  static async decrementFollowers(userId: string): Promise<void> {
+    const index = tipsterProfilesTable.findIndex(p => p.userId === userId);
+    if (index !== -1 && tipsterProfilesTable[index].followers > 0) {
+      tipsterProfilesTable[index].followers -= 1;
+      tipsterProfilesTable[index].updatedAt = new Date();
+    }
   }
 
   static async updateStats(userId: string, won: boolean): Promise<void> {
-    // Update win rate, streak, total predictions
-    // Implementation depends on your ORM
-    throw new Error('Implement with your ORM');
+    const index = tipsterProfilesTable.findIndex(p => p.userId === userId);
+    if (index !== -1) {
+      const p = tipsterProfilesTable[index];
+      p.totalPredictions += 1;
+      if (won) {
+        p.successfulPredictions += 1;
+        p.streak += 1;
+      } else {
+        p.streak = 0;
+      }
+      p.winRate = Math.round((p.successfulPredictions / p.totalPredictions) * 100);
+      p.updatedAt = new Date();
+    }
   }
 
   static async getTopTipsters(limit: number = 10): Promise<TipsterProfileModel[]> {
-    // Get top tipsters by win rate, followers, rating
-    // Implementation depends on your ORM
-    throw new Error('Implement with your ORM');
+    return [...tipsterProfilesTable]
+      .sort((a, b) => b.winRate - a.winRate)
+      .slice(0, limit);
   }
 }

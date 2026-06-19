@@ -9,6 +9,7 @@ export interface CreateTipsterRequest {
   experience: string;
   channelName: string;
   specialties: string[];
+  price?: number;
 }
 
 export interface TipsterProfile extends TipsterProfileModel {
@@ -28,6 +29,7 @@ class TipsterServiceClass {
           experience: data.experience,
           channelName: data.channelName,
           specialties: data.specialties,
+          price: data.price,
         }
       );
       return response.data;

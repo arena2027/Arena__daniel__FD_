@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/auth/hooks/AuthContext';
+import { useAuth } from '../../auth/hooks/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Trophy, Check, ChevronRight, Zap, AlertCircle, Loader } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Trophy, Check, ChevronRight, Zap, AlertCircle, Loader, CreditCard } from 'lucide-react';
+import { cn } from '../../lib/utils';
 
 const perks = [
   { icon: Trophy, label: 'Monetize your expertise' },
@@ -30,6 +30,7 @@ export default function BecomeTipsterPage() {
     bio: '',
     experience: '',
     channelName: '',
+    channelPrice: '2500',
     agreed: false,
   });
   const [submitting, setSubmitting] = useState(false);
@@ -63,6 +64,7 @@ export default function BecomeTipsterPage() {
         experience: form.experience,
         channelName: form.channelName,
         specialties: selectedSports,
+        price: Number(form.channelPrice) || 0,
       });
 
       setTimeout(() => {
@@ -77,7 +79,7 @@ export default function BecomeTipsterPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       {/* Header */}
-      <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-4">
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-4">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-9 h-9 rounded-full bg-[#ef4444]/20 flex items-center justify-center">
             <Trophy className="w-5 h-5 text-[#ef4444]" />
@@ -293,6 +295,24 @@ export default function BecomeTipsterPage() {
                 </div>
               </div>
 
+              {/* Channel Price */}
+              <div className="mb-4">
+                <label className="text-xs font-bold text-[#71767b] mb-2 block">
+                  Monthly VIP Price (₦)
+                </label>
+                <div className="flex items-center gap-2 bg-[#111] border border-[#1f1f1f] focus-within:border-[#ef4444]/50 rounded-xl px-4 py-3 transition-all">
+                  <CreditCard className="w-4 h-4 text-[#71767b] shrink-0" />
+                  <input
+                    type="number"
+                    value={form.channelPrice}
+                    onChange={e => update('channelPrice', e.target.value)}
+                    placeholder="e.g. 2500"
+                    className="flex-1 bg-transparent text-sm text-white placeholder:text-[#71767b] outline-none"
+                  />
+                </div>
+                <p className="text-[10px] text-[#71767b] mt-1">Set to 0 for a free channel.</p>
+              </div>
+
               {/* Summary */}
               <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-4 mb-5">
                 <p className="text-sm font-bold text-white mb-3">Application Summary</p>
@@ -308,6 +328,12 @@ export default function BecomeTipsterPage() {
                   <div className="flex justify-between text-xs">
                     <span className="text-[#71767b]">Channel</span>
                     <span className="text-white font-semibold">{form.channelName || 'Not set'}</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-[#71767b]">Pricing</span>
+                    <span className="text-white font-semibold">
+                      {Number(form.channelPrice) > 0 ? `₦${Number(form.channelPrice).toLocaleString()}/mo` : 'Free Channel'}
+                    </span>
                   </div>
                   <div className="flex justify-between text-xs">
                     <span className="text-[#71767b]">Account Type</span>

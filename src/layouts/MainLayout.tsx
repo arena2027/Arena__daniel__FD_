@@ -28,6 +28,7 @@ const WalletPage = React.lazy(() => import('../users/pages/WalletPage').then(m =
 const SettingsPage = React.lazy(() => import('../users/pages/SettingsPage').then(m => ({ default: m.SettingsPage })));
 const BookmarksPage = React.lazy(() => import('../users/pages/BookmarksPage').then(m => ({ default: m.BookmarksPage })));
 const UserProfileView = React.lazy(() => import('../users/pages/UserProfileView').then(m => ({ default: m.UserProfileRoute })));
+const BecomeTipsterPage = React.lazy(() => import('../users/pages/BecomeTipsterPage'));
 
 function LoadingFallback() {
   return (
@@ -107,7 +108,6 @@ function MobileBottomNav() {
 
 const MainLayout: React.FC = () => {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -122,27 +122,10 @@ const MainLayout: React.FC = () => {
 
   const location = useLocation();
   const isFullBleedLayout = ['/messages', '/predictions'].includes(location.pathname);
-  const activeTab = (
-    Object.entries({
-      Home: '/',
-      Live: '/live',
-      Predictions: '/predictions',
-    }) as [string, string][]
-  ).find(([, path]) => path === location.pathname)?.[0] ?? 'Home';
-
   return (
     <div className="min-h-screen bg-[#050505] text-white flex flex-col">
       <Header
         title="Arena"
-        activeTab={activeTab}
-        onTabChange={(tab: string) => {
-          const tabRoutes: Record<string, string> = {
-            Home: '/',
-            Live: '/live',
-            Predictions: '/predictions',
-          };
-          navigate(tabRoutes[tab] ?? '/');
-        }}
         onMenuClick={() => setSidebarOpen((prev) => !prev)}
       />
 
@@ -194,6 +177,7 @@ const MainLayout: React.FC = () => {
                     <Route path="/settings" element={<SettingsPage userRole={user.role} />} />
                     <Route path="/profile" element={<ProfilePage appUser={user} />} />
                     <Route path="/user/:name" element={<UserProfileView />} />
+                    <Route path="/become-tipster" element={<BecomeTipsterPage />} />
 
                     {/* Tipster-only Routes */}
                     <Route

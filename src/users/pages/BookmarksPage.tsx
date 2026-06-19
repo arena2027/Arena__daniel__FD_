@@ -32,7 +32,7 @@ export function BookmarksPage() {
 
   return (
     <div>
-      <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-3">
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-3">
         <h1 className="text-lg font-black text-white">Bookmarks</h1>
         <p className="text-xs text-[#71767b] mt-0.5">{bookmarks.length} saved posts</p>
       </div>

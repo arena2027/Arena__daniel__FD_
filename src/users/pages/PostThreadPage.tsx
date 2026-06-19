@@ -176,7 +176,7 @@ export function PostThreadPage({ post, onBack, onUserClick }: PostThreadPageProp
   return (
     <div className="flex flex-col min-h-screen">
       {/* Header */}
-      <div className="sticky top-14 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-3 flex items-center gap-3">
+      <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-3 flex items-center gap-3">
         <button onClick={onBack} className="p-1.5 rounded-full hover:bg-white/10 transition-colors">
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>
@@ -231,7 +231,7 @@ export function PostThreadPage({ post, onBack, onUserClick }: PostThreadPageProp
 
         {post.video && (
           <div className="mb-3 rounded-2xl overflow-hidden border border-[#1f1f1f]">
-            <video src={post.video} controls className="w-full max-h-80 rounded-2xl" />
+            <video src={post.video} controls className="w-full h-auto rounded-2xl" />
           </div>
         )}
 

@@ -13,8 +13,6 @@ export function PremiumPredictionModal({ isOpen, onClose, onSubmit }: PremiumPre
   const [games, setGames] = useState([]);
   const [reasoning, setReasoning] = useState('');
   const [price, setPrice] = useState(4.99);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [showGameList, setShowGameList] = useState(false);
 
   const handleSubmit = () => {
     if (games.length === 0 || reasoning.trim().length === 0) {
