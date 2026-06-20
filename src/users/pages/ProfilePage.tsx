@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Heart, MessageCircle, Repeat2, Share, Bookmark, Trophy, Upload, X, ArrowLeft } from 'lucide-react';
+import { Zap, Heart, MessageCircle, Repeat2, Share, Bookmark, Trophy, Upload, X, ArrowLeft, MapPin, Calendar } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import type { AppUser } from '../../core/types';
@@ -398,8 +398,7 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
       alert('Image must be less than 5MB');
       return;
     }
-
-    // Create preview
+// Create preview
     const reader = new FileReader();
     reader.onload = (event) => {
       const result = event.target?.result as string;
@@ -434,17 +433,20 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
       </div>
 
       {/* Cover */}
-      <div className={cn(
-        'h-32 md:h-40 bg-gradient-to-br border-b border-[#1f1f1f]',
-        isTipster
-          ? 'from-yellow-500/30 via-orange-500/20 to-transparent'
-          : 'from-[#ef4444]/30 via-[#dc2626]/20 to-transparent'
-      )} />
+      <div className="h-32 md:h-40 relative border-b border-[#1f1f1f] bg-[#111] overflow-hidden">
+        <img
+          src="https://images.unsplash.com/photo-1540747737956-378724044282?q=80&w=800"
+          alt="Cover"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-black/25" />
+      </div>
 
       {/* Profile Header */}
-      <div className="bg-[#08090b] border-b border-[#1f1f1f] px-4 pb-4">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-end -mt-12 md:-mt-16 mb-4">
-          <div className="ring-4 ring-[#08090b] rounded-full relative group shrink-0">
+      <div className="bg-black border-b border-[#1f1f1f] px-4 pb-4">
+        {/* Avatar and Action Buttons Row */}
+        <div className="flex justify-between items-end mb-3 -mt-[44px] md:-mt-[60px] relative z-10">
+          <div className="ring-4 ring-black rounded-full relative group shrink-0 overflow-hidden bg-black">
             <Avatar name={appUser.name || 'U'} size="xl" image={previewImage} />
             {editMode && (
               <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
@@ -459,8 +461,43 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
               </label>
             )}
           </div>
-          <div className="flex-1 mt-2 md:mt-0 md:pb-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+
+          <div className="flex gap-2 shrink-0 pb-1">
+            <button
+              onClick={() => setEditMode(e => !e)}
+              className="h-9 px-4 rounded-full border border-[#1f1f1f] text-xs font-bold text-white hover:bg-white/5 transition-colors"
+            >
+              {editMode ? 'Done' : 'Edit Profile'}
+            </button>
+            {!isTipster && (
+              <button
+                onClick={handleBecomeTipster}
+                disabled={isNavigating}
+                className={cn(
+                  'h-9 px-4 rounded-full text-xs font-bold text-white transition-colors flex items-center justify-center gap-1.5',
+                  isNavigating ? 'bg-white/10 text-[#71767b] cursor-wait' : 'bg-[#ef4444] hover:bg-[#dc2626]'
+                )}
+              >
+                <Zap className="w-3.5 h-3.5" />
+                {isNavigating ? 'Opening...' : 'Become Tipster'}
+              </button>
+            )}
+            {isTipster && (
+              <button
+                onClick={() => navigate('/dashboard')}
+                className="h-9 px-4 rounded-full bg-yellow-500 text-xs font-bold text-black hover:bg-yellow-400 transition-colors flex items-center justify-center gap-1.5"
+              >
+                <Trophy className="w-3.5 h-3.5" />
+                Dashboard
+              </button>
+            )}
+          </div>
+        </div>
+
+        {/* User Details */}
+        <div className="space-y-3">
+          <div>
+            <div className="flex items-center gap-1.5 flex-wrap">
               <h2 className="text-xl font-black text-white">{appUser.name || 'SportX Fan'}</h2>
               {isTipster && (
                 <div className="flex items-center gap-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full px-2 py-0.5">
@@ -470,49 +507,30 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
               )}
             </div>
             <p className="text-sm text-[#71767b]">{appUser.handle || '@user'}</p>
-            <p className="text-sm text-[#e7e9ea] mt-1 max-w-[400px]">Sports fan. Love predictions and good vibes.</p>
-            <div className="flex gap-6 mt-3">
-              {[
-                { value: 56, label: 'Followers' },
-                { value: 28, label: 'Following' },
-                { value: 3, label: 'Subscribed' },
-              ].map(s => (
-                <div key={s.label}>
-                  <p className="text-lg font-black text-white">{s.value}</p>
-                  <p className="text-xs text-[#71767b]">{s.label}</p>
-                </div>
-              ))}
-            </div>
           </div>
-          <div className="flex gap-2 flex-wrap shrink-0 w-full md:w-auto mt-2 md:mt-0">
-            <button
-              onClick={() => setEditMode(e => !e)}
-              className="flex-1 md:flex-none h-10 px-4 rounded-xl border border-[#1f1f1f] text-sm font-bold text-white hover:border-white/20 transition-colors"
-            >
-              {editMode ? 'Done' : 'Edit Profile'}
-            </button>
-            {!isTipster && (
-              <button
-                onClick={handleBecomeTipster}
-                disabled={isNavigating}
-                className={cn(
-                  'flex-1 md:flex-none h-10 px-4 rounded-xl text-sm font-bold text-white transition-colors flex items-center justify-center gap-1.5',
-                  isNavigating ? 'bg-white/10 text-[#71767b] cursor-wait' : 'bg-[#ef4444] hover:bg-[#dc2626]'
-                )}
-              >
-                <Zap className="w-4 h-4" />
-                {isNavigating ? 'Opening...' : 'Become Tipster'}
-              </button>
-            )}
-            {isTipster && (
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="flex-1 md:flex-none h-10 px-4 rounded-xl bg-yellow-500 text-sm font-bold text-black hover:bg-yellow-400 transition-colors flex items-center justify-center gap-1.5"
-              >
-                <Trophy className="w-4 h-4" />
-                Dashboard
-              </button>
-            )}
+
+          <p className="text-sm text-[#e7e9ea] leading-relaxed max-w-[500px]">
+            {editForm.bio}
+          </p>
+
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[#71767b] text-xs">
+            <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />Lagos, Nigeria</span>
+            <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />Joined March 2026</span>
+          </div>
+
+          <div className="flex gap-4 text-sm">
+            <div className="hover:underline cursor-pointer">
+              <span className="font-black text-white">56</span>
+              <span className="text-[#71767b] ml-1">Followers</span>
+            </div>
+            <div className="hover:underline cursor-pointer">
+              <span className="font-black text-white">28</span>
+              <span className="text-[#71767b] ml-1">Following</span>
+            </div>
+            <div>
+              <span className="font-black text-white">3</span>
+              <span className="text-[#71767b] ml-1">Subscribed</span>
+            </div>
           </div>
         </div>
 

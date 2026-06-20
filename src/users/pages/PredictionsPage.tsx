@@ -63,6 +63,8 @@ interface Channel {
   bio: string;
   sports: string[];
   creationDate: string;
+  avatar?: string;
+  coverImage?: string;
 }
 
 // ── Mock Data ─────────────────────────────────────────────────
@@ -75,6 +77,8 @@ const channels: Channel[] = [
     bio: 'Premium football and tennis predictions. 80%+ historical accuracy on daily rollover bets. Joined by pro tipsters worldwide.',
     sports: ['⚽ Football', '🎾 Tennis', '🏀 Basketball'],
     creationDate: 'Jan 2026',
+    avatar: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=150',
+    coverImage: 'https://images.unsplash.com/photo-1540747737956-378724044282?q=80&w=800',
     feed: [
       {
         id: 'f1', code: 'GOLD-7X2K', time: '2h ago',
@@ -107,6 +111,8 @@ const channels: Channel[] = [
     bio: 'Official free predictions channel for Arena. Get daily free singles, match insights, and community polls.',
     sports: ['⚽ Football', '🏀 Basketball', '🏐 Volleyball'],
     creationDate: 'Dec 2025',
+    avatar: 'https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=150',
+    coverImage: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=800',
     feed: [
       {
         id: 'f1', code: 'ARENA-MC1', time: '30m ago',
@@ -128,6 +134,8 @@ const channels: Channel[] = [
     bio: 'Spanish football specialist. In-depth analysis of LaLiga, Copa del Rey, and European competitions.',
     sports: ['⚽ Football'],
     creationDate: 'Feb 2026',
+    avatar: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=150',
+    coverImage: 'https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=800',
     feed: [
       {
         id: 'f1', code: 'LALIGA-RC1', time: '4h ago',
@@ -148,6 +156,8 @@ const channels: Channel[] = [
     bio: 'Daily basketball spreadsheets, player props, and game totals. Focus on NBA, NCAA, and EuroLeague.',
     sports: ['🏀 Basketball'],
     creationDate: 'Nov 2025',
+    avatar: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=150',
+    coverImage: 'https://images.unsplash.com/photo-1505666287802-931dc83948e9?q=80&w=800',
     feed: [
       {
         id: 'f1', code: 'NBA-LW22', time: '1h ago',
@@ -169,6 +179,8 @@ const channels: Channel[] = [
     bio: 'Exclusive VIP channel covering Champions League, Europa League, and top 5 European leagues.',
     sports: ['⚽ Football', '🎾 Tennis'],
     creationDate: 'Oct 2025',
+    avatar: 'https://images.unsplash.com/photo-1579952362224-89a5db75d15c?q=80&w=150',
+    coverImage: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=800',
     feed: [
       {
         id: 'f1', code: 'UCL-QF01', time: '6h ago',
@@ -185,10 +197,21 @@ const channels: Channel[] = [
 ];
 
 // ── Avatar ────────────────────────────────────────────────────
-function Avatar({ name, size = 'md' }: { name: string; size?: 'sm' | 'md' }) {
+function Avatar({ name, size = 'md', image }: { name: string; size?: 'sm' | 'md' | 'lg'; image?: string }) {
   const colors = ['bg-red-600', 'bg-blue-600', 'bg-green-600', 'bg-purple-600', 'bg-orange-600'];
   const color = colors[name.charCodeAt(0) % colors.length];
-  const sizes = { sm: 'w-8 h-8 text-xs', md: 'w-11 h-11 text-sm' };
+  const sizes = { sm: 'w-8 h-8 text-xs', md: 'w-11 h-11 text-sm', lg: 'w-[44px] h-[44px] text-base' };
+
+  if (image) {
+    return (
+      <img
+        src={image}
+        alt={name}
+        className={cn('rounded-full object-cover shrink-0', sizes[size])}
+      />
+    );
+  }
+
   return (
     <div className={cn('rounded-full flex items-center justify-center font-black text-white shrink-0', sizes[size], color)}>
       {name[0].toUpperCase()}
@@ -208,7 +231,7 @@ function ChannelRow({ ch, active, onTap, isTipster = false }: { ch: Channel; act
       )}
     >
       <div className="relative shrink-0">
-        <Avatar name={ch.name} />
+        <Avatar name={ch.name} image={ch.avatar} />
         {ch.verified && (
           <div className="absolute -bottom-0.5 -right-0.5 w-4 h-4 bg-[#ef4444] rounded-full flex items-center justify-center ring-2 ring-black">
             <Star className="w-2.5 h-2.5 text-white fill-white" />
@@ -301,26 +324,39 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
   return (
     <div className="flex flex-col h-full">
       {/* Enhanced Header */}
-      <div className="bg-gradient-to-b from-black/60 to-black/30 backdrop-blur-xl border-b border-[#1f1f1f] shrink-0">
-        <div className="flex items-center gap-3 px-4 py-4">
-          <button onClick={onBack} className="p-2 rounded-lg hover:bg-white/10 transition-colors">
-            <ArrowLeft className="w-5 h-5 text-white" />
+      <div className="border-b border-[#1f1f1f] shrink-0 relative bg-black">
+        {/* Cover Photo */}
+        <div className="h-24 md:h-28 relative overflow-hidden bg-[#111]">
+          <img
+            src={ch.coverImage || "https://images.unsplash.com/photo-1540747737956-378724044282?q=80&w=800"}
+            alt="Cover"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-black/45" />
+          <button onClick={onBack} className="absolute top-3 left-3 p-1.5 rounded-full bg-black/60 hover:bg-black/80 text-white transition-colors z-20">
+            <ArrowLeft className="w-4 h-4" />
           </button>
-          
-          {/* Clickable Channel Profile Header */}
+        </div>
+
+        {/* Avatar and Action Buttons Row */}
+        <div className="flex justify-between items-end px-4 pb-3 -mt-6 relative z-10">
           <div 
             onClick={() => setShowChannelInfoModal(true)}
-            className="flex flex-1 items-center gap-3 cursor-pointer hover:opacity-85 select-none min-w-0"
+            className="flex items-end gap-3 cursor-pointer hover:opacity-90 select-none min-w-0"
           >
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-[#ef4444] to-[#dc2626] flex items-center justify-center text-white font-black text-lg shrink-0">
-              {ch.name.charAt(0)}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2">
-                <p className="font-black text-lg text-white truncate">{ch.name}</p>
-                {ch.verified && <Star className="w-4 h-4 text-[#ef4444] fill-[#ef4444] shrink-0" />}
+            {ch.avatar ? (
+              <img src={ch.avatar} alt={ch.name} className="w-16 h-16 rounded-2xl border-4 border-black object-cover shrink-0 shadow-lg" />
+            ) : (
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#ef4444] to-[#dc2626] border-4 border-black flex items-center justify-center text-white font-black text-xl shrink-0 shadow-lg">
+                {ch.name.charAt(0)}
               </div>
-              <p className="text-xs text-[#71767b]">{ch.members.toLocaleString()} members · {ch.winRate} win rate</p>
+            )}
+            <div className="pb-0.5 min-w-0">
+              <div className="flex items-center gap-1.5">
+                <p className="font-black text-base text-white truncate leading-tight">{ch.name}</p>
+                {ch.verified && <Star className="w-3.5 h-3.5 text-[#ef4444] fill-[#ef4444] shrink-0" />}
+              </div>
+              <p className="text-[10px] text-[#71767b] font-bold mt-0.5">{ch.members.toLocaleString()} members</p>
             </div>
           </div>
 
@@ -337,10 +373,10 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
               }
             }}
             className={cn(
-              'px-5 py-2 rounded-xl text-xs font-bold transition-all shrink-0 whitespace-nowrap',
+              'px-4 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 whitespace-nowrap',
               joined
                 ? 'border border-white/20 text-[#71767b] hover:border-[#ef4444]/50 hover:text-[#ef4444]'
-                : 'bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white hover:shadow-lg hover:shadow-red-500/30'
+                : 'bg-white text-black hover:bg-white/90'
             )}
           >
             {joined ? 'Joined ✓' : isTipster ? (ch.type === 'paid' ? `Join · ${ch.price}` : 'Join Free') : 'Join'}
@@ -348,23 +384,23 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
         </div>
 
         {/* Stats Row */}
-        <div className="flex items-center gap-6 px-4 py-3 border-t border-[#1f1f1f]">
+        <div className="flex items-center gap-6 px-4 py-2 border-t border-[#1f1f1f]">
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-green-400" />
+            <TrendingUp className="w-3.5 h-3.5 text-green-400" />
             <span className="text-xs font-bold">
               <span className="text-green-400">{ch.winRate}</span>
               <span className="text-[#71767b] ml-1">Win Rate</span>
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Zap className="w-4 h-4 text-[#ef4444]" />
+            <Zap className="w-3.5 h-3.5 text-[#ef4444]" />
             <span className="text-xs font-bold">
               <span className="text-[#ef4444]">{ch.streak}</span>
               <span className="text-[#71767b] ml-1">Streak</span>
             </span>
           </div>
           <div className="flex items-center gap-2">
-            <Users className="w-4 h-4 text-[#71767b]" />
+            <Users className="w-3.5 h-3.5 text-[#71767b]" />
             <span className="text-xs font-bold text-[#71767b]">{ch.members.toLocaleString()}</span>
           </div>
         </div>
@@ -403,6 +439,7 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
               <div className="w-full max-w-xs">
                 <PredictionCard
                   code={post.code}
+                  userAvatar={ch.avatar}
                   userName={ch.name}
                   userHandle={ch.handle}
                   userStats={{ wins: post.wins, losses: post.losses, streak: ch.streak }}
@@ -903,8 +940,14 @@ function ChannelInfoModal({ isOpen, onClose, ch, joined, onJoinToggle }: Channel
             onClick={(e) => e.stopPropagation()}
             className="w-full max-w-md bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl overflow-hidden shadow-2xl relative z-10"
           >
-            {/* Header Profile Cover (Gradient) */}
-            <div className="h-28 bg-gradient-to-r from-[#dc2626] to-[#ef4444] relative flex items-end px-6">
+            {/* Header Profile Cover */}
+            <div className="h-28 relative flex items-end px-6 bg-[#111] overflow-hidden">
+              <img
+                src={ch.coverImage || "https://images.unsplash.com/photo-1540747737956-378724044282?q=80&w=800"}
+                alt="Cover"
+                className="absolute inset-0 w-full h-full object-cover"
+              />
+              <div className="absolute inset-0 bg-black/35" />
               <button 
                 onClick={onClose} 
                 className="absolute top-4 right-4 p-1.5 rounded-full bg-black/40 hover:bg-black/60 text-white transition-colors"
@@ -916,9 +959,13 @@ function ChannelInfoModal({ isOpen, onClose, ch, joined, onJoinToggle }: Channel
             {/* Profile Avatar Overlay */}
             <div className="px-6 relative -mt-10 mb-4 flex items-end justify-between">
               <div className="relative">
-                <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#ef4444] to-[#dc2626] border-4 border-[#0d0d0d] flex items-center justify-center text-white font-black text-3xl shadow-xl">
-                  {ch.name.charAt(0)}
-                </div>
+                {ch.avatar ? (
+                  <img src={ch.avatar} alt={ch.name} className="w-20 h-20 rounded-2xl border-4 border-[#0d0d0d] object-cover shadow-xl shrink-0" />
+                ) : (
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#ef4444] to-[#dc2626] border-4 border-[#0d0d0d] flex items-center justify-center text-white font-black text-3xl shadow-xl">
+                    {ch.name.charAt(0)}
+                  </div>
+                )}
                 {ch.verified && (
                   <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#ef4444] rounded-full flex items-center justify-center ring-4 ring-[#0d0d0d]">
                     <Star className="w-3.5 h-3.5 text-white fill-white" />
@@ -1100,11 +1147,11 @@ function AddModal({ onClose }: { onClose: () => void }) {
 // ── Leaderboard ───────────────────────────────────────────────
 function Leaderboard({ onSelect }: { onSelect: (name: string) => void }) {
   const tipsters = [
-    { rank: 1, name: 'GoldTips VIP', winRate: '74%', streak: 8, members: 12400, badge: '🥇' },
-    { rank: 2, name: 'Champions Elite', winRate: '71%', streak: 11, members: 22000, badge: '🥈' },
-    { rank: 3, name: 'LaLiga Insider', winRate: '69%', streak: 5, members: 5800, badge: '🥉' },
-    { rank: 4, name: 'NBA Picks Daily', winRate: '67%', streak: 6, members: 9100, badge: '' },
-    { rank: 5, name: 'Arena Free Tips', winRate: '61%', streak: 3, members: 48200, badge: '' },
+    { rank: 1, name: 'GoldTips VIP', winRate: '74%', streak: 8, members: 12400, badge: '🥇', avatar: 'https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=150' },
+    { rank: 2, name: 'Champions Elite', winRate: '71%', streak: 11, members: 22000, badge: '🥈', avatar: 'https://images.unsplash.com/photo-1579952362224-89a5db75d15c?q=80&w=150' },
+    { rank: 3, name: 'LaLiga Insider', winRate: '69%', streak: 5, members: 5800, badge: '🥉', avatar: 'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?q=80&w=150' },
+    { rank: 4, name: 'NBA Picks Daily', winRate: '67%', streak: 6, members: 9100, badge: '', avatar: 'https://images.unsplash.com/photo-1546519638-68e109498ffc?q=80&w=150' },
+    { rank: 5, name: 'Arena Free Tips', winRate: '61%', streak: 3, members: 48200, badge: '', avatar: 'https://images.unsplash.com/photo-1518063319789-7217e6706b04?q=80&w=150' },
   ];
 
   return (
@@ -1129,8 +1176,14 @@ function Leaderboard({ onSelect }: { onSelect: (name: string) => void }) {
               : <span className="text-sm font-black text-[#71767b]">#{t.rank}</span>
             }
           </div>
-          <div className="w-9 h-9 rounded-full bg-[#ef4444]/10 border border-[#ef4444]/20 flex items-center justify-center font-black text-[#ef4444] text-sm shrink-0">
-            {t.name[0]}
+          <div className="w-9 h-9 rounded-full overflow-hidden shrink-0">
+            {t.avatar ? (
+              <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />
+            ) : (
+              <div className="w-full h-full bg-[#ef4444]/10 border border-[#ef4444]/20 flex items-center justify-center font-black text-[#ef4444] text-sm">
+                {t.name[0]}
+              </div>
+            )}
           </div>
           <div className="flex-1 min-w-0">
             <p className="font-bold text-sm text-white truncate">{t.name}</p>

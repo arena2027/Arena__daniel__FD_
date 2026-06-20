@@ -52,12 +52,18 @@ export function PredictionCard({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-gradient-to-br from-[#111] to-[#0d0d0d] border border-[#1f1f1f] rounded-2xl overflow-hidden hover:border-[#ef4444]/30 transition-all max-w-xs w-full max-h-[600px] overflow-y-auto"
+      className="bg-gradient-to-br from-[#111] to-[#0d0d0d] border border-[#1f1f1f] rounded-2xl overflow-hidden hover:border-[#ef4444]/30 transition-all max-w-xs w-full"
     >
       {/* Header with User Info */}
       <div className="px-4 py-3 border-b border-[#1f1f1f] flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#ef4444] to-[#dc2626] flex items-center justify-center text-white font-bold">
-          {userAvatar || userName.charAt(0)}
+        <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 flex items-center justify-center text-white font-bold bg-[#1e1e1e]">
+          {userAvatar ? (
+            <img src={userAvatar} alt={userName} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full bg-gradient-to-br from-[#ef4444] to-[#dc2626] flex items-center justify-center text-xs">
+              {userName.charAt(0).toUpperCase()}
+            </div>
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5">

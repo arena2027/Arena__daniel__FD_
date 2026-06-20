@@ -191,7 +191,7 @@ const MainLayout: React.FC = () => {
           {/* Center Main Feed - Scrollable */}
           <main className="flex-1 overflow-y-auto border-r border-[#1f1f1f]" style={{ msOverflowStyle: 'auto', scrollbarWidth: 'none' }}>
             <div className={cn('w-full', isFullBleedLayout ? 'w-full' : 'max-w-2xl mx-auto')}>
-              <div className="px-4 py-6 sm:px-6">
+              <div className={cn("px-4 py-6 sm:px-6", isFullBleedLayout && "px-0 py-0 sm:px-0")}>
                 <Suspense fallback={<LoadingFallback />}>
                   <Routes>
                     {/* Public Routes (accessible by all authenticated users) */}
