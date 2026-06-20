@@ -63,7 +63,7 @@ export function Chat({ isDesktop, activeChat, onSelectChat, onBack }: ChatProps)
   }
 
   return (
-    <div className="h-[calc(100vh-56px)] flex overflow-hidden rounded-[28px] border border-[#1f1f1f] bg-[#070708] shadow-lg">
+    <div className="h-full flex overflow-hidden rounded-[28px] border border-[#1f1f1f] bg-[#070708] shadow-lg">
       <Conversation chats={mockChats} activeChat={activeChat} onSelectChat={onSelectChat} />
       
       <section className="hidden md:flex flex-1 flex-col bg-[#0b141a]">

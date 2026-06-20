@@ -476,6 +476,8 @@ export function HomePage() {
   const [sharePost, setSharePost] = useState<Post | null>(null);
   const [morePost, setMorePost] = useState<Post | null>(null);
   const [showPoll, setShowPoll] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [compactSearchActive, setCompactSearchActive] = useState(false);
   const lastScrollY = useRef(0);
 
   useEffect(() => {
@@ -483,6 +485,8 @@ export function HomePage() {
       const currentY = window.scrollY;
       if (currentY > lastScrollY.current && currentY > 100) setShowButton(false);
       else setShowButton(true);
+      
+      setIsScrolled(currentY > 50);
       lastScrollY.current = currentY;
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -495,16 +499,6 @@ export function HomePage() {
     window.addEventListener('openPostModal', handleOpenPostModal);
     return () => window.removeEventListener('openPostModal', handleOpenPostModal);
   }, []);
-
-  if (selectedMatch) return <MatchDetailPage onBack={() => setSelectedMatch(null)} />;
-  if (selectedPost) return (
-    <PostThreadPage
-      post={selectedPost}
-      onBack={() => setSelectedPost(null)}
-      onUserClick={(name) => { setSelectedPost(null); setSelectedUser(name); }}
-    />
-  );
-  if (selectedUser) return <UserProfileView userName={selectedUser} onBack={() => setSelectedUser(null)} />;
 
   const handleNewPost = (text: string, image?: string, video?: string) => {
     setPosts(prev => [{
@@ -540,100 +534,204 @@ export function HomePage() {
   ] as const;
 
   return (
-    <div>
-      {/* Tabs nav row — pinned under header */}
-      <div className="sticky top-0 z-30 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
-        <div className="max-w-3xl mx-auto px-4 py-2 flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2">
-            {tabs.map(tab => (
-              <button key={tab.key} onClick={() => { setActiveTab(tab.key); }}
-                className={cn('px-3 py-1.5 rounded-md text-xs font-semibold transition-all relative overflow-visible',
-                  activeTab === tab.key ? 'text-white' : 'text-[#9aa0a6] hover:text-white hover:bg-white/2'
-                )}
-              >
-                <span className="relative z-20">{tab.label}</span>
-
-                {activeTab === tab.key && (
-                  <>
-                    <motion.span layoutId="active-tab-pill" transition={{ type: 'spring', stiffness: 700, damping: 40 }}
-                      className="absolute inset-0 rounded-md bg-white/4 z-0"
-                    />
-                    <motion.span layoutId="active-tab-indicator" transition={{ type: 'spring', stiffness: 700, damping: 35 }}
-                      className="absolute left-3 right-3 -bottom-1 h-0.5 bg-[#ef4444] rounded z-10"
-                    />
-                  </>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* Search bar always visible */}
-        <div className="px-4 py-2 border-t border-[#1f1f1f]">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex items-center gap-2 bg-[#111] rounded-full px-3 py-1.5 border border-[#1f1f1f] focus-within:border-[#ef4444]/30 transition-all">
-              <Search className="w-3.5 h-3.5 text-[#71767b] shrink-0" />
-              <input
-                value={searchQuery}
-                onChange={e => setSearchQuery(e.target.value)}
-                placeholder="Search Arena..."
-                className="flex-1 bg-transparent text-xs text-white placeholder:text-[#71767b] outline-none"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Live Ticker — with proper spacing */}
-      {/* Removed: Live ticker section */}
-
-      {/* Search label */}
-      {searchQuery && (
-        <div className="px-4 py-2 border-b border-[#1f1f1f]">
-          <p className="text-xs text-[#71767b]">
-            {filteredPosts.length} results for <span className="text-white font-bold">"{searchQuery}"</span>
-          </p>
-        </div>
-      )}
-
-      {/* Feed */}
+    <div className="relative">
       <AnimatePresence mode="wait">
-        {activeTab === 'video' ? (
-          <motion.div key="video-feed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-            <FeedProvider>
-              <FeedContainer
-                filter="video"
-                onUserClick={(name: string) => setSelectedUser(name)}
-                onMatchClick={(matchId: string) => setSelectedMatch(matchId)}
-                onTagClick={(_tag: string) => {/* Handle tag click */}}
-              />
-            </FeedProvider>
-          </motion.div>
-        ) : (
-          <motion.div key={activeTab + searchQuery} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
-            {filteredPosts.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-20 text-center px-8">
-                <p className="text-4xl mb-3">🔍</p>
-                <p className="font-bold text-white mb-1">No posts found</p>
-                <p className="text-sm text-[#71767b]">Try a different search term</p>
+        {!selectedPost && !selectedMatch && !selectedUser ? (
+          <motion.div
+            key="home-feed"
+            initial={{ opacity: 0, x: -10 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -10 }}
+            transition={{ duration: 0.2, ease: 'easeInOut' }}
+          >
+            {/* Tabs nav row — pinned under header */}
+            <div className="sticky top-0 z-30 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
+              <div className="max-w-3xl mx-auto px-4 py-2 flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  {tabs.map(tab => (
+                    <button key={tab.key} onClick={() => { setActiveTab(tab.key); }}
+                      className={cn('px-3 py-1.5 rounded-md text-xs font-semibold transition-all relative overflow-visible',
+                        activeTab === tab.key ? 'text-white' : 'text-[#9aa0a6] hover:text-white hover:bg-white/2'
+                      )}
+                    >
+                      <span className="relative z-20">{tab.label}</span>
+
+                      {activeTab === tab.key && (
+                        <>
+                          <motion.span layoutId="active-tab-pill" transition={{ type: 'spring', stiffness: 700, damping: 40 }}
+                            className="absolute inset-0 rounded-md bg-white/4 z-0"
+                          />
+                          <motion.span layoutId="active-tab-indicator" transition={{ type: 'spring', stiffness: 700, damping: 35 }}
+                            className="absolute left-3 right-3 -bottom-1 h-0.5 bg-[#ef4444] rounded z-10"
+                          />
+                        </>
+                      )}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Minimized Scroll Search Icon / Compact Input */}
+                <AnimatePresence>
+                  {isScrolled && (
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      className="flex items-center gap-2"
+                    >
+                      {compactSearchActive ? (
+                        <div className="flex items-center gap-1.5 bg-[#111] border border-[#1f1f1f] rounded-full px-2.5 py-1 transition-all w-32 sm:w-44">
+                          <Search className="w-3.5 h-3.5 text-[#71767b] shrink-0" />
+                          <input
+                            autoFocus
+                            value={searchQuery}
+                            onChange={e => setSearchQuery(e.target.value)}
+                            placeholder="Search..."
+                            className="bg-transparent text-[11px] text-white outline-none w-full placeholder:text-[#71767b]"
+                            onBlur={() => {
+                              if (!searchQuery) setCompactSearchActive(false);
+                            }}
+                          />
+                          <button
+                            onClick={() => {
+                              setSearchQuery('');
+                              setCompactSearchActive(false);
+                            }}
+                            className="text-[#71767b] hover:text-white"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => setCompactSearchActive(true)}
+                          className="p-1.5 rounded-full bg-white/5 hover:bg-white/10 text-[#71767b] hover:text-white transition-all mr-1"
+                          title="Search Arena"
+                        >
+                          <Search className="w-4 h-4" />
+                        </button>
+                      )}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
-            ) : filteredPosts.map(post => (
-              <PostCard
-                key={post.id}
-                post={post}
-                onPostClick={setSelectedPost}
-                onUserClick={setSelectedUser}
-                onShare={setSharePost}
-                onMore={setMorePost}
-              />
-            ))}
+
+              {/* Search bar always visible when at the top */}
+              <AnimatePresence>
+                {!isScrolled && (
+                  <motion.div
+                    initial={{ height: 0, opacity: 0 }}
+                    animate={{ height: 'auto', opacity: 1 }}
+                    exit={{ height: 0, opacity: 0 }}
+                    transition={{ duration: 0.15 }}
+                    className="px-4 py-2 border-t border-[#1f1f1f] overflow-hidden"
+                  >
+                    <div className="max-w-3xl mx-auto">
+                      <div className="flex items-center gap-2 bg-[#111] rounded-full px-3 py-1.5 border border-[#1f1f1f] focus-within:border-[#ef4444]/30 transition-all">
+                        <Search className="w-3.5 h-3.5 text-[#71767b] shrink-0" />
+                        <input
+                          value={searchQuery}
+                          onChange={e => setSearchQuery(e.target.value)}
+                          placeholder="Search Arena..."
+                          className="flex-1 bg-transparent text-xs text-white placeholder:text-[#71767b] outline-none"
+                        />
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Search label */}
+            {searchQuery && (
+              <div className="px-4 py-2 border-b border-[#1f1f1f]">
+                <p className="text-xs text-[#71767b]">
+                  {filteredPosts.length} results for <span className="text-white font-bold">"{searchQuery}"</span>
+                </p>
+              </div>
+            )}
+
+            {/* Feed */}
+            <AnimatePresence mode="wait">
+              {activeTab === 'video' ? (
+                <motion.div key="video-feed" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+                  <FeedProvider>
+                    <FeedContainer
+                      filter="video"
+                      onUserClick={(name: string) => setSelectedUser(name)}
+                      onMatchClick={(matchId: string) => setSelectedMatch(matchId)}
+                      onTagClick={(_tag: string) => {/* Handle tag click */}}
+                    />
+                  </FeedProvider>
+                </motion.div>
+              ) : (
+                <motion.div key={activeTab + searchQuery} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
+                  {filteredPosts.length === 0 ? (
+                    <div className="flex flex-col items-center justify-center py-20 text-center px-8">
+                      <p className="text-4xl mb-3">🔍</p>
+                      <p className="font-bold text-white mb-1.5">No posts found</p>
+                      <p className="text-xs text-[#71767b]">Try a different search term</p>
+                    </div>
+                  ) : filteredPosts.map(post => (
+                    <PostCard
+                      key={post.id}
+                      post={post}
+                      onPostClick={setSelectedPost}
+                      onUserClick={setSelectedUser}
+                      onShare={setSharePost}
+                      onMore={setMorePost}
+                    />
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
           </motion.div>
-        )}
+        ) : null}
+
+        {selectedPost ? (
+          <motion.div
+            key="post-thread"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
+            <PostThreadPage
+              post={selectedPost}
+              onBack={() => setSelectedPost(null)}
+              onUserClick={(name) => { setSelectedPost(null); setSelectedUser(name); }}
+            />
+          </motion.div>
+        ) : null}
+
+        {selectedMatch ? (
+          <motion.div
+            key="match-detail"
+            initial={{ opacity: 0, scale: 0.98 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.2 }}
+          >
+            <MatchDetailPage onBack={() => setSelectedMatch(null)} />
+          </motion.div>
+        ) : null}
+
+        {selectedUser ? (
+          <motion.div
+            key="user-profile"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.25, ease: 'easeOut' }}
+          >
+            <UserProfileView userName={selectedUser} onBack={() => setSelectedUser(null)} />
+          </motion.div>
+        ) : null}
       </AnimatePresence>
 
       {/* Floating Post Button */}
       <AnimatePresence>
-        {showButton && (
+        {showButton && !selectedPost && !selectedMatch && !selectedUser && (
           <motion.button
             initial={{ scale: 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0, opacity: 0 }}
             whileTap={{ scale: 0.9 }} onClick={() => setShowModal(true)}

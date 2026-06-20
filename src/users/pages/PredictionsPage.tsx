@@ -299,7 +299,7 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
   const [showChannelInfoModal, setShowChannelInfoModal] = useState(false);
 
   return (
-    <div className="flex flex-col h-[calc(100vh-56px)]">
+    <div className="flex flex-col h-full">
       {/* Enhanced Header */}
       <div className="bg-gradient-to-b from-black/60 to-black/30 backdrop-blur-xl border-b border-[#1f1f1f] shrink-0">
         <div className="flex items-center gap-3 px-4 py-4">
@@ -1187,6 +1187,13 @@ export function PredictionsPage() {
     <div>
       <div className="sticky top-0 z-20 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
         <div className="flex items-center gap-2 px-4 py-3">
+          <button 
+            onClick={() => navigate('/')} 
+            className="p-1 -ml-1 rounded-full hover:bg-white/10 text-[#71767b] hover:text-white md:hidden mr-1"
+            title="Back to Home"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
           <h1 className="text-lg font-black text-white flex-1">Predictions</h1>
           <button
             onClick={() => setShowAdd(true)}

@@ -107,9 +107,9 @@ export function ChatWindow({ chat, onBack }: ChatWindowProps) {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-56px)]">
+    <div className="flex flex-col h-full">
       {/* Header */}
-      <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[#1f1f1f] bg-black/95 backdrop-blur-sm shrink-0">
+      <div className="flex items-center gap-3 px-4 py-3.5 border-b border-[#1f1f1f] bg-black/95 backdrop-blur-md shrink-0 relative z-20">
         <button onClick={onBack} className="p-2 rounded-full hover:bg-white/10 transition-colors duration-200">
           <ArrowLeft className="w-5 h-5 text-white" />
         </button>
@@ -150,7 +150,7 @@ export function ChatWindow({ chat, onBack }: ChatWindowProps) {
                   animate={{ opacity: 1, scale: 1, y: 0 }}
                   exit={{ opacity: 0, scale: 0.95, y: -8 }}
                   transition={{ duration: 0.15 }}
-                  className="absolute right-0 top-full mt-2 w-56 bg-[#1a1a1a] border border-[#2a2a2a] rounded-xl shadow-2xl z-50 overflow-hidden backdrop-blur-sm"
+                  className="absolute right-0 top-full mt-2 w-56 bg-[#0d0d0f] border border-[#2a2a30] rounded-xl shadow-2xl z-50 overflow-hidden"
                 >
                   <div className="divide-y divide-[#1f1f1f]">
                     {/* Conversation Actions */}

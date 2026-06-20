@@ -1,6 +1,7 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X } from 'lucide-react';
+import { Search, X, ArrowLeft } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import type { Chat } from './types';
 import { Avatar } from './Avatar';
@@ -13,6 +14,7 @@ interface ConversationListProps {
 
 export function Conversation({ chats, activeChat, onSelectChat }: ConversationListProps) {
   const [query, setQuery] = useState('');
+  const navigate = useNavigate();
 
   const filtered = chats.filter(c =>
     c.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -23,7 +25,16 @@ export function Conversation({ chats, activeChat, onSelectChat }: ConversationLi
     <aside className="w-full md:w-[380px] border-r border-[#1f1f1f] bg-[#08090b] flex flex-col overflow-hidden">
       {/* Header */}
       <div className="border-b border-[#1f1f1f] bg-black/80 backdrop-blur-sm px-4 py-4 shrink-0">
-        <h1 className="text-xl font-black text-white mb-3.5 tracking-tight">Messages</h1>
+        <div className="flex items-center gap-2 mb-3.5">
+          <button 
+            onClick={() => navigate('/')} 
+            className="p-1 -ml-1 rounded-full hover:bg-white/10 text-[#71767b] hover:text-white md:hidden"
+            title="Back to Home"
+          >
+            <ArrowLeft className="w-5 h-5" />
+          </button>
+          <h1 className="text-xl font-black text-white tracking-tight">Messages</h1>
+        </div>
         <div className="flex items-center gap-2 bg-[#111] rounded-full px-4 py-2.5 border border-[#1f1f1f] focus-within:border-[#ef4444]/40 transition-all duration-200">
           <Search className="w-4 h-4 text-[#71767b] shrink-0" />
           <input

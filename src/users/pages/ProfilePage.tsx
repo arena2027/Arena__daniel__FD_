@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Heart, MessageCircle, Repeat2, Share, Bookmark, Trophy, Upload, X } from 'lucide-react';
+import { Zap, Heart, MessageCircle, Repeat2, Share, Bookmark, Trophy, Upload, X, ArrowLeft } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import type { AppUser } from '../../core/types';
@@ -89,7 +89,7 @@ function TipstersGrid() {
   return (
     <div className="bg-[#12121A] p-4 rounded-2xl border border-[#1f1f1f]">
       <h3 className="mb-4 text-sm font-bold text-white">Followed Tipsters</h3>
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {followedTipsters.map(t => (
           <div key={t.id} className="bg-[#0d0d0d] p-3 rounded-xl border border-[#1f1f1f] flex flex-col gap-2">
             <Avatar name={t.name} size="md" />
@@ -421,19 +421,30 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
   };
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen pb-24">
+      {/* Sticky Profile Header for Mobile viewports */}
+      <div className="sticky top-0 z-30 bg-black/95 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-3 flex items-center gap-3 md:hidden">
+        <button onClick={() => navigate('/')} className="p-1.5 rounded-full hover:bg-white/10 transition-colors">
+          <ArrowLeft className="w-5 h-5 text-white" />
+        </button>
+        <div className="flex-1 min-w-0">
+          <p className="font-black text-white text-sm truncate">{appUser.name || 'SportX Fan'}</p>
+          <p className="text-xs text-[#71767b]">Profile</p>
+        </div>
+      </div>
+
       {/* Cover */}
       <div className={cn(
-        'h-24',
+        'h-32 md:h-40 bg-gradient-to-br border-b border-[#1f1f1f]',
         isTipster
-          ? 'bg-gradient-to-br from-yellow-500/30 via-orange-500/20 to-transparent'
-          : 'bg-gradient-to-br from-[#ef4444]/30 via-[#dc2626]/20 to-transparent'
+          ? 'from-yellow-500/30 via-orange-500/20 to-transparent'
+          : 'from-[#ef4444]/30 via-[#dc2626]/20 to-transparent'
       )} />
 
       {/* Profile Header */}
-      <div className="bg-[#12121A] border-b border-[#1f1f1f] px-4 pb-4">
-        <div className="flex flex-col md:flex-row gap-4 items-start md:items-end -mt-10 mb-4">
-          <div className="ring-4 ring-[#12121A] rounded-full relative group">
+      <div className="bg-[#08090b] border-b border-[#1f1f1f] px-4 pb-4">
+        <div className="flex flex-col md:flex-row gap-4 items-start md:items-end -mt-12 md:-mt-16 mb-4">
+          <div className="ring-4 ring-[#08090b] rounded-full relative group shrink-0">
             <Avatar name={appUser.name || 'U'} size="xl" image={previewImage} />
             {editMode && (
               <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
@@ -448,8 +459,8 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
               </label>
             )}
           </div>
-          <div className="flex-1 mt-2 md:mt-0 md:pb-1">
-            <div className="flex items-center gap-2 mb-0.5">
+          <div className="flex-1 mt-2 md:mt-0 md:pb-1 min-w-0">
+            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
               <h2 className="text-xl font-black text-white">{appUser.name || 'SportX Fan'}</h2>
               {isTipster && (
                 <div className="flex items-center gap-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full px-2 py-0.5">
@@ -473,10 +484,10 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
               ))}
             </div>
           </div>
-          <div className="flex gap-3 shrink-0">
+          <div className="flex gap-2 flex-wrap shrink-0 w-full md:w-auto mt-2 md:mt-0">
             <button
               onClick={() => setEditMode(e => !e)}
-              className="h-10 px-4 rounded-xl border border-[#1f1f1f] text-sm font-bold text-white hover:border-white/20 transition-colors"
+              className="flex-1 md:flex-none h-10 px-4 rounded-xl border border-[#1f1f1f] text-sm font-bold text-white hover:border-white/20 transition-colors"
             >
               {editMode ? 'Done' : 'Edit Profile'}
             </button>
@@ -485,7 +496,7 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
                 onClick={handleBecomeTipster}
                 disabled={isNavigating}
                 className={cn(
-                  'h-10 px-4 rounded-xl text-sm font-bold text-white transition-colors flex items-center gap-1.5',
+                  'flex-1 md:flex-none h-10 px-4 rounded-xl text-sm font-bold text-white transition-colors flex items-center justify-center gap-1.5',
                   isNavigating ? 'bg-white/10 text-[#71767b] cursor-wait' : 'bg-[#ef4444] hover:bg-[#dc2626]'
                 )}
               >
@@ -496,13 +507,12 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
             {isTipster && (
               <button
                 onClick={() => navigate('/dashboard')}
-                className="h-10 px-4 rounded-xl bg-yellow-500 text-sm font-bold text-black hover:bg-yellow-400 transition-colors flex items-center gap-1.5"
+                className="flex-1 md:flex-none h-10 px-4 rounded-xl bg-yellow-500 text-sm font-bold text-black hover:bg-yellow-400 transition-colors flex items-center justify-center gap-1.5"
               >
                 <Trophy className="w-4 h-4" />
                 Dashboard
               </button>
             )}
-
           </div>
         </div>
 

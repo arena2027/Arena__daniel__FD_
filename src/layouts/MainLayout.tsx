@@ -43,7 +43,7 @@ function LoadingFallback() {
 
 
 // ── Mobile Bottom Navigation ──────────────────────────────────────
-function MobileBottomNav() {
+function MobileBottomNav({ visible }: { visible: boolean }) {
   const navigate = useNavigate();
   const location = useLocation();
   const { showDetailView } = useDetailView();
@@ -53,6 +53,7 @@ function MobileBottomNav() {
   
   // Hide if on hidden paths or if a detail view is open
   const shouldShow = 
+    visible &&
     !hideOnPaths.includes(location.pathname) && 
     !showDetailView;
 
@@ -109,6 +110,13 @@ function MobileBottomNav() {
 const MainLayout: React.FC = () => {
   const { user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [mobileView, setMobileView] = useState(() => typeof window !== 'undefined' ? window.innerWidth < 768 : false);
+
+  useEffect(() => {
+    const handleResize = () => setMobileView(window.innerWidth < 768);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   useEffect(() => {
     if (window.innerWidth >= 768) {
@@ -121,13 +129,33 @@ const MainLayout: React.FC = () => {
   }
 
   const location = useLocation();
-  const isFullBleedLayout = ['/messages', '/predictions'].includes(location.pathname);
+  const { showDetailView } = useDetailView();
+
+  const hideMobileNavAndHeaderPaths = [
+    '/messages',
+    '/predictions',
+    '/profile',
+    '/user',
+    '/become-tipster',
+    '/wallet',
+    '/settings',
+    '/bookmarks',
+    '/notifications'
+  ];
+
+  const hideOnMobile = hideMobileNavAndHeaderPaths.some(path => location.pathname.startsWith(path)) || showDetailView;
+  const shouldShowGlobalHeader = !mobileView || !hideOnMobile;
+  const shouldShowBottomNav = !sidebarOpen && (!mobileView || !hideOnMobile);
+
+  const isFullBleedLayout = ['/messages', '/predictions', '/profile', '/user'].some(path => location.pathname.startsWith(path));
   return (
     <div className="min-h-screen bg-[#050505] text-white flex flex-col">
-      <Header
-        title="Arena"
-        onMenuClick={() => setSidebarOpen((prev) => !prev)}
-      />
+      {shouldShowGlobalHeader && (
+        <Header
+          title="Arena"
+          onMenuClick={() => setSidebarOpen((prev) => !prev)}
+        />
+      )}
 
       {/* 3-Column Layout with Fixed Sidebar */}
       <div className="flex flex-1 overflow-hidden pr-0 xl:pr-80">
@@ -156,7 +184,10 @@ const MainLayout: React.FC = () => {
         )}
 
         {/* Center + Right Container */}
-        <div className="flex flex-1 h-[calc(100vh-56px)] relative">
+        <div className={cn(
+          "flex flex-1 relative",
+          shouldShowGlobalHeader ? "h-[calc(100vh-56px)]" : "h-screen"
+        )}>
           {/* Center Main Feed - Scrollable */}
           <main className="flex-1 overflow-y-auto border-r border-[#1f1f1f]" style={{ msOverflowStyle: 'auto', scrollbarWidth: 'none' }}>
             <div className={cn('w-full', isFullBleedLayout ? 'w-full' : 'max-w-2xl mx-auto')}>
@@ -215,7 +246,7 @@ const MainLayout: React.FC = () => {
       </div>
 
       {/* Mobile Bottom Navigation */}
-      <MobileBottomNav />
+      <MobileBottomNav visible={shouldShowBottomNav} />
     </div>
   );
 };

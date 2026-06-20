@@ -39,6 +39,15 @@ export function PredictionCard({
   const [expanded, setExpanded] = useState(false);
   const [liked, setLiked] = useState(false);
 
+  const [copied, setCopied] = useState(false);
+
+  const handleCopyCode = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 12 }}
@@ -66,9 +75,22 @@ export function PredictionCard({
       {/* Prediction Code */}
       <div className="px-4 pt-3 pb-2">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-sm font-bold text-[#ef4444] flex items-center gap-1">
-            🎯 {code}
-          </span>
+          <button
+            onClick={handleCopyCode}
+            className="text-sm font-bold text-[#ef4444] hover:text-[#ff6b6b] active:scale-95 transition-all flex items-center gap-1.5 bg-[#ef4444]/10 hover:bg-[#ef4444]/20 px-2 py-1 rounded-lg border border-[#ef4444]/20 select-all"
+            title="Click to copy game code"
+          >
+            <span>🎯 {code}</span>
+            {copied ? (
+              <span className="text-[10px] bg-green-500/20 text-green-400 px-1 rounded flex items-center gap-0.5 font-bold">
+                <Check className="w-2.5 h-2.5" /> Copied
+              </span>
+            ) : (
+              <span className="text-[9px] text-[#71767b] font-normal opacity-80">
+                📋 copy
+              </span>
+            )}
+          </button>
           <span className="text-[10px] text-[#71767b]">{timestamp}</span>
         </div>
 
