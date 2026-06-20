@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Heart, MessageCircle, Repeat2, Share, Bookmark, Trophy, Upload, X, ArrowLeft, MapPin, Calendar } from 'lucide-react';
+import { Zap, Heart, MessageCircle, Repeat2, Share, Bookmark, Trophy, Upload, X, Settings } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
 import type { AppUser } from '../../core/types';
@@ -21,7 +21,7 @@ const recentActivity = [
   { id: 5, text: 'Followed NBA Central tipster', time: '3d ago', emoji: '🏀' },
 ];
 
-const recentPredictions = ['W', 'W', 'L', 'W', 'L', 'W', 'W'];
+
 
 const myPosts = [
   { id: 'p1', content: 'Man City are going to win the treble this season. Book it. 🏆🏆🏆', time: '2h ago', likes: 234, comments: 45, reposts: 12 },
@@ -44,13 +44,13 @@ const subscriptions = [
 
 // ── Avatar ────────────────────────────────────────────────────
 function Avatar({ name, size = 'md', image }: { name: string; size?: 'sm' | 'md' | 'lg' | 'xl'; image?: string }) {
-  const colors = ['bg-red-600', 'bg-blue-600', 'bg-green-600', 'bg-purple-600', 'bg-orange-600'];
+  const colors = ['bg-[#ef4444]', 'bg-blue-600', 'bg-green-600', 'bg-purple-600', 'bg-orange-600'];
   const color = colors[name.charCodeAt(0) % colors.length];
   const sizes = {
     sm: 'w-7 h-7 text-xs',
     md: 'w-10 h-10 text-sm',
     lg: 'w-12 h-12 text-base',
-    xl: 'w-[88px] h-[88px] text-3xl',
+    xl: 'w-24 h-24 text-4xl',
   };
 
   if (image) {
@@ -70,42 +70,45 @@ function Avatar({ name, size = 'md', image }: { name: string; size?: 'sm' | 'md'
   );
 }
 
-// ── Win/Loss Row ──────────────────────────────────────────────
-function WinLossRow({ data }: { data: string[] }) {
-  return (
-    <div className="flex gap-2 flex-wrap">
-      {data.map((d, i) => (
-        <div key={i} className={cn('w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white', d === 'W' ? 'bg-green-500' : 'bg-[#ef4444]')}>
-          {d}
-        </div>
-      ))}
-    </div>
-  );
-}
+
 
 // ── Tipsters Grid ─────────────────────────────────────────────
 function TipstersGrid() {
-  const [following, setFollowing] = useState<Record<number, boolean>>({});
+  const [following, setFollowing] = useState<Record<number, boolean>>({
+    1: true,
+    2: true,
+    3: true,
+    4: true,
+  });
+
   return (
-    <div className="bg-[#12121A] p-4 rounded-2xl border border-[#1f1f1f]">
-      <h3 className="mb-4 text-sm font-bold text-white">Followed Tipsters</h3>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div className="py-2">
+      <h3 className="text-base font-bold text-white mb-3">Followed Tipsters</h3>
+      <div className="flex gap-3 overflow-x-auto scrollbar-none pb-2" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
         {followedTipsters.map(t => (
-          <div key={t.id} className="bg-[#0d0d0d] p-3 rounded-xl border border-[#1f1f1f] flex flex-col gap-2">
-            <Avatar name={t.name} size="md" />
-            <div>
-              <p className="text-sm font-bold text-white">{t.name}</p>
-              <p className="text-xs text-[#71767b]">{t.handle}</p>
-              <div className="flex items-center gap-2 mt-1">
-                <span className="text-[10px] text-green-400 font-bold">{t.winRate} WR</span>
-                <span className="text-[10px] text-[#ef4444] font-bold">🔥 {t.streak}</span>
+          <div 
+            key={t.id} 
+            className="bg-[#0b0c0e] p-3 rounded-2xl border border-[#1f1f1f] flex items-center justify-between min-w-[245px] w-[245px] shrink-0"
+          >
+            <div className="flex items-center gap-2.5 min-w-0">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-r from-yellow-500 to-amber-600 flex items-center justify-center font-black text-black text-sm shrink-0 shadow-md">
+                {t.name[0]}
+              </div>
+              <div className="min-w-0">
+                <p className="text-sm font-bold text-white truncate leading-tight">{t.name}</p>
+                <p className="text-xs text-green-400 font-bold mt-0.5">{t.winRate} WR 🔥</p>
               </div>
             </div>
             <button
               onClick={() => setFollowing(f => ({ ...f, [t.id]: !f[t.id] }))}
-              className={cn('h-8 text-xs rounded-lg font-bold transition-all', following[t.id] ? 'border border-white/20 text-[#71767b]' : 'bg-[#ef4444] text-white hover:bg-[#dc2626]')}
+              className={cn(
+                'h-8 px-4 text-xs font-bold rounded-full transition-all shrink-0',
+                following[t.id] 
+                  ? 'bg-[#ef4444] text-white hover:bg-[#dc2626]' 
+                  : 'border border-white/20 text-[#71767b]'
+              )}
             >
-              {following[t.id] ? 'Following ✓' : 'Follow'}
+              {following[t.id] ? 'Follow' : 'Followed'}
             </button>
           </div>
         ))}
@@ -117,52 +120,111 @@ function TipstersGrid() {
 // ── Activity List ─────────────────────────────────────────────
 function ActivityList() {
   return (
-    <div className="bg-[#12121A] p-4 rounded-2xl border border-[#1f1f1f]">
-      <h3 className="mb-3 text-sm font-bold text-white">Recent Activity</h3>
-      {recentActivity.map(item => (
-        <div key={item.id} className="flex items-center justify-between h-[56px] px-3 rounded-lg hover:bg-[#1A1A25] transition-colors cursor-pointer">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-[#ef4444]/10 border border-[#ef4444]/20 rounded-full flex items-center justify-center text-sm shrink-0">
+    <div className="bg-[#0b0c0e] p-4 rounded-2xl border border-[#1f1f1f] relative">
+      <h3 className="mb-4 text-base font-bold text-white">Recent Activity</h3>
+      
+      {/* Vertical timeline line on the right side */}
+      <div className="absolute right-[54px] top-[74px] bottom-[34px] w-[1px] bg-[#1f1f1f] z-0" />
+      
+      <div className="space-y-4">
+        {recentActivity.map(item => (
+          <div key={item.id} className="flex items-center gap-3 relative z-10">
+            {/* Left Icon */}
+            <div className="w-8 h-8 rounded-full bg-[#16171a] flex items-center justify-center text-sm shrink-0 border border-[#1f1f1f]">
               {item.emoji}
             </div>
-            <p className="text-sm text-[#e7e9ea] truncate max-w-[180px]">{item.text}</p>
+            
+            {/* Middle Text */}
+            <div className="flex-1 min-w-0 pr-8">
+              <p className="text-xs md:text-sm text-[#e7e9ea] truncate font-medium">
+                {item.text}
+              </p>
+            </div>
+
+            {/* Timeline Dot */}
+            <div className="absolute right-[49px] w-2.5 h-2.5 rounded-full bg-[#ef4444] border border-black shrink-0" />
+
+            {/* Right Timestamp */}
+            <span className="text-xs text-[#71767b] w-8 text-right shrink-0">
+              {item.time.replace(' ago', '')}
+            </span>
           </div>
-          <span className="text-xs text-[#71767b] shrink-0 ml-2">{item.time}</span>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
 
-// ── Right Panel ───────────────────────────────────────────────
-function RightPanel({ isTipster, onBecomeTipster }: { isTipster: boolean; onBecomeTipster: () => void }) {
+// ── Prediction Record ─────────────────────────────────────────
+function PredictionRecord() {
+  const badges = [
+    { outcome: 'W', label: '4W-30' },
+    { outcome: 'W', label: '4W-2L' },
+    { outcome: 'L', label: '06-28' },
+    { outcome: 'W', label: '06-28' },
+    { outcome: 'L', label: '06-29' },
+    { outcome: 'L', label: '06-23' },
+    { outcome: 'W', label: '06-21' },
+    { outcome: 'L', label: '06-21' },
+  ];
+
   const stats = [
-    { value: '63%', label: 'Accuracy' },
-    { value: '32', label: 'Predictions' },
-    { value: '+12%', label: 'ROI' },
+    { value: '71%', label: '% WR', isGreen: false },
+    { value: '1.8', label: 'Avg Odds', isGreen: false },
+    { value: '32', label: 'Predictions', isGreen: false },
+    { value: '+12%', label: 'ROI', isGreen: true },
   ];
 
   return (
-    <div className="space-y-4">
-      <div className="bg-[#12121A] p-4 rounded-2xl border border-[#1f1f1f]">
-        <h4 className="text-sm font-bold text-white mb-3">Prediction Record</h4>
-        <div className="grid grid-cols-3 gap-2 mb-3">
-          {stats.map(s => (
-            <div key={s.label} className="bg-[#0d0d0d] p-3 rounded-xl border border-[#1f1f1f] text-center">
-              <p className="text-lg font-black text-white">{s.value}</p>
-              <p className="text-[10px] text-[#71767b] mt-0.5">{s.label}</p>
-            </div>
-          ))}
+    <div className="bg-[#0b0c0e] p-4 rounded-2xl border border-[#1f1f1f]">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <h3 className="text-base font-bold text-white">Prediction Record</h3>
+        <div className="text-xs font-semibold text-[#71767b]">
+          Record: <span className="text-green-500 font-bold">4W</span>-<span className="text-[#ef4444] font-bold">3L</span>, Streak: <span className="text-green-500 font-bold">W2</span>
         </div>
-        <p className="text-xs text-[#71767b] mb-2">Last 7 predictions</p>
-        <WinLossRow data={recentPredictions} />
       </div>
 
-      <div className="bg-[#12121A] p-4 rounded-2xl border border-[#1f1f1f]">
-        <h4 className="text-sm font-bold text-white mb-2">About</h4>
-        <p className="text-sm text-[#71767b] leading-relaxed">Sports fan. Love predictions and good vibes.</p>
+      {/* Badges Row */}
+      <div className="flex items-center justify-between gap-1 overflow-x-auto scrollbar-none pb-4 border-b border-[#1f1f1f] mb-4" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+        {badges.map((b, i) => (
+          <div key={i} className="flex flex-col items-center gap-1.5 shrink-0 min-w-[36px]">
+            <div 
+              className={cn(
+                'w-8 h-8 rounded-full flex items-center justify-center text-xs font-black text-white shadow-sm',
+                b.outcome === 'W' ? 'bg-green-500' : 'bg-[#ef4444]'
+              )}
+            >
+              {b.outcome}
+            </div>
+            <span className="text-[10px] text-[#71767b] font-medium">{b.label}</span>
+          </div>
+        ))}
       </div>
 
+      {/* Stats Grid */}
+      <div className="grid grid-cols-4 gap-2 text-center">
+        {stats.map(s => (
+          <div key={s.label}>
+            <p className={cn('text-lg font-black', s.isGreen ? 'text-green-400' : 'text-white')}>
+              {s.value}
+            </p>
+            <p className="text-[10px] text-[#71767b] font-bold mt-0.5 uppercase tracking-wider">{s.label}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── Overview Tab ──────────────────────────────────────────────
+function OverviewTab({ isTipster, onBecomeTipster }: { isTipster: boolean; onBecomeTipster: () => void }) {
+  return (
+    <div className="flex flex-col gap-4 mt-4 max-w-2xl mx-auto">
+      <TipstersGrid />
+      <ActivityList />
+      <PredictionRecord />
+      
       {/* Become Tipster CTA — only for regular users */}
       {!isTipster && (
         <div className="bg-gradient-to-br from-[#ef4444]/20 to-[#dc2626]/10 border border-[#ef4444]/20 rounded-2xl p-4">
@@ -181,34 +243,6 @@ function RightPanel({ isTipster, onBecomeTipster }: { isTipster: boolean; onBeco
           </button>
         </div>
       )}
-
-      {/* Tipster badge — only for tipsters */}
-      {isTipster && (
-        <div className="bg-gradient-to-br from-yellow-500/20 to-orange-500/10 border border-yellow-500/20 rounded-2xl p-4">
-          <div className="flex items-center gap-2 mb-2">
-            <Trophy className="w-4 h-4 text-yellow-400" />
-            <p className="text-sm font-bold text-white">Verified Tipster</p>
-          </div>
-          <p className="text-xs text-[#71767b] leading-relaxed">
-            You are a verified tipster. Your predictions and channels are featured across the platform.
-          </p>
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ── Overview Tab ──────────────────────────────────────────────
-function OverviewTab({ isTipster, onBecomeTipster }: { isTipster: boolean; onBecomeTipster: () => void }) {
-  return (
-    <div className="grid grid-cols-1 gap-4 mt-4 md:grid-cols-[2fr_1fr]">
-      <div className="flex flex-col gap-4">
-        <TipstersGrid />
-        <ActivityList />
-      </div>
-      <div className="flex flex-col gap-4">
-        <RightPanel isTipster={isTipster} onBecomeTipster={onBecomeTipster} />
-      </div>
     </div>
   );
 }
@@ -398,7 +432,8 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
       alert('Image must be less than 5MB');
       return;
     }
-// Create preview
+
+    // Create preview
     const reader = new FileReader();
     reader.onload = (event) => {
       const result = event.target?.result as string;
@@ -414,192 +449,89 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
   };
 
   const handleSaveProfile = () => {
-    // Here you would call the API to save the profile
-    // For now, just close edit mode
     setEditMode(false);
   };
 
   return (
     <div className="min-h-screen pb-24">
-      {/* Sticky Profile Header for Mobile viewports */}
-      <div className="sticky top-0 z-30 bg-black/95 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-3 flex items-center gap-3 md:hidden">
-        <button onClick={() => navigate('/')} className="p-1.5 rounded-full hover:bg-white/10 transition-colors">
-          <ArrowLeft className="w-5 h-5 text-white" />
+      {/* Redesigned Header: Centered layout matching reference image */}
+      <div className="sticky top-0 z-30 bg-black/95 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-3.5 flex items-center justify-between">
+        <div className="w-10 shrink-0" />
+        <h1 className="text-base font-black text-white text-center flex-1">Profile</h1>
+        <button 
+          onClick={() => navigate('/settings')} 
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/10 text-white transition-colors shrink-0"
+          title="Settings"
+        >
+          <Settings className="w-5 h-5" />
         </button>
-        <div className="flex-1 min-w-0">
-          <p className="font-black text-white text-sm truncate">{appUser.name || 'SportX Fan'}</p>
-          <p className="text-xs text-[#71767b]">Profile</p>
-        </div>
       </div>
 
-      {/* Cover */}
-      <div className="h-32 md:h-40 relative border-b border-[#1f1f1f] bg-[#111] overflow-hidden">
-        <img
-          src="https://images.unsplash.com/photo-1540747737956-378724044282?q=80&w=800"
-          alt="Cover"
-          className="w-full h-full object-cover"
-        />
-        <div className="absolute inset-0 bg-black/25" />
-      </div>
-
-      {/* Profile Header */}
-      <div className="bg-black border-b border-[#1f1f1f] px-4 pb-4">
-        {/* Avatar and Action Buttons Row */}
-        <div className="flex justify-between items-end mb-3 -mt-[44px] md:-mt-[60px] relative z-10">
-          <div className="ring-4 ring-black rounded-full relative group shrink-0 overflow-hidden bg-black">
-            <Avatar name={appUser.name || 'U'} size="xl" image={previewImage} />
-            {editMode && (
-              <label className="absolute inset-0 flex items-center justify-center bg-black/50 rounded-full cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePictureChange}
-                  className="hidden"
-                  disabled={uploading}
-                />
-                <Upload className="w-8 h-8 text-white" />
-              </label>
-            )}
-          </div>
-
-          <div className="flex gap-2 shrink-0 pb-1">
-            <button
-              onClick={() => setEditMode(e => !e)}
-              className="h-9 px-4 rounded-full border border-[#1f1f1f] text-xs font-bold text-white hover:bg-white/5 transition-colors"
-            >
-              {editMode ? 'Done' : 'Edit Profile'}
-            </button>
-            {!isTipster && (
-              <button
-                onClick={handleBecomeTipster}
-                disabled={isNavigating}
-                className={cn(
-                  'h-9 px-4 rounded-full text-xs font-bold text-white transition-colors flex items-center justify-center gap-1.5',
-                  isNavigating ? 'bg-white/10 text-[#71767b] cursor-wait' : 'bg-[#ef4444] hover:bg-[#dc2626]'
-                )}
-              >
-                <Zap className="w-3.5 h-3.5" />
-                {isNavigating ? 'Opening...' : 'Become Tipster'}
-              </button>
-            )}
-            {isTipster && (
-              <button
-                onClick={() => navigate('/dashboard')}
-                className="h-9 px-4 rounded-full bg-yellow-500 text-xs font-bold text-black hover:bg-yellow-400 transition-colors flex items-center justify-center gap-1.5"
-              >
-                <Trophy className="w-3.5 h-3.5" />
-                Dashboard
-              </button>
-            )}
-          </div>
+      {/* Centered Profile Details Section */}
+      <div className="bg-black border-b border-[#1f1f1f] px-4 py-8 flex flex-col items-center">
+        {/* Avatar */}
+        <div className="ring-4 ring-black rounded-full overflow-hidden bg-black mb-4 shadow-xl shrink-0">
+          <Avatar name={appUser.name || 'U'} size="xl" image={previewImage} />
         </div>
 
-        {/* User Details */}
-        <div className="space-y-3">
+        {/* User Metadata */}
+        <div className="text-center mb-3">
+          <h2 className="text-xl font-black text-white leading-tight">{appUser.name || 'SportX Fan'}</h2>
+          <p className="text-sm text-[#71767b] mt-0.5">{appUser.handle || '@user'}</p>
+        </div>
+
+        {/* Bio */}
+        <p className="text-sm text-[#e7e9ea] text-center leading-relaxed max-w-[400px] mb-4 font-medium">
+          {editForm.bio}
+        </p>
+
+        {/* Follower / Subscriber Stats */}
+        <div className="flex gap-8 text-center mb-6">
+          <div className="hover:opacity-80 cursor-pointer">
+            <p className="text-base font-black text-white">56</p>
+            <p className="text-xs text-[#71767b] mt-0.5">Followers</p>
+          </div>
+          <div className="hover:opacity-80 cursor-pointer">
+            <p className="text-base font-black text-white">28</p>
+            <p className="text-xs text-[#71767b] mt-0.5">Following</p>
+          </div>
           <div>
-            <div className="flex items-center gap-1.5 flex-wrap">
-              <h2 className="text-xl font-black text-white">{appUser.name || 'SportX Fan'}</h2>
-              {isTipster && (
-                <div className="flex items-center gap-1 bg-yellow-500/20 border border-yellow-500/30 rounded-full px-2 py-0.5">
-                  <Trophy className="w-3 h-3 text-yellow-400" />
-                  <span className="text-[10px] font-black text-yellow-400">TIPSTER</span>
-                </div>
-              )}
-            </div>
-            <p className="text-sm text-[#71767b]">{appUser.handle || '@user'}</p>
-          </div>
-
-          <p className="text-sm text-[#e7e9ea] leading-relaxed max-w-[500px]">
-            {editForm.bio}
-          </p>
-
-          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[#71767b] text-xs">
-            <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" />Lagos, Nigeria</span>
-            <span className="flex items-center gap-1"><Calendar className="w-3.5 h-3.5" />Joined March 2026</span>
-          </div>
-
-          <div className="flex gap-4 text-sm">
-            <div className="hover:underline cursor-pointer">
-              <span className="font-black text-white">56</span>
-              <span className="text-[#71767b] ml-1">Followers</span>
-            </div>
-            <div className="hover:underline cursor-pointer">
-              <span className="font-black text-white">28</span>
-              <span className="text-[#71767b] ml-1">Following</span>
-            </div>
-            <div>
-              <span className="font-black text-white">3</span>
-              <span className="text-[#71767b] ml-1">Subscribed</span>
-            </div>
+            <p className="text-base font-black text-white">3</p>
+            <p className="text-xs text-[#71767b] mt-0.5">Subscribed</p>
           </div>
         </div>
 
-        <AnimatePresence>
-          {editMode && (
-            <motion.div
-              initial={{ opacity: 0, height: 0 }}
-              animate={{ opacity: 1, height: 'auto' }}
-              exit={{ opacity: 0, height: 0 }}
-              className="space-y-3 border-t border-[#1f1f1f] pt-4"
+        {/* Action Buttons Row */}
+        <div className="flex gap-3 w-full max-w-[340px] px-2 shrink-0">
+          <button
+            onClick={() => setEditMode(true)}
+            className="flex-1 h-11 rounded-full border border-[#2a2a30] text-xs font-bold text-white hover:bg-white/5 transition-all active:scale-98 animate-fade-in"
+          >
+            Edit Profile
+          </button>
+          {!isTipster && (
+            <button
+              onClick={handleBecomeTipster}
+              disabled={isNavigating}
+              className={cn(
+                'flex-1 h-11 rounded-full text-xs font-black text-black bg-white hover:bg-white/90 transition-all flex items-center justify-center gap-1.5 active:scale-98 shadow-md',
+                isNavigating && 'opacity-50 cursor-wait'
+              )}
             >
-              {/* Profile Picture Upload */}
-              <div className="flex items-center gap-3">
-                <div className="flex-1">
-                  <p className="text-xs font-bold text-[#71767b] mb-2 block">Profile Picture</p>
-                  <label className="flex items-center justify-center gap-2 py-6 border-2 border-dashed border-[#1f1f1f] rounded-xl hover:border-[#ef4444]/50 transition-colors cursor-pointer bg-[#0d0d0d]">
-                    <Upload className="w-4 h-4 text-[#71767b]" />
-                    <span className="text-sm text-[#71767b]">Click to upload or drag and drop</span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handlePictureChange}
-                      className="hidden"
-                      disabled={uploading}
-                    />
-                  </label>
-                  {previewImage && (
-                    <p className="text-xs text-green-400 mt-2">✓ Image selected</p>
-                  )}
-                </div>
-                {previewImage && (
-                  <button
-                    onClick={handleRemovePicture}
-                    type="button"
-                    className="h-10 px-3 rounded-xl border border-[#ef4444] text-[#ef4444] hover:bg-[#ef4444]/10 transition-colors"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                )}
-              </div>
-
-              <div>
-                <p className="text-xs font-bold text-[#71767b] mb-2 block">Display Name</p>
-                <input
-                  value={editForm.name}
-                  onChange={e => setEditForm(prev => ({ ...prev, name: e.target.value }))}
-                  className="w-full bg-[#0d0d0d] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition-all"
-                  placeholder="Display Name"
-                />
-              </div>
-              <div>
-                <p className="text-xs font-bold text-[#71767b] mb-2 block">Bio</p>
-                <textarea
-                  value={editForm.bio}
-                  onChange={e => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
-                  rows={2}
-                  className="w-full bg-[#0d0d0d] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-2.5 text-sm text-white outline-none resize-none transition-all"
-                  placeholder="Bio"
-                />
-              </div>
-              <div className="flex gap-2">
-                <button onClick={handleSaveProfile} disabled={uploading} className="flex-1 py-2 bg-[#ef4444] rounded-full text-sm font-bold text-white hover:bg-[#dc2626] transition-colors disabled:opacity-50">
-                  {uploading ? 'Saving...' : 'Save'}
-                </button>
-                <button onClick={() => setEditMode(false)} className="flex-1 py-2 border border-[#1f1f1f] rounded-full text-sm font-bold text-[#71767b] hover:text-white transition-colors">Cancel</button>
-              </div>
-            </motion.div>
+              <Zap className="w-3.5 h-3.5 fill-black text-black" />
+              {isNavigating ? 'Opening...' : 'Become Tipster'}
+            </button>
           )}
-        </AnimatePresence>
+          {isTipster && (
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="flex-1 h-11 rounded-full bg-yellow-500 text-xs font-black text-black hover:bg-yellow-400 transition-all flex items-center justify-center gap-1.5 active:scale-98 shadow-md"
+            >
+              <Trophy className="w-3.5 h-3.5 fill-black text-black" />
+              Dashboard
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Tabs */}
@@ -611,7 +543,7 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
             className={cn(
               'pb-3 pt-3 px-3 text-sm font-semibold whitespace-nowrap transition-all border-b-2',
               activeTab === tab
-                ? 'border-[#ef4444] text-white'
+                ? 'border-[#ef4444] text-[#ef4444]'
                 : 'border-transparent text-[#71767b] hover:text-white'
             )}
           >
@@ -636,6 +568,118 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
           {activeTab === 'Followers'     && <PeopleTab />}
           {activeTab === 'Subscriptions' && <SubscriptionsTab />}
         </motion.div>
+      </AnimatePresence>
+
+      {/* Edit Profile Modal Dialog with Full Screen Blur Backdrop */}
+      <AnimatePresence>
+        {editMode && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-md">
+            {/* Backdrop click to close */}
+            <div className="absolute inset-0 bg-transparent" onClick={() => setEditMode(false)} />
+            
+            {/* Modal Box */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ duration: 0.2 }}
+              className="relative w-full max-w-md bg-[#0d0d0f] border border-[#2a2a30] rounded-3xl overflow-hidden shadow-2xl flex flex-col z-10"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between px-6 py-4 border-b border-[#1f1f1f]">
+                <h3 className="text-base font-black text-white">Edit Profile</h3>
+                <button 
+                  onClick={() => setEditMode(false)}
+                  className="p-1.5 rounded-full hover:bg-white/10 text-[#71767b] hover:text-white transition-colors"
+                  title="Close"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              {/* Form Body */}
+              <div className="p-6 space-y-5 overflow-y-auto max-h-[calc(100vh-220px)]">
+                {/* Profile Picture Upload Section */}
+                <div className="flex flex-col items-center gap-3">
+                  <div className="relative w-24 h-24 rounded-full overflow-hidden ring-4 ring-[#ef4444]/20 group bg-black shrink-0 shadow-lg">
+                    <Avatar name={editForm.name || 'U'} size="xl" image={previewImage} />
+                    <label className="absolute inset-0 flex items-center justify-center bg-black/65 cursor-pointer opacity-0 group-hover:opacity-100 transition-opacity">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePictureChange}
+                        className="hidden"
+                        disabled={uploading}
+                      />
+                      <Upload className="w-6 h-6 text-white" />
+                    </label>
+                  </div>
+                  <div className="flex gap-2">
+                    <label className="px-3 py-1.5 rounded-lg border border-[#1f1f1f] text-xs font-bold text-white hover:bg-white/5 cursor-pointer select-none">
+                      Change Photo
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handlePictureChange}
+                        className="hidden"
+                        disabled={uploading}
+                      />
+                    </label>
+                    {previewImage && (
+                      <button
+                        onClick={handleRemovePicture}
+                        type="button"
+                        className="px-3 py-1.5 rounded-lg border border-[#ef4444]/30 text-[#ef4444] hover:bg-[#ef4444]/5 text-xs font-bold transition-colors"
+                      >
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Display Name Input */}
+                <div>
+                  <label className="text-[10px] font-bold text-[#71767b] mb-1.5 block uppercase tracking-wider">Display Name</label>
+                  <input
+                    value={editForm.name}
+                    onChange={e => setEditForm(prev => ({ ...prev, name: e.target.value }))}
+                    className="w-full bg-[#16161a] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-3 text-sm text-white outline-none transition-all"
+                    placeholder="Display Name"
+                  />
+                </div>
+
+                {/* Bio Textarea Input */}
+                <div>
+                  <label className="text-[10px] font-bold text-[#71767b] mb-1.5 block uppercase tracking-wider">Bio</label>
+                  <textarea
+                    value={editForm.bio}
+                    onChange={e => setEditForm(prev => ({ ...prev, bio: e.target.value }))}
+                    rows={3}
+                    className="w-full bg-[#16161a] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-3 text-sm text-white outline-none resize-none transition-all"
+                    placeholder="Bio"
+                  />
+                </div>
+              </div>
+
+              {/* Action Buttons Footer */}
+              <div className="flex gap-3 px-6 py-4 border-t border-[#1f1f1f] bg-[#09090b]">
+                <button 
+                  onClick={() => setEditMode(false)}
+                  className="flex-1 py-3 border border-[#1f1f1f] rounded-full text-sm font-bold text-[#71767b] hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={handleSaveProfile}
+                  disabled={uploading}
+                  className="flex-1 py-3 bg-[#ef4444] rounded-full text-sm font-bold text-white hover:bg-[#dc2626] transition-colors disabled:opacity-50"
+                >
+                  {uploading ? 'Saving...' : 'Save Changes'}
+                </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
       </AnimatePresence>
     </div>
   );

@@ -189,9 +189,27 @@ const MainLayout: React.FC = () => {
           shouldShowGlobalHeader ? "h-[calc(100vh-56px)]" : "h-screen"
         )}>
           {/* Center Main Feed - Scrollable */}
-          <main className="flex-1 overflow-y-auto border-r border-[#1f1f1f]" style={{ msOverflowStyle: 'auto', scrollbarWidth: 'none' }}>
-            <div className={cn('w-full', isFullBleedLayout ? 'w-full' : 'max-w-2xl mx-auto')}>
-              <div className={cn("px-4 py-6 sm:px-6", isFullBleedLayout && "px-0 py-0 sm:px-0")}>
+          <main 
+            className={cn(
+              "flex-1 border-r border-[#1f1f1f]",
+              location.pathname.startsWith('/messages') ? "h-full overflow-hidden flex flex-col" : "overflow-y-auto"
+            )} 
+            style={{ msOverflowStyle: 'auto', scrollbarWidth: 'none' }}
+          >
+            <div 
+              className={cn(
+                'w-full', 
+                isFullBleedLayout ? 'w-full' : 'max-w-2xl mx-auto',
+                location.pathname.startsWith('/messages') && 'h-full flex flex-col'
+              )}
+            >
+              <div 
+                className={cn(
+                  "px-4 py-6 sm:px-6", 
+                  isFullBleedLayout && "px-0 py-0 sm:px-0",
+                  location.pathname.startsWith('/messages') && 'h-full flex flex-col flex-1'
+                )}
+              >
                 <Suspense fallback={<LoadingFallback />}>
                   <Routes>
                     {/* Public Routes (accessible by all authenticated users) */}
