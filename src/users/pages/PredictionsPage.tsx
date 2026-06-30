@@ -322,7 +322,7 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
   const [showChannelInfoModal, setShowChannelInfoModal] = useState(false);
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden">
       {/* Enhanced Header */}
       <div className="border-b border-[#1f1f1f] shrink-0 relative bg-black">
         {/* Cover Photo */}
@@ -406,7 +406,10 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
         </div>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4">
+      {/* Scrollable feed — flex-1 so it fills all remaining space between header and input bar */}
+      <div className="flex-1 overflow-y-auto px-4 py-4 space-y-4 pb-2"
+        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+      >
         {ch.type === 'paid' && !joined && (
           <motion.div
             initial={{ opacity: 0, y: 8 }}
@@ -455,9 +458,10 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
         })}
       </div>
 
-      <div className="relative">
+      {/* ── Pinned input bar — always visible at the bottom ── */}
+      <div className="shrink-0 border-t border-[#1f1f1f] bg-black">
         {isTipster ? (
-          <div className="flex items-center gap-3 px-4 py-3 border-t border-[#1f1f1f] bg-gradient-to-t from-black/50 to-black/20 backdrop-blur shrink-0">
+          <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-t from-black/50 to-black/20 backdrop-blur">
             {/* Action Button - Tipsters only */}
             <button
               onClick={() => setShowActionMenu(!showActionMenu)}
@@ -524,7 +528,7 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.15 }}
-              className="absolute bottom-16 left-4 z-50 w-56 bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl shadow-xl overflow-hidden"
+              className="fixed bottom-20 left-4 z-50 w-64 max-h-[60vh] overflow-y-auto bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl shadow-2xl"
               onClick={e => e.stopPropagation()}
             >
               <div className="p-2">

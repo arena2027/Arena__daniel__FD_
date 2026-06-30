@@ -94,9 +94,9 @@ export const ROLE_PERMISSIONS: Record<UserRole, string[]> = {
 };
 
 export const ROUTE_ACCESS: Record<UserRole, string[]> = {
-  user: ['/', '/explore', '/live', '/videos', '/predictions', '/communities', '/messages', '/notifications', '/bookmarks', '/wallet', '/settings', '/profile', '/become-tipster', '/user/*'],
-  tipster: ['/', '/explore', '/live', '/videos', '/predictions', '/communities', '/messages', '/notifications', '/bookmarks', '/wallet', '/settings', '/profile', '/dashboard', '/user/*'],
-  admin: ['/', '/explore', '/live', '/videos', '/predictions', '/communities', '/messages', '/notifications', '/bookmarks', '/wallet', '/settings', '/profile', '/dashboard', '/admin', '/user/*'],
+  user:    ['/', '/explore', '/live', '/feed', '/videos', '/predictions', '/communities', '/messages', '/notifications', '/bookmarks', '/wallet', '/settings', '/profile', '/become-tipster', '/user/*'],
+  tipster: ['/', '/explore', '/live', '/feed', '/videos', '/predictions', '/communities', '/messages', '/notifications', '/bookmarks', '/wallet', '/settings', '/profile', '/become-tipster', '/dashboard', '/user/*'],
+  admin:   ['/', '/explore', '/live', '/feed', '/videos', '/predictions', '/communities', '/messages', '/notifications', '/bookmarks', '/wallet', '/settings', '/profile', '/become-tipster', '/dashboard', '/admin', '/user/*'],
 };
 
 export const API_ENDPOINTS = {

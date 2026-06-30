@@ -133,14 +133,7 @@ const MainLayout: React.FC = () => {
 
   const hideMobileNavAndHeaderPaths = [
     '/messages',
-    '/predictions',
-    '/profile',
-    '/user',
     '/become-tipster',
-    '/wallet',
-    '/settings',
-    '/bookmarks',
-    '/notifications'
   ];
 
   const hideOnMobile = hideMobileNavAndHeaderPaths.some(path => location.pathname.startsWith(path)) || showDetailView;
@@ -192,7 +185,9 @@ const MainLayout: React.FC = () => {
           <main 
             className={cn(
               "flex-1 border-r border-[#1f1f1f]",
-              location.pathname.startsWith('/messages') ? "h-full overflow-hidden flex flex-col" : "overflow-y-auto"
+              (location.pathname.startsWith('/messages') || location.pathname.startsWith('/predictions'))
+                ? "h-full overflow-hidden flex flex-col"
+                : "overflow-y-auto"
             )} 
             style={{ msOverflowStyle: 'auto', scrollbarWidth: 'none' }}
           >
@@ -200,14 +195,14 @@ const MainLayout: React.FC = () => {
               className={cn(
                 'w-full', 
                 isFullBleedLayout ? 'w-full' : 'max-w-2xl mx-auto',
-                location.pathname.startsWith('/messages') && 'h-full flex flex-col'
+                (location.pathname.startsWith('/messages') || location.pathname.startsWith('/predictions')) && 'h-full flex flex-col'
               )}
             >
               <div 
                 className={cn(
                   "px-4 py-6 sm:px-6", 
                   isFullBleedLayout && "px-0 py-0 sm:px-0",
-                  location.pathname.startsWith('/messages') && 'h-full flex flex-col flex-1'
+                  (location.pathname.startsWith('/messages') || location.pathname.startsWith('/predictions')) && 'h-full flex flex-col flex-1'
                 )}
               >
                 <Suspense fallback={<LoadingFallback />}>
@@ -248,7 +243,22 @@ const MainLayout: React.FC = () => {
                       }
                     />
 
-                    {/* Fallback */}
+                    {/* Fallback / Unauthorized */}
+                    <Route path="/unauthorized" element={
+                      <div className="min-h-screen flex flex-col items-center justify-center bg-black text-white gap-4 px-6">
+                        <div className="w-16 h-16 rounded-full bg-[#ef4444]/10 flex items-center justify-center">
+                          <span className="text-3xl">🚫</span>
+                        </div>
+                        <h1 className="text-xl font-black text-white">Access Denied</h1>
+                        <p className="text-sm text-[#71767b] text-center">You don't have permission to view this page.</p>
+                        <button
+                          onClick={() => window.history.back()}
+                          className="px-6 py-2.5 bg-[#ef4444] rounded-full text-sm font-bold text-white hover:bg-[#dc2626] transition-colors"
+                        >
+                          Go Back
+                        </button>
+                      </div>
+                    } />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </Suspense>

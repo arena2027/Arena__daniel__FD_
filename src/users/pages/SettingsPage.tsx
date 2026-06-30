@@ -89,6 +89,16 @@ export function SettingsPage({ userRole }: SettingsPageProps) {
   const [twoFA, setTwoFA] = useState(false);
   const [loginAlerts, setLoginAlerts] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [toast, setToast] = useState<{ msg: string; type?: 'success' | 'error' } | null>(null);
+  const [confirmDialog, setConfirmDialog] = useState<{ title: string; desc: string; onConfirm: () => void } | null>(null);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+
+  const showToast = (msg: string, type: 'success' | 'error' = 'success') => {
+    setToast({ msg, type });
+    setTimeout(() => setToast(null), 3000);
+  };
+
   const tabs = [
     { key: 'account',       label: 'Account',      icon: User },
     { key: 'privacy',       label: 'Privacy',       icon: Eye },
@@ -141,7 +151,13 @@ export function SettingsPage({ userRole }: SettingsPageProps) {
                     className="w-full bg-[#111] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-2.5 text-sm text-white outline-none transition-all"
                   />
                 </div>
-                <button className="w-full py-2.5 bg-[#ef4444] rounded-full text-sm font-bold text-white hover:bg-[#dc2626] transition-colors">
+                <button
+                  onClick={() => {
+                    if (!name.trim()) { showToast('Display name cannot be empty', 'error'); return; }
+                    showToast('Profile updated successfully!');
+                  }}
+                  className="w-full py-2.5 bg-[#ef4444] rounded-full text-sm font-bold text-white hover:bg-[#dc2626] transition-colors"
+                >
                   Save Changes
                 </button>
               </div>
@@ -149,18 +165,18 @@ export function SettingsPage({ userRole }: SettingsPageProps) {
               {isTipster && (
                 <>
                   <SectionHeader title="Tipster Settings" />
-                  <SettingRow label="Payout Account" desc="Manage your bank account for payouts" onClick={() => {}} />
-                  <SettingRow label="Channel Settings" desc="Manage your prediction channels" onClick={() => {}} />
+                  <SettingRow label="Payout Account" desc="Manage your bank account for payouts" onClick={() => showToast('Payout account settings coming soon')} />
+                  <SettingRow label="Channel Settings" desc="Manage your prediction channels" onClick={() => showToast('Channel settings coming soon')} />
                   <SettingRow label="Subscription Pricing" desc="Set prices for your paid channels" onClick={() => setShowPriceModal(true)} />
                 </>
               )}
               <SectionHeader title="Account Actions" />
-              <SettingRow label="Change Password" desc="Update your password" onClick={() => {}} />
-              <SettingRow label="Connected Accounts" desc="Google, Apple" onClick={() => {}} />
-              <SettingRow label="Download My Data" desc="Get a copy of your Arena data" onClick={() => {}} />
+              <SettingRow label="Change Password" desc="Update your password" onClick={() => setActiveTab('security')} />
+              <SettingRow label="Connected Accounts" desc="Google, Apple" onClick={() => showToast('Connected accounts coming soon')} />
+              <SettingRow label="Download My Data" desc="Get a copy of your Arena data" onClick={() => showToast('Your data export has been requested. You will receive an email shortly.', 'success')} />
               <SectionHeader title="Danger Zone" />
-              <SettingRow label="Deactivate Account" desc="Temporarily disable your account" onClick={() => {}} danger />
-              <SettingRow label="Delete Account" desc="Permanently delete your account and data" onClick={() => {}} danger />
+              <SettingRow label="Deactivate Account" desc="Temporarily disable your account" onClick={() => setConfirmDialog({ title: 'Deactivate Account?', desc: 'Your account will be hidden from other users. You can reactivate at any time.', onConfirm: () => { showToast('Account deactivated', 'error'); setConfirmDialog(null); } })} danger />
+              <SettingRow label="Delete Account" desc="Permanently delete your account and data" onClick={() => setConfirmDialog({ title: 'Delete Account?', desc: 'This is permanent and cannot be undone. All your data will be erased.', onConfirm: () => { logout(); } })} danger />
               <div className="p-4">
                 <button onClick={logout} className="w-full flex items-center justify-center gap-2 py-3 border border-[#ef4444]/30 rounded-full text-[#ef4444] text-sm font-bold hover:bg-[#ef4444]/10 transition-all">
                   <LogOut className="w-4 h-4" /> Sign Out
@@ -237,19 +253,35 @@ export function SettingsPage({ userRole }: SettingsPageProps) {
                     {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
-                <input type="password" placeholder="New password"
+                <input
+                  type="password" placeholder="New password"
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
                   className="w-full bg-[#111] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-[#71767b] outline-none transition-all"
                 />
-                <input type="password" placeholder="Confirm new password"
+                <input
+                  type="password" placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
                   className="w-full bg-[#111] border border-[#1f1f1f] focus:border-[#ef4444]/50 rounded-xl px-4 py-2.5 text-sm text-white placeholder:text-[#71767b] outline-none transition-all"
                 />
-                <button className="w-full py-2.5 bg-[#ef4444] rounded-full text-sm font-bold text-white hover:bg-[#dc2626] transition-colors">
+                <button
+                  onClick={() => {
+                    if (!newPassword) { showToast('Enter your new password', 'error'); return; }
+                    if (newPassword !== confirmPassword) { showToast('Passwords do not match', 'error'); return; }
+                    if (newPassword.length < 8) { showToast('Password must be at least 8 characters', 'error'); return; }
+                    showToast('Password updated successfully!');
+                    setNewPassword('');
+                    setConfirmPassword('');
+                  }}
+                  className="w-full py-2.5 bg-[#ef4444] rounded-full text-sm font-bold text-white hover:bg-[#dc2626] transition-colors"
+                >
                   Update Password
                 </button>
               </div>
               <SectionHeader title="Sessions" />
-              <SettingRow label="Active Sessions" desc="Manage devices logged in to your account" onClick={() => {}} />
-              <SettingRow label="Sign Out All Devices" onClick={() => {}} danger />
+              <SettingRow label="Active Sessions" desc="Manage devices logged in to your account" onClick={() => showToast('Session management coming soon')} />
+              <SettingRow label="Sign Out All Devices" onClick={() => setConfirmDialog({ title: 'Sign out all devices?', desc: 'You will be logged out from all active sessions across all devices.', onConfirm: () => { showToast('Signed out from all devices'); setConfirmDialog(null); } })} danger />
               <SectionHeader title="Danger" />
               <div className="px-4 py-3 border-b border-[#1f1f1f]">
                 <div className="flex items-start gap-3 p-3 bg-[#ef4444]/5 border border-[#ef4444]/20 rounded-xl">
@@ -333,6 +365,59 @@ export function SettingsPage({ userRole }: SettingsPageProps) {
               >
                 {savingPrice ? 'Saving Changes...' : 'Save Settings'}
               </button>
+            </motion.div>
+          </div>
+        )}
+      {/* ── Toast notification ── */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 60 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 60 }}
+            className={cn(
+              'fixed bottom-24 left-1/2 -translate-x-1/2 z-[100] px-5 py-3 rounded-2xl shadow-2xl text-sm font-bold text-white flex items-center gap-2 max-w-[90vw]',
+              toast.type === 'error' ? 'bg-[#ef4444]' : 'bg-[#16a34a]'
+            )}
+          >
+            {toast.type === 'error' ? '✕' : '✓'} {toast.msg}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* ── Confirm Dialog ── */}
+      <AnimatePresence>
+        {confirmDialog && (
+          <div className="fixed inset-0 z-[90] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/75 backdrop-blur-sm"
+              onClick={() => setConfirmDialog(null)}
+            />
+            <motion.div
+              initial={{ scale: 0.92, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.92, opacity: 0 }}
+              className="relative z-10 w-full max-w-sm bg-[#0f0f11] border border-[#2a2a30] rounded-2xl p-6 space-y-4"
+            >
+              <h3 className="text-base font-black text-white">{confirmDialog.title}</h3>
+              <p className="text-sm text-[#71767b] leading-relaxed">{confirmDialog.desc}</p>
+              <div className="flex gap-3">
+                <button
+                  onClick={() => setConfirmDialog(null)}
+                  className="flex-1 py-2.5 border border-[#1f1f1f] rounded-full text-sm font-bold text-[#71767b] hover:text-white transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDialog.onConfirm}
+                  className="flex-1 py-2.5 bg-[#ef4444] rounded-full text-sm font-bold text-white hover:bg-[#dc2626] transition-colors"
+                >
+                  Confirm
+                </button>
+              </div>
             </motion.div>
           </div>
         )}

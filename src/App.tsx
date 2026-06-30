@@ -19,6 +19,7 @@ function LoadingFallback() {
 // Lazy load page components
 const AuthPage = lazy(() => import('./auth/pages/AuthPage').then(m => ({ default: m.AuthPage })));
 const OTPPage = lazy(() => import('./auth/pages/OTPPage').then(m => ({ default: m.OTPPage })));
+const ForgotPasswordPage = lazy(() => import('./auth/pages/ForgotPasswordPage'));
 
 // ── App Content Component ─────────────────────────────────────────────────────
 function AppContent() {
@@ -43,6 +44,16 @@ function AppContent() {
           <AuthGuard user={user}>
             <Suspense fallback={<LoadingFallback />}>
               <OTPPage />
+            </Suspense>
+          </AuthGuard>
+        }
+      />
+      <Route
+        path="/auth/forgot-password"
+        element={
+          <AuthGuard user={user}>
+            <Suspense fallback={<LoadingFallback />}>
+              <ForgotPasswordPage />
             </Suspense>
           </AuthGuard>
         }

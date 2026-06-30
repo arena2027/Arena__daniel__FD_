@@ -64,6 +64,7 @@ export function UserProfileView({ userName, onBack }: UserProfileViewProps) {
   const [activeTab, setActiveTab] = useState<'posts' | 'replies'>('posts');
   const [following, setFollowing] = useState(false);
   const [liked, setLiked] = useState<Record<string, boolean>>({});
+  const [showMoreMenu, setShowMoreMenu] = useState(false);
   const user = mockUsers[userName] ?? {
     name: userName, handle: `@${userName.toLowerCase().replace(' ', '')}`,
     bio: 'Arena sports fan', location: '', joined: '2024',
@@ -78,10 +79,32 @@ export function UserProfileView({ userName, onBack }: UserProfileViewProps) {
           <ArrowLeft className="w-5 h-5" />
         </button>
         <h1 className="text-base font-black text-white text-center flex-1">{user.name}</h1>
-        <button className="p-1.5 rounded-full hover:bg-white/10 transition-colors text-[#71767b] hover:text-white shrink-0">
+        <button
+          onClick={() => setShowMoreMenu(m => !m)}
+          className="p-1.5 rounded-full hover:bg-white/10 transition-colors text-[#71767b] hover:text-white shrink-0 relative"
+        >
           <MoreHorizontal className="w-5 h-5" />
+          {showMoreMenu && (
+            <div className="absolute right-0 top-10 w-48 bg-[#0f0f11] border border-[#2a2a30] rounded-2xl overflow-hidden shadow-2xl z-50">
+              {[
+                { label: 'Share Profile', action: () => { navigator.share?.({ title: user.name, url: window.location.href }); setShowMoreMenu(false); } },
+                { label: 'Copy Profile Link', action: () => { navigator.clipboard?.writeText(window.location.href); setShowMoreMenu(false); } },
+                { label: 'Report Account', action: () => setShowMoreMenu(false) },
+                { label: 'Block', action: () => setShowMoreMenu(false) },
+              ].map(item => (
+                <button
+                  key={item.label}
+                  onClick={item.action}
+                  className="w-full text-left px-4 py-3 text-sm text-white hover:bg-white/5 transition-colors border-b border-[#1f1f1f] last:border-0"
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+          )}
         </button>
       </div>
+
 
       {/* Centered Profile Details Section */}
       <div className="bg-black border-b border-[#1f1f1f] px-4 py-8 flex flex-col items-center">
