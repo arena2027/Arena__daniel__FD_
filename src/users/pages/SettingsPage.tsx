@@ -368,6 +368,8 @@ export function SettingsPage({ userRole }: SettingsPageProps) {
             </motion.div>
           </div>
         )}
+      </AnimatePresence>
+
       {/* ── Toast notification ── */}
       <AnimatePresence>
         {toast && (

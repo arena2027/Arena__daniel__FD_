@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Zap, Heart, MessageCircle, Repeat2, Share, Bookmark,
-  Trophy, Upload, X, Settings, ChevronRight, MapPin, Calendar
+  Trophy, Upload, Settings, ChevronRight, MapPin, Calendar
 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { useNavigate } from 'react-router-dom';
