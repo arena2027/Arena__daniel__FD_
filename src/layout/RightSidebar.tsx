@@ -116,7 +116,7 @@ export function RightSidebar() {
       <div className="mt-6 pt-4 border-t border-[#1f1f1f]">
         <div className="space-y-1">
           <p className="text-[10px] text-[#71767b]">
-            <a href="#" className="hover:underline">About Arena</a> • <a href="#" className="hover:underline">Privacy</a>
+            <a href="#" className="hover:underline">About Arena</a> • <a href="/privacy" className="hover:underline">Privacy</a>
           </p>
           <p className="text-[10px] text-[#71767b]">
             © 2024 Arena. All rights reserved.

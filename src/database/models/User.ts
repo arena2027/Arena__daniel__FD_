@@ -10,6 +10,10 @@ export interface UserModel {
   subscriptionStatus: 'free' | 'premium';
   tokenVersion: number; // For token invalidation
   emailVerified: boolean;
+  termsAccepted?: boolean;
+  privacyAccepted?: boolean;
+  acceptedAt?: string;
+  policyVersion?: string;
   name: string;
   handle: string;
   profilePicture?: string;
@@ -28,6 +32,10 @@ CREATE TABLE users (
   subscription_status ENUM('free', 'premium') NOT NULL DEFAULT 'free',
   token_version INTEGER NOT NULL DEFAULT 1,
   email_verified BOOLEAN NOT NULL DEFAULT FALSE,
+  terms_accepted BOOLEAN NOT NULL DEFAULT FALSE,
+  privacy_accepted BOOLEAN NOT NULL DEFAULT FALSE,
+  accepted_at TIMESTAMP WITH TIME ZONE,
+  policy_version TEXT,
   name VARCHAR(255) NOT NULL,
   handle VARCHAR(255) NOT NULL,
   profile_picture TEXT,

@@ -141,8 +141,25 @@ export class AuthApi {
     return apiClient.get<AppUser>(API_ENDPOINTS.AUTH.PROFILE);
   }
 
-  static async signup(email: string, password: string, name: string, role: 'user' | 'tipster' = 'user'): Promise<AppUser> {
-    return apiClient.post<AppUser>(API_ENDPOINTS.AUTH.LOGIN, { email, password, name, role }); // Should be SIGNUP
+  static async signup(
+    email: string,
+    password: string,
+    name: string,
+    role: 'user' | 'tipster' = 'user',
+    termsAccepted = true,
+    privacyAccepted = true,
+    policyVersion = 'v1.0'
+  ): Promise<AppUser> {
+    return apiClient.post<AppUser>(API_ENDPOINTS.AUTH.SIGNUP, {
+      email,
+      password,
+      name,
+      role,
+      termsAccepted,
+      privacyAccepted,
+      acceptedAt: new Date().toISOString(),
+      policyVersion,
+    });
   }
 }
 

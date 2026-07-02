@@ -8,7 +8,15 @@ import { tipsterService, type CreateTipsterRequest } from '../../services/tipste
 interface AuthContextType {
   user: AppUser | null;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name: string, role?: 'user' | 'tipster') => Promise<void>;
+  signup: (
+    email: string,
+    password: string,
+    name: string,
+    role?: 'user' | 'tipster',
+    termsAccepted?: boolean,
+    privacyAccepted?: boolean,
+    policyVersion?: string
+  ) => Promise<void>;
   requestOTP: (email: string, password: string) => Promise<{ requiresOtp: true; email: string }>;
   becomeTipster: (data: CreateTipsterRequest) => Promise<void>;
   logout: () => Promise<void>;
@@ -69,11 +77,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const signup = async (email: string, password: string, name: string, role: 'user' | 'tipster' = 'user') => {
+  const signup = async (
+    email: string,
+    password: string,
+    name: string,
+    role: 'user' | 'tipster' = 'user',
+    termsAccepted = true,
+    privacyAccepted = true,
+    policyVersion = 'v1.0'
+  ) => {
     try {
       setLoading(true);
       setError(null);
-      const newUser = await authService.signup(email, password, name, role);
+      const newUser = await authService.signup(
+        email,
+        password,
+        name,
+        role,
+        termsAccepted,
+        privacyAccepted,
+        policyVersion
+      );
       setUser(newUser);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Signup failed');

@@ -11,6 +11,10 @@ export interface AppUser {
   subscriptionStatus?: 'free' | 'premium';
   createdAt: string;
   profilePicture?: string;
+  termsAccepted?: boolean;
+  privacyAccepted?: boolean;
+  acceptedAt?: string;
+  policyVersion?: string;
 }
 
 export interface TipsterProfile {

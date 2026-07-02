@@ -175,10 +175,23 @@ app.post('/api/auth/login', async (req, res) => {
 
 app.post('/api/auth/signup', async (req, res) => {
   try {
-    const { email, password, name, role = 'user' } = req.body;
+    const {
+      email,
+      password,
+      name,
+      role = 'user',
+      termsAccepted,
+      privacyAccepted,
+      acceptedAt,
+      policyVersion,
+    } = req.body;
 
     if (!email || !password || !name) {
       return res.status(400).json({ error: 'Email, password, and name required' });
+    }
+
+    if (!termsAccepted || !privacyAccepted) {
+      return res.status(400).json({ error: 'Terms and privacy acceptance required' });
     }
 
     const existingUser = await User.findByEmail(email);
@@ -197,7 +210,11 @@ app.post('/api/auth/signup', async (req, res) => {
       tokenVersion: 1,
       emailVerified: false,
       name,
-      handle
+      handle,
+      termsAccepted: Boolean(termsAccepted),
+      privacyAccepted: Boolean(privacyAccepted),
+      acceptedAt: acceptedAt || new Date().toISOString(),
+      policyVersion: policyVersion || 'v1.0',
     });
 
     if (role === 'tipster') {

@@ -142,16 +142,33 @@ export class AuthService {
   }
 
   // Signup method for tipster registration
-  async signup(email: string, password: string, name: string, role: 'user' | 'tipster' = 'user'): Promise<AppUser> {
+  async signup(
+    email: string,
+    password: string,
+    name: string,
+    role: 'user' | 'tipster' = 'user',
+    termsAccepted = true,
+    privacyAccepted = true,
+    policyVersion = 'v1.0'
+  ): Promise<AppUser> {
     if (USE_MOCK_AUTH) {
-      return mockAuthService.signup(email, password, name, role);
+      return mockAuthService.signup(email, password, name, role, termsAccepted, privacyAccepted, policyVersion);
     }
 
     try {
-      const response = await fetch(API_ENDPOINTS.AUTH.LOGIN, {
+      const response = await fetch(API_ENDPOINTS.AUTH.SIGNUP, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password, name, role }),
+        body: JSON.stringify({
+          email,
+          password,
+          name,
+          role,
+          termsAccepted,
+          privacyAccepted,
+          acceptedAt: new Date().toISOString(),
+          policyVersion,
+        }),
       });
 
       if (!response.ok) {

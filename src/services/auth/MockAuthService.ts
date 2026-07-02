@@ -133,7 +133,15 @@ export class MockAuthService {
   }
 
   // Mock signup for tipster registration
-  async signup(email: string, password: string, name: string, role: 'user' | 'tipster' = 'user'): Promise<AppUser> {
+  async signup(
+    email: string,
+    password: string,
+    name: string,
+    role: 'user' | 'tipster' = 'user',
+    termsAccepted = true,
+    privacyAccepted = true,
+    policyVersion = 'v1.0'
+  ): Promise<AppUser> {
     // Simulate network delay
     await new Promise(resolve => setTimeout(resolve, 800));
 
@@ -149,6 +157,10 @@ export class MockAuthService {
       role,
       subscriptionStatus: 'free',
       createdAt: new Date().toISOString(),
+      termsAccepted,
+      privacyAccepted,
+      acceptedAt: new Date().toISOString(),
+      policyVersion,
     };
 
     this.mockUsers[email] = { password, user: newUser };

@@ -20,6 +20,7 @@ function LoadingFallback() {
 const AuthPage = lazy(() => import('./auth/pages/AuthPage').then(m => ({ default: m.AuthPage })));
 const OTPPage = lazy(() => import('./auth/pages/OTPPage').then(m => ({ default: m.OTPPage })));
 const ForgotPasswordPage = lazy(() => import('./auth/pages/ForgotPasswordPage'));
+const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage').then(m => ({ default: m.PrivacyPolicyPage })));
 
 // ── App Content Component ─────────────────────────────────────────────────────
 function AppContent() {
@@ -56,6 +57,15 @@ function AppContent() {
               <ForgotPasswordPage />
             </Suspense>
           </AuthGuard>
+        }
+      />
+
+      <Route
+        path="/privacy"
+        element={
+          <Suspense fallback={<LoadingFallback />}>
+            <PrivacyPolicyPage />
+          </Suspense>
         }
       />
 

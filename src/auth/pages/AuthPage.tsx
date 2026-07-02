@@ -204,6 +204,7 @@ export function AuthPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [selectedSports, setSelectedSports] = useState<string[]>([]);
   const [tipsterStep, setTipsterStep] = useState(1);
+  const [policyAccepted, setPolicyAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [socialLoading, setSocialLoading] = useState<'google' | 'apple' | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -248,6 +249,7 @@ export function AuthPage() {
     if (!form.password) e.password = 'Password is required';
     else if (form.password.length < 8) e.password = 'At least 8 characters';
     if (form.password !== form.confirmPassword) e.confirmPassword = 'Passwords do not match';
+    if (!policyAccepted) e.policyAccepted = 'You must agree to the Terms and Privacy Policy';
     setErrors(e);
     return Object.keys(e).length === 0;
   };
@@ -270,7 +272,15 @@ export function AuthPage() {
     if (!validateSignUp()) return;
     try {
       setLoading(true);
-      await signup(form.email, form.password, form.name, 'user');
+      await signup(
+        form.email,
+        form.password,
+        form.name,
+        'user',
+        policyAccepted,
+        policyAccepted,
+        'v1.0'
+      );
       navigate('/');
     } catch (err: unknown) {
       setErrors({ email: err instanceof Error ? err.message : 'Sign up failed' });
@@ -435,9 +445,9 @@ export function AuthPage() {
 
                   <p className="text-[11px] text-white/25 text-center leading-relaxed">
                     By continuing you agree to our{' '}
-                    <span className="text-white/40 underline cursor-pointer hover:text-white/60 transition-colors">Terms</span>,{' '}
-                    <span className="text-white/40 underline cursor-pointer hover:text-white/60 transition-colors">Privacy Policy</span> and{' '}
-                    <span className="text-white/40 underline cursor-pointer hover:text-white/60 transition-colors">Cookie Policy</span>.
+                    <a href="https://teamly.com/legal/terms" className="text-white/40 underline hover:text-white/60 transition-colors" target="_blank" rel="noreferrer">Terms</a>,{' '}
+                    <a href="/privacy" className="text-white/40 underline hover:text-white/60 transition-colors">Privacy Policy</a> and{' '}
+                    <a href="https://teamly.com/legal/cookie-policy" className="text-white/40 underline hover:text-white/60 transition-colors" target="_blank" rel="noreferrer">Cookie Policy</a>.
                   </p>
                 </motion.div>
               )}
@@ -533,6 +543,20 @@ export function AuthPage() {
                     />
                   </div>
 
+                  <p className="text-sm text-white/40 text-center">
+                    By continuing, you agree to our{' '}
+                    <a href="https://teamly.com/legal/terms" className="text-[#ef4444] underline" target="_blank" rel="noreferrer">
+                      Terms & Conditions
+                    </a>{' '}
+                    and acknowledge our{' '}
+                    <a href="/privacy" className="text-[#ef4444] underline">
+                      Privacy Policy
+                    </a>.
+                    Learn more in our{' '}
+                    <a href="https://teamly.com/legal/cookie-policy" className="text-[#ef4444] underline" target="_blank" rel="noreferrer">
+                      Cookie Policy
+                    </a>.
+                  </p>
                   <p className="text-sm text-white/40 text-center">
                     Don't have an account?{' '}
                     <button onClick={() => goTo('signup', 1)} className="text-[#ef4444] font-bold hover:underline transition-colors">
@@ -637,11 +661,36 @@ export function AuthPage() {
                         </button>
                       }
                     />
+
+                    <label className="flex items-start gap-3 mt-2 text-sm text-white/80">
+                      <input
+                        type="checkbox"
+                        checked={policyAccepted}
+                        onChange={e => {
+                          setPolicyAccepted(e.target.checked);
+                          setErrors(prev => ({ ...prev, policyAccepted: '' }));
+                        }}
+                        className="mt-1 h-4 w-4 rounded border-white/20 bg-black text-[#ef4444] focus:ring-[#ef4444]"
+                      />
+                      <span>
+                        I have read and agree to the{' '}
+                        <a href="https://teamly.com/legal/terms" target="_blank" rel="noreferrer" className="text-[#ef4444] underline">
+                          Terms & Conditions
+                        </a>{' '}
+                        and{' '}
+                        <a href="/privacy" className="text-[#ef4444] underline">
+                          Privacy Policy
+                        </a>.
+                      </span>
+                    </label>
+                    {errors.policyAccepted && (
+                      <p className="text-xs text-red-400 mt-1 ml-7">{errors.policyAccepted}</p>
+                    )}
                   </div>
 
                   <button
                     onClick={handleSignUp}
-                    disabled={loading}
+                    disabled={loading || !policyAccepted}
                     className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#dc2626] to-[#ef4444] text-white font-bold text-sm py-3.5 rounded-2xl hover:opacity-90 active:scale-[0.98] transition-all shadow-lg shadow-red-500/25 disabled:opacity-60"
                   >
                     {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Create Account <ArrowRight className="w-4 h-4" /></>}
@@ -649,9 +698,17 @@ export function AuthPage() {
 
                   <p className="text-[11px] text-white/25 text-center leading-relaxed">
                     By signing up you agree to our{' '}
-                    <span className="text-white/40 underline cursor-pointer">Terms</span>,{' '}
-                    <span className="text-white/40 underline cursor-pointer">Privacy Policy</span> and{' '}
-                    <span className="text-white/40 underline cursor-pointer">Cookie Policy</span>.
+                    <a href="https://teamly.com/legal/terms" target="_blank" rel="noreferrer" className="text-[#ef4444] underline">
+                      Terms & Conditions
+                    </a>{' '}
+                    and acknowledge our{' '}
+                    <a href="/privacy" className="text-[#ef4444] underline">
+                      Privacy Policy
+                    </a>.
+                    Learn more in our{' '}
+                    <a href="https://teamly.com/legal/cookie-policy" target="_blank" rel="noreferrer" className="text-[#ef4444] underline">
+                      Cookie Policy
+                    </a>.
                   </p>
 
                   <p className="text-sm text-white/40 text-center">
