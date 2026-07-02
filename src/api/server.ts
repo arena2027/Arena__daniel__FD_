@@ -14,6 +14,8 @@ import {
 } from '../middleware/guards/PermissionMiddleware';
 import { User } from '../../database/models/User';
 import { TipsterProfile } from '../../database/models/TipsterProfile';
+import type { PlatformPricing } from '../config/platformPricing';
+import { DEFAULT_PLATFORM_PRICING } from '../config/platformPricing';
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -639,6 +641,42 @@ app.post('/api/messages', authenticateToken, async (req, res) => {
 });
 
 // ── Admin Routes ─────────────────────────────────────────────────────────────
+
+let platformPricingStore: PlatformPricing = { ...DEFAULT_PLATFORM_PRICING };
+
+app.get('/api/platform/pricing', (_req, res) => {
+  res.json({ data: platformPricingStore });
+});
+
+app.get('/api/admin/platform-pricing', authenticateToken, requireRole(['admin']), (_req, res) => {
+  res.json({ data: platformPricingStore });
+});
+
+app.put('/api/admin/platform-pricing', authenticateToken, requireRole(['admin']), (req, res) => {
+  const {
+    tipsterRegistrationFeeNgn,
+    subscriptionCommissionPercent,
+    predictionCommissionPercent,
+    payoutProcessingFeePercent,
+    minChannelPriceNgn,
+    maxChannelPriceNgn,
+    defaultChannelPriceNgn,
+  } = req.body;
+
+  platformPricingStore = {
+    ...platformPricingStore,
+    ...(tipsterRegistrationFeeNgn !== undefined && { tipsterRegistrationFeeNgn: Number(tipsterRegistrationFeeNgn) }),
+    ...(subscriptionCommissionPercent !== undefined && { subscriptionCommissionPercent: Number(subscriptionCommissionPercent) }),
+    ...(predictionCommissionPercent !== undefined && { predictionCommissionPercent: Number(predictionCommissionPercent) }),
+    ...(payoutProcessingFeePercent !== undefined && { payoutProcessingFeePercent: Number(payoutProcessingFeePercent) }),
+    ...(minChannelPriceNgn !== undefined && { minChannelPriceNgn: Number(minChannelPriceNgn) }),
+    ...(maxChannelPriceNgn !== undefined && { maxChannelPriceNgn: Number(maxChannelPriceNgn) }),
+    ...(defaultChannelPriceNgn !== undefined && { defaultChannelPriceNgn: Number(defaultChannelPriceNgn) }),
+    updatedAt: new Date().toISOString(),
+  };
+
+  res.json({ data: platformPricingStore });
+});
 
 app.get('/api/admin/users', authenticateToken, requireRole(['admin']), async (req, res) => {
   try {

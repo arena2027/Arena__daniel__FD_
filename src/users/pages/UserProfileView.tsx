@@ -72,7 +72,7 @@ export function UserProfileView({ userName, onBack }: UserProfileViewProps) {
   };
   const fmt = (n: number) => n >= 1000 ? `${(n / 1000).toFixed(1)}K` : String(n);
   return (
-    <div className="pb-24">
+    <div className="min-h-full">
       {/* Centered Header */}
       <div className="sticky top-0 z-20 bg-black/95 backdrop-blur-md border-b border-[#1f1f1f] px-4 py-3.5 flex items-center justify-between">
         <button onClick={onBack} className="p-1.5 rounded-full hover:bg-white/10 transition-colors text-white shrink-0" title="Back">

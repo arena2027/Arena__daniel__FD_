@@ -75,29 +75,34 @@ export function Sidebar({ open, onClose, userRole, appUser }: SidebarProps) {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             onClick={onClose}
+            aria-hidden="true"
           />
         )}
       </AnimatePresence>
 
       <aside
         className={cn(
-          'fixed inset-y-14 left-0 z-50 w-72 bg-[#09090c] border-r border-[#1f1f1f] p-4 transition-transform duration-300 ease-out overflow-y-auto md:relative md:w-auto md:inset-auto md:z-auto md:border-none md:p-4 md:flex md:flex-col md:translate-x-0 md:h-full md:bg-transparent md:overflow-y-auto',
-          isOpen ? 'translate-x-0' : '-translate-x-full'
+          'fixed top-app-header bottom-0 left-0 z-50 w-[min(18rem,88vw)] bg-[#09090c] border-r border-[#1f1f1f] p-3 sm:p-4 transition-transform duration-300 ease-out overflow-y-auto scrollbar-none pb-safe md:relative md:w-auto md:inset-auto md:top-auto md:bottom-auto md:z-auto md:border-none md:p-4 md:flex md:flex-col md:translate-x-0 md:h-full md:bg-transparent',
+          isOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
         )}
       >
         <div className="flex flex-col h-full">
           <div>
-            <div className="flex items-center justify-between mb-6 md:hidden">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-full bg-[#ef4444] flex items-center justify-center text-white font-black">
+            <div className="flex items-center justify-between mb-4 md:mb-6 md:hidden">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-9 h-9 rounded-full bg-[#ef4444] flex items-center justify-center text-white font-black shrink-0 text-sm">
                   {getInitials(appUser.name || 'A')}
                 </div>
-                <span className="text-white font-bold">Arena</span>
+                <div className="min-w-0">
+                  <span className="text-white font-bold block truncate">{appUser.name || 'Arena'}</span>
+                  <span className="text-[11px] text-[#71767b] block truncate">{appUser.handle || '@arena'}</span>
+                </div>
               </div>
               <button
                 type="button"
                 onClick={onClose}
-                className="p-2 rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors"
+                aria-label="Close menu"
+                className="p-2 rounded-full bg-white/5 text-white hover:bg-white/10 transition-colors shrink-0 min-h-touch min-w-touch flex items-center justify-center"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -119,7 +124,7 @@ export function Sidebar({ open, onClose, userRole, appUser }: SidebarProps) {
                         onClose();
                       }}
                       className={cn(
-                        'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all text-left relative z-20',
+                        'w-full flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-sm font-semibold transition-all text-left relative z-20 min-h-touch',
                         isActive ? 'bg-[#1f1f1f] text-[#ef4444]' : 'text-[#e7e9ea] hover:bg-white/5 hover:text-white'
                       )}
                     >
@@ -155,7 +160,7 @@ export function Sidebar({ open, onClose, userRole, appUser }: SidebarProps) {
                         onClose();
                       }}
                       className={cn(
-                        'w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all text-left relative z-10',
+                        'w-full flex items-center gap-3 px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl text-sm font-semibold transition-all text-left relative z-10 min-h-touch',
                         isActive ? 'bg-[#1f1f1f] text-[#ef4444]' : 'text-[#e7e9ea] hover:bg-white/5 hover:text-white'
                       )}
                     >
@@ -173,8 +178,8 @@ export function Sidebar({ open, onClose, userRole, appUser }: SidebarProps) {
             </div>
           </div>
 
-          {/* Post Action Button - Desktop/Tablet only */}
-          <div className="mt-4 px-4 hidden md:block">
+          {/* Post Action Button */}
+          <div className="mt-3 px-1 sm:px-4">
             <button
               onClick={() => {
                 if (location.pathname !== '/') {
@@ -185,14 +190,14 @@ export function Sidebar({ open, onClose, userRole, appUser }: SidebarProps) {
                 }, 100);
                 onClose();
               }}
-              className="w-full py-2.5 bg-gradient-to-r from-[#dc2626] to-[#ef4444] hover:opacity-95 text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-red-500/20 flex items-center justify-center gap-2"
+              className="w-full py-2.5 bg-gradient-to-r from-[#dc2626] to-[#ef4444] hover:opacity-95 text-white font-bold rounded-xl text-sm transition-all shadow-lg shadow-red-500/20 flex items-center justify-center gap-2 min-h-touch"
             >
               <span>Post</span>
             </button>
           </div>
 
           {/* User Profile Section - always at bottom */}
-          <div className="shrink-0 border-t border-white/10 pt-4 mt-auto">
+          <div className="shrink-0 border-t border-white/10 pt-3 sm:pt-4 mt-auto hidden md:block">
             <button
               onClick={() => {
                 navigate('/profile');

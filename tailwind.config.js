@@ -26,6 +26,20 @@ export default {
       fontFamily: {
         sans: ["Outfit", "Inter", "sans-serif"],
       },
+      spacing: {
+        "app-header": "var(--header-height)",
+        "app-nav": "var(--bottom-nav-height)",
+      },
+      height: {
+        "app-header": "var(--header-height)",
+        "app-nav": "var(--bottom-nav-height)",
+      },
+      minWidth: {
+        touch: "44px",
+      },
+      minHeight: {
+        touch: "44px",
+      },
     },
   },
 

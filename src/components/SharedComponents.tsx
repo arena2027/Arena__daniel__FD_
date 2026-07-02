@@ -36,7 +36,7 @@ export function ShareSheet({ onClose, postContent }: ShareSheetProps) {
       <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         onClick={e => e.stopPropagation()}
-        className="w-full bg-[#0d0d0d] border-t border-[#1f1f1f] rounded-t-3xl px-5 pt-3 pb-10"
+        className="w-full bg-[#0d0d0d] border-t border-[#1f1f1f] rounded-t-3xl px-5 pt-3 pb-10 pb-safe"
       >
         <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-5" />
         <div className="flex items-center justify-between mb-5">
@@ -95,7 +95,7 @@ export function MoreMenu({ onClose, userName }: MoreMenuProps) {
       <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         onClick={e => e.stopPropagation()}
-        className="w-full bg-[#0d0d0d] border-t border-[#1f1f1f] rounded-t-3xl px-5 pt-3 pb-10"
+        className="w-full bg-[#0d0d0d] border-t border-[#1f1f1f] rounded-t-3xl px-5 pt-3 pb-10 pb-safe"
       >
         <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-5" />
         <div className="flex items-center justify-between mb-4">
@@ -147,7 +147,7 @@ export function PollCreator({ onClose, onCreate }: PollCreatorProps) {
       <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         onClick={e => e.stopPropagation()}
-        className="w-full md:max-w-lg bg-[#0d0d0d] border border-[#1f1f1f] rounded-t-3xl md:rounded-3xl px-5 pt-3 pb-10"
+        className="w-full md:max-w-lg bg-[#0d0d0d] border border-[#1f1f1f] rounded-t-3xl md:rounded-3xl px-5 pt-3 pb-10 pb-safe"
       >
         <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-4 md:hidden" />
         <div className="flex items-center justify-between mb-5">
@@ -226,7 +226,7 @@ export function CreateCommunity({ onClose, onCreate }: CreateCommunityProps) {
       <motion.div initial={{ y: '100%' }} animate={{ y: 0 }} exit={{ y: '100%' }}
         transition={{ type: 'spring', damping: 28, stiffness: 300 }}
         onClick={e => e.stopPropagation()}
-        className="w-full md:max-w-lg bg-[#0d0d0d] border border-[#1f1f1f] rounded-t-3xl md:rounded-3xl px-5 pt-3 pb-10 max-h-[90vh] overflow-y-auto"
+        className="w-full md:max-w-lg bg-[#0d0d0d] border border-[#1f1f1f] rounded-t-3xl md:rounded-3xl px-5 pt-3 pb-10 pb-safe max-h-[90vh] overflow-y-auto"
       >
         <div className="w-10 h-1 bg-white/20 rounded-full mx-auto mb-4 md:hidden" />
         <div className="flex items-center justify-between mb-5">

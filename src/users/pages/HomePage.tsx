@@ -546,11 +546,11 @@ export function HomePage() {
           >
             {/* Tabs nav row — pinned under header */}
             <div className="sticky top-0 z-30 bg-black/90 backdrop-blur-md border-b border-[#1f1f1f]">
-              <div className="max-w-3xl mx-auto px-4 py-2 flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2">
+              <div className="max-w-3xl mx-auto px-3 sm:px-4 py-2 flex items-center justify-between gap-2 overflow-x-auto scrollbar-none">
+                <div className="flex items-center gap-1 sm:gap-2 shrink-0">
                   {tabs.map(tab => (
                     <button key={tab.key} onClick={() => { setActiveTab(tab.key); }}
-                      className={cn('px-3 py-1.5 rounded-md text-xs font-semibold transition-all relative overflow-visible',
+                      className={cn('px-2.5 sm:px-3 py-1.5 rounded-md text-[11px] sm:text-xs font-semibold transition-all relative overflow-visible whitespace-nowrap',
                         activeTab === tab.key ? 'text-white' : 'text-[#9aa0a6] hover:text-white hover:bg-white/2'
                       )}
                     >

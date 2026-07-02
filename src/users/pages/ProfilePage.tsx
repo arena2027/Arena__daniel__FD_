@@ -550,20 +550,33 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
   const handleSave = () => setEditOpen(false);
 
   return (
-    <div className="w-full min-h-screen bg-black pb-24 selection:bg-[#ef4444]/30">
+    <div className="w-full min-h-full bg-black selection:bg-[#ef4444]/30">
 
-      {/* ── Sticky Header ── */}
-      <div className="sticky top-0 z-30 w-full bg-black/95 backdrop-blur-md border-b border-[#1f1f1f]">
+      {/* Page header — desktop only; mobile uses global header */}
+      <div className="hidden md:block sticky top-0 z-30 w-full bg-black/95 backdrop-blur-md border-b border-[#1f1f1f]">
         <div className="flex items-center h-14 px-4">
           <div className="w-10 shrink-0" />
           <h1 className="flex-1 text-center text-base font-black text-white">Profile</h1>
           <button
             onClick={() => navigate('/settings')}
             className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/8 text-white transition-colors shrink-0"
+            aria-label="Settings"
           >
             <Settings className="w-5 h-5" />
           </button>
         </div>
+      </div>
+
+      {/* Mobile quick actions */}
+      <div className="md:hidden flex items-center justify-between px-4 py-3 border-b border-[#1f1f1f]">
+        <h1 className="text-base font-black text-white">Profile</h1>
+        <button
+          onClick={() => navigate('/settings')}
+          className="p-2 rounded-full hover:bg-white/8 text-white transition-colors min-h-touch min-w-touch flex items-center justify-center"
+          aria-label="Settings"
+        >
+          <Settings className="w-5 h-5" />
+        </button>
       </div>
 
       {/* ── Profile Hero ── */}
@@ -665,8 +678,7 @@ export function ProfilePage({ appUser }: ProfilePageProps) {
 
       {/* ── Tab Bar ── */}
       <div
-        className="w-full flex border-b border-[#1f1f1f] overflow-x-auto sticky top-14 z-20 bg-black"
-        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        className="w-full flex border-b border-[#1f1f1f] overflow-x-auto scrollbar-none sticky top-0 z-20 bg-black"
       >
         {TABS.map(tab => (
           <button

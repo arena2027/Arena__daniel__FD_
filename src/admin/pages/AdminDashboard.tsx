@@ -1,7 +1,9 @@
 // ── Admin Dashboard ───────────────────────────────────────────────────────────
 
 import React, { useEffect, useState } from 'react';
-import { DashboardCard, StatCard } from '../../dashboard/shared/DashboardComponents';
+import { useNavigate } from 'react-router-dom';
+import { DashboardCard, StatCard, QuickActionButton } from '../../dashboard/shared/DashboardComponents';
+import { Percent } from 'lucide-react';
 
 interface AdminStats {
   totalUsers: number;
@@ -13,6 +15,7 @@ interface AdminStats {
 }
 
 const AdminDashboard: React.FC = () => {
+  const navigate = useNavigate();
   const [stats, setStats] = useState<AdminStats | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -39,30 +42,42 @@ const AdminDashboard: React.FC = () => {
   }, []);
 
   if (loading) {
-    return <div className="flex justify-center items-center h-64">Loading admin dashboard...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[16rem] gap-3">
+        <div className="w-10 h-10 rounded-full border-4 border-[#ef4444] border-t-transparent animate-spin" />
+        <p className="text-sm text-[#71767b] font-semibold">Loading admin dashboard...</p>
+      </div>
+    );
   }
 
   if (!stats) {
-    return <div className="text-center text-gray-500">Failed to load admin data</div>;
+    return (
+      <div className="text-center py-16 px-6">
+        <p className="text-[#71767b]">Failed to load admin data</p>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold text-gray-900">Admin Dashboard</h1>
-        <div className="flex items-center space-x-2">
-          <div className={`w-3 h-3 rounded-full ${
+    <div className="w-full max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6 space-y-5 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-2">
+        <div>
+          <p className="text-xs font-bold text-[#ef4444] uppercase tracking-wider mb-1">Admin</p>
+          <h1 className="text-xl sm:text-2xl font-black text-white">Admin Dashboard</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <div className={`w-2.5 h-2.5 rounded-full ${
             stats.systemHealth === 'good' ? 'bg-green-500' :
             stats.systemHealth === 'warning' ? 'bg-yellow-500' : 'bg-red-500'
-          }`}></div>
-          <span className="text-sm text-gray-600 capitalize">
+          }`} />
+          <span className="text-xs text-[#71767b] capitalize">
             System: {stats.systemHealth}
           </span>
         </div>
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <StatCard
           label="Total Users"
           value={stats.totalUsers.toLocaleString()}
@@ -90,62 +105,44 @@ const AdminDashboard: React.FC = () => {
       </div>
 
       {/* Admin Actions Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* User Management */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-5">
         <DashboardCard title="User Management">
-          <div className="space-y-3">
-            <button className="w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors">
-              Manage Users ({stats.totalUsers.toLocaleString()})
-            </button>
-            <button className="w-full bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 transition-colors">
-              Verify Tipsters ({stats.pendingVerifications} pending)
-            </button>
-            <button className="w-full bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 transition-colors">
-              View Reports ({stats.reportedContent})
-            </button>
+          <div className="grid grid-cols-1 gap-2.5">
+            <QuickActionButton label={`Manage Users (${stats.totalUsers.toLocaleString()})`} variant="primary" />
+            <QuickActionButton label={`Verify Tipsters (${stats.pendingVerifications} pending)`} variant="success" />
+            <QuickActionButton label={`View Reports (${stats.reportedContent})`} variant="accent" />
           </div>
         </DashboardCard>
 
-        {/* System Management */}
-        <DashboardCard title="System Management">
-          <div className="space-y-3">
-            <button className="w-full bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors">
-              System Settings
-            </button>
-            <button className="w-full bg-yellow-600 text-white px-4 py-2 rounded-md hover:bg-yellow-700 transition-colors">
-              View Logs
-            </button>
-            <button className="w-full bg-red-600 text-white px-4 py-2 rounded-md hover:bg-red-700 transition-colors">
-              Emergency Controls
-            </button>
+        <DashboardCard title="Platform & Revenue">
+          <div className="grid grid-cols-1 gap-2.5">
+            <QuickActionButton
+              label="Pricing & Commissions"
+              variant="primary"
+              icon={<Percent className="w-4 h-4" />}
+              onClick={() => navigate('/admin/pricing')}
+            />
+            <QuickActionButton label="View Logs" variant="muted" />
+            <QuickActionButton label="Emergency Controls" variant="muted" />
           </div>
         </DashboardCard>
       </div>
 
-      {/* Recent Activity */}
       <DashboardCard title="Recent System Activity">
         <div className="space-y-4">
-          <div className="flex items-center justify-between py-2 border-b">
-            <div>
-              <p className="text-sm font-medium text-gray-900">New tipster verification request</p>
-              <p className="text-xs text-gray-500">John Smith applied for tipster status</p>
+          {[
+            { title: 'New tipster verification request', desc: 'John Smith applied for tipster status', time: '2 hours ago' },
+            { title: 'User reported content', desc: 'Inappropriate prediction in Premier League section', time: '4 hours ago' },
+            { title: 'System backup completed', desc: 'Daily backup finished successfully', time: '6 hours ago' },
+          ].map((item) => (
+            <div key={item.title} className="flex items-start justify-between gap-3 py-2 border-b border-[#1f1f1f] last:border-0">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-white">{item.title}</p>
+                <p className="text-xs text-[#71767b] mt-0.5">{item.desc}</p>
+              </div>
+              <span className="text-xs text-[#71767b] shrink-0">{item.time}</span>
             </div>
-            <span className="text-xs text-gray-500">2 hours ago</span>
-          </div>
-          <div className="flex items-center justify-between py-2 border-b">
-            <div>
-              <p className="text-sm font-medium text-gray-900">User reported content</p>
-              <p className="text-xs text-gray-500">Inappropriate prediction in Premier League section</p>
-            </div>
-            <span className="text-xs text-gray-500">4 hours ago</span>
-          </div>
-          <div className="flex items-center justify-between py-2 border-b">
-            <div>
-              <p className="text-sm font-medium text-gray-900">System backup completed</p>
-              <p className="text-xs text-gray-500">Daily backup finished successfully</p>
-            </div>
-            <span className="text-xs text-gray-500">6 hours ago</span>
-          </div>
+          ))}
         </div>
       </DashboardCard>
     </div>

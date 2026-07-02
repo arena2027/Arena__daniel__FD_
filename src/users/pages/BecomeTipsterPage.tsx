@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../auth/hooks/AuthContext';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Trophy, Check, ChevronRight, Zap, AlertCircle, Loader, CreditCard } from 'lucide-react';
 import { cn } from '../../lib/utils';
+import { platformPricingService } from '../../services/pricing/PlatformPricingService';
+import { calcTipsterEarnings, formatNgn, type PlatformPricing } from '../../config/platformPricing';
+import { DEFAULT_PLATFORM_PRICING } from '../../config/platformPricing';
 
 const perks = [
   { icon: Trophy, label: 'Monetize your expertise' },
@@ -35,6 +38,14 @@ export default function BecomeTipsterPage() {
   });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
+  const [pricing, setPricing] = useState<PlatformPricing>(DEFAULT_PLATFORM_PRICING);
+
+  useEffect(() => {
+    platformPricingService.getPricing().then((p) => {
+      setPricing(p);
+      setForm((prev) => ({ ...prev, channelPrice: String(p.defaultChannelPriceNgn) }));
+    });
+  }, []);
 
   const update = (key: string, value: any) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -54,6 +65,12 @@ export default function BecomeTipsterPage() {
 
   const handleBecomeTipster = async () => {
     if (!canProceedStep3) return;
+
+    const channelPriceNum = Number(form.channelPrice) || 0;
+    if (channelPriceNum > 0 && (channelPriceNum < pricing.minChannelPriceNgn || channelPriceNum > pricing.maxChannelPriceNgn)) {
+      setSubmitError(`Channel price must be between ${formatNgn(pricing.minChannelPriceNgn)} and ${formatNgn(pricing.maxChannelPriceNgn)}`);
+      return;
+    }
 
     setSubmitting(true);
     setSubmitError(null);
@@ -115,10 +132,31 @@ export default function BecomeTipsterPage() {
               <h2 className="text-2xl font-black text-white mb-2">
                 Upgrade Your Account
               </h2>
-              <p className="text-sm text-[#71767b] mb-6 leading-relaxed">
+              <p className="text-sm text-[#71767b] mb-4 leading-relaxed">
                 Becoming a tipster is a <span className="text-white font-bold">permanent upgrade</span> to your Arena account.
                 You'll gain access to exclusive tools and features to share your expertise and earn from your predictions.
               </p>
+
+              {/* Platform fees */}
+              <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-4 mb-6 space-y-2">
+                <p className="text-xs font-black text-[#71767b] uppercase tracking-wider">Platform fees</p>
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#71767b]">One-time registration</span>
+                  <span className="text-white font-bold">
+                    {pricing.tipsterRegistrationFeeNgn > 0
+                      ? formatNgn(pricing.tipsterRegistrationFeeNgn)
+                      : 'Free'}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#71767b]">Subscription commission</span>
+                  <span className="text-white font-bold">{pricing.subscriptionCommissionPercent}% to Arena</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#71767b]">Paid prediction commission</span>
+                  <span className="text-white font-bold">{pricing.predictionCommissionPercent}% to Arena</span>
+                </div>
+              </div>
 
               {/* Perks */}
               <div className="space-y-3 mb-6">
@@ -310,8 +348,36 @@ export default function BecomeTipsterPage() {
                     className="flex-1 bg-transparent text-sm text-white placeholder:text-[#71767b] outline-none"
                   />
                 </div>
-                <p className="text-[10px] text-[#71767b] mt-1">Set to 0 for a free channel.</p>
+                <p className="text-[10px] text-[#71767b] mt-1">
+                  Set to 0 for a free channel. Allowed: {formatNgn(pricing.minChannelPriceNgn)} – {formatNgn(pricing.maxChannelPriceNgn)}/mo
+                </p>
               </div>
+
+              {/* Earnings preview */}
+              {Number(form.channelPrice) > 0 && (
+                <div className="mb-4 p-3 rounded-xl bg-green-500/10 border border-green-500/20 text-xs space-y-1">
+                  <p className="text-green-400 font-bold">Your earnings per subscriber / month</p>
+                  {(() => {
+                    const e = calcTipsterEarnings(Number(form.channelPrice), pricing.subscriptionCommissionPercent);
+                    return (
+                      <>
+                        <div className="flex justify-between text-[#71767b]">
+                          <span>Subscriber pays</span>
+                          <span className="text-white">{formatNgn(e.gross)}</span>
+                        </div>
+                        <div className="flex justify-between text-[#71767b]">
+                          <span>Arena commission ({e.commissionPercent}%)</span>
+                          <span className="text-[#ef4444]">−{formatNgn(e.commission)}</span>
+                        </div>
+                        <div className="flex justify-between font-bold">
+                          <span className="text-white">You receive</span>
+                          <span className="text-green-400">{formatNgn(e.net)}</span>
+                        </div>
+                      </>
+                    );
+                  })()}
+                </div>
+              )}
 
               {/* Summary */}
               <div className="bg-[#111] border border-[#1f1f1f] rounded-2xl p-4 mb-5">
@@ -330,9 +396,21 @@ export default function BecomeTipsterPage() {
                     <span className="text-white font-semibold">{form.channelName || 'Not set'}</span>
                   </div>
                   <div className="flex justify-between text-xs">
-                    <span className="text-[#71767b]">Pricing</span>
+                    <span className="text-[#71767b]">Registration fee</span>
                     <span className="text-white font-semibold">
-                      {Number(form.channelPrice) > 0 ? `₦${Number(form.channelPrice).toLocaleString()}/mo` : 'Free Channel'}
+                      {pricing.tipsterRegistrationFeeNgn > 0
+                        ? formatNgn(pricing.tipsterRegistrationFeeNgn)
+                        : 'Free'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-[#71767b]">Arena commission</span>
+                    <span className="text-white font-semibold">{pricing.subscriptionCommissionPercent}% on subscriptions</span>
+                  </div>
+                  <div className="flex justify-between text-xs">
+                    <span className="text-[#71767b]">Channel price</span>
+                    <span className="text-white font-semibold">
+                      {Number(form.channelPrice) > 0 ? `${formatNgn(Number(form.channelPrice))}/mo` : 'Free Channel'}
                     </span>
                   </div>
                   <div className="flex justify-between text-xs">

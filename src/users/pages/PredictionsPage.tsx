@@ -528,7 +528,7 @@ function ChannelFeed({ ch, onBack, isTipster = false }: { ch: Channel; onBack: (
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
               transition={{ duration: 0.15 }}
-              className="fixed bottom-20 left-4 z-50 w-64 max-h-[60vh] overflow-y-auto bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl shadow-2xl"
+              className="fixed left-4 z-50 w-64 max-w-[calc(100vw-2rem)] max-h-[60vh] overflow-y-auto bg-[#0d0d0d] border border-[#1f1f1f] rounded-2xl shadow-2xl bottom-[calc(var(--bottom-nav-height)+1rem+env(safe-area-inset-bottom))] md:bottom-20"
               onClick={e => e.stopPropagation()}
             >
               <div className="p-2">

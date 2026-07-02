@@ -12,7 +12,7 @@ import { Sidebar } from '../layout/Sidebar';
 import { RightSidebar } from '../layout/RightSidebar';
 import { FeedProvider } from '../stores/feedStore';
 import TipsterDashboard from '../dashboard/tipster/TipsterDashboard';
-import AdminDashboard from '../admin/pages/AdminDashboard';
+import { AdminRoutes } from '../admin/AdminRoutes';
 
 // Lazy load page components
 const HomePage = React.lazy(() => import('../users/pages/HomePage').then(m => ({ default: m.HomePage })));
@@ -74,8 +74,8 @@ function MobileBottomNav({ visible }: { visible: boolean }) {
   };
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[#09090c] border-t border-[#1f1f1f]">
-      <div className="flex items-center justify-around h-16">
+    <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden bg-[#09090c]/95 backdrop-blur-md border-t border-[#1f1f1f] pb-safe">
+      <div className="flex items-stretch justify-around min-h-app-nav max-w-screen-sm mx-auto">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = location.pathname === item.path;
@@ -84,23 +84,23 @@ function MobileBottomNav({ visible }: { visible: boolean }) {
               key={item.path}
               onClick={() => navigate(item.path)}
               className={cn(
-                'flex-1 flex flex-col items-center justify-center py-2 transition-colors duration-200',
-                isActive ? 'text-[#ef4444]' : 'text-[#71767b] hover:text-white'
+                'flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 py-2 px-0.5 transition-colors duration-200 min-h-touch',
+                isActive ? 'text-[#ef4444]' : 'text-[#71767b] active:text-white'
               )}
             >
-              <Icon className="w-6 h-6 mb-1" />
-              <span className="text-[10px] font-semibold">{item.label}</span>
+              <Icon className="w-5 h-5 sm:w-6 sm:h-6 shrink-0" />
+              <span className="text-[9px] sm:text-[10px] font-semibold truncate max-w-full">{item.label}</span>
             </button>
           );
         })}
         <button
           onClick={handleCreatePost}
-          className="flex-1 flex flex-col items-center justify-center py-2 text-[#71767b] hover:text-[#ef4444] transition-colors duration-200"
+          className="flex-1 min-w-0 flex flex-col items-center justify-center gap-0.5 py-1.5 px-0.5 text-[#71767b] active:text-[#ef4444] transition-colors duration-200 min-h-touch"
         >
-          <div className="w-10 h-10 rounded-full bg-[#ef4444] flex items-center justify-center mb-1 shadow-lg shadow-red-500/40">
-            <Plus className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#ef4444] flex items-center justify-center shadow-lg shadow-red-500/40 shrink-0">
+            <Plus className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
           </div>
-          <span className="text-[10px] font-semibold">Create</span>
+          <span className="text-[9px] sm:text-[10px] font-semibold">Create</span>
         </button>
       </div>
     </nav>
@@ -141,8 +141,10 @@ const MainLayout: React.FC = () => {
   const shouldShowBottomNav = !sidebarOpen && (!mobileView || !hideOnMobile);
 
   const isFullBleedLayout = ['/messages', '/predictions', '/profile', '/user'].some(path => location.pathname.startsWith(path));
+  const needsMobileNavPadding = mobileView && !hideOnMobile && !sidebarOpen;
+
   return (
-    <div className="min-h-screen bg-[#050505] text-white flex flex-col">
+    <div className="min-h-[100dvh] bg-[#050505] text-white flex flex-col overflow-x-hidden">
       {shouldShowGlobalHeader && (
         <Header
           title="Arena"
@@ -151,9 +153,9 @@ const MainLayout: React.FC = () => {
       )}
 
       {/* 3-Column Layout with Fixed Sidebar */}
-      <div className="flex flex-1 overflow-hidden pr-0 xl:pr-80">
-        {/* Left Sidebar - LOCKED (no scrolling) */}
-        <div className="hidden md:block md:w-64 lg:w-72 md:border-r md:border-[#1f1f1f] md:h-[calc(100vh-56px)] md:overflow-hidden">
+      <div className="flex flex-1 overflow-hidden pr-0 xl:pr-80 min-h-0">
+        {/* Left Sidebar - Desktop */}
+        <div className="hidden md:block md:w-64 lg:w-72 md:border-r md:border-[#1f1f1f] md:h-app-content md:overflow-hidden shrink-0">
           <Sidebar
             open={sidebarOpen}
             onClose={() => setSidebarOpen(false)}
@@ -162,34 +164,30 @@ const MainLayout: React.FC = () => {
           />
         </div>
 
-        {/* Mobile Sidebar Overlay */}
-        {sidebarOpen && (
-          <div className="fixed inset-0 z-40 bg-black/60 md:hidden" onClick={() => setSidebarOpen(false)}>
-            <div onClick={e => e.stopPropagation()}>
-              <Sidebar
-                open={sidebarOpen}
-                onClose={() => setSidebarOpen(false)}
-                userRole={user.role}
-                appUser={user}
-              />
-            </div>
-          </div>
-        )}
+        {/* Mobile Sidebar - drawer only, no duplicate overlay */}
+        <div className="md:hidden">
+          <Sidebar
+            open={sidebarOpen}
+            onClose={() => setSidebarOpen(false)}
+            userRole={user.role}
+            appUser={user}
+          />
+        </div>
 
         {/* Center + Right Container */}
         <div className={cn(
-          "flex flex-1 relative",
-          shouldShowGlobalHeader ? "h-[calc(100vh-56px)]" : "h-screen"
+          "flex flex-1 relative min-w-0",
+          shouldShowGlobalHeader ? "h-app-content" : "h-app-content-full"
         )}>
           {/* Center Main Feed - Scrollable */}
           <main 
             className={cn(
-              "flex-1 border-r border-[#1f1f1f]",
+              "flex-1 border-r border-[#1f1f1f] min-w-0",
               (location.pathname.startsWith('/messages') || location.pathname.startsWith('/predictions'))
                 ? "h-full overflow-hidden flex flex-col"
-                : "overflow-y-auto"
+                : "overflow-y-auto scrollbar-none",
+              needsMobileNavPadding && "pb-mobile-nav"
             )} 
-            style={{ msOverflowStyle: 'auto', scrollbarWidth: 'none' }}
           >
             <div 
               className={cn(
@@ -218,7 +216,7 @@ const MainLayout: React.FC = () => {
                     <Route path="/notifications" element={<NotificationsPage />} />
                     <Route path="/bookmarks" element={<BookmarksPage />} />
                     <Route path="/wallet" element={<WalletPage userRole={user.role} />} />
-                    <Route path="/settings" element={<SettingsPage userRole={user.role} />} />
+                    <Route path="/settings/*" element={<SettingsPage userRole={user.role} />} />
                     <Route path="/profile" element={<ProfilePage appUser={user} />} />
                     <Route path="/user/:name" element={<UserProfileView />} />
                     <Route path="/become-tipster" element={<BecomeTipsterPage />} />
@@ -235,10 +233,10 @@ const MainLayout: React.FC = () => {
 
                     {/* Admin-only Routes */}
                     <Route
-                      path="/admin"
+                      path="/admin/*"
                       element={
                         <RouteGuard user={user} allowedRoles={['admin']}>
-                          <AdminDashboard />
+                          <AdminRoutes />
                         </RouteGuard>
                       }
                     />
@@ -267,7 +265,7 @@ const MainLayout: React.FC = () => {
           </main>
 
           {/* Right Sidebar - Fully Independent Scrolling */}
-          <div className="hidden xl:flex xl:fixed xl:top-14 xl:right-0 xl:w-80 xl:h-[calc(100vh-56px)] xl:overflow-y-auto xl:border-l xl:border-[#1f1f1f] xl:bg-[#050505]" style={{ scrollbarWidth: 'none' }}>
+          <div className="hidden xl:flex xl:fixed xl:top-app-header xl:right-0 xl:w-80 xl:h-app-content xl:overflow-y-auto xl:border-l xl:border-[#1f1f1f] xl:bg-[#050505] scrollbar-none">
             <RightSidebar />
           </div>
         </div>
