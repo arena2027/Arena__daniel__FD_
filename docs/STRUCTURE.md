@@ -49,11 +49,11 @@ Do **not** hardcode `2500`, `15%`, etc. in pages — import from config or fetch
 
 ## Recommended cleanup (incremental, no big rewrite)
 
-### Phase 1 — Quick wins (done / in progress)
+-### Phase 1 — Quick wins (done / in progress)
 - [x] Central `config/platformPricing.ts`
 - [x] Admin pricing page at `/admin/pricing`
 - [ ] Delete `src/tipsters/pages/DashboardPage.tsx` (unused duplicate)
-- [ ] Move `layouts/MainLayout.tsx` → `layout/MainLayout.tsx`
+- [x] Move `layouts/MainLayout.tsx` → `layout/MainLayout.tsx`
 
 ### Phase 2 — Feature folders
 ```
@@ -90,7 +90,7 @@ Keep **URLs unchanged** — only move files and fix imports.
 
 ## Routing hub
 
-All in-app routes are declared in **`layouts/MainLayout.tsx`** (moving to `layout/MainLayout.tsx`).
+All in-app routes are declared in **`layout/MainLayout.tsx`**.
 
 Admin sub-routes: **`admin/AdminRoutes.tsx`** (`/admin`, `/admin/pricing`).
 

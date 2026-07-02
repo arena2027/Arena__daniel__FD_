@@ -352,7 +352,7 @@
   - `ROUTE_ACCESS` mapping
 - ✅ Frontend: [RouteGuards.tsx](src/middleware/guards/RouteGuards.tsx) - Role checking
 - ✅ Frontend: [AuthContext.tsx](src/auth/hooks/AuthContext.tsx) - Global auth state
-- ✅ Frontend: [MainLayout.tsx](src/layouts/MainLayout.tsx) - Role-aware navigation
+- ✅ Frontend: [MainLayout.tsx](src/layout/MainLayout.tsx) - Role-aware navigation
 - ❌ Backend: No server-side permission enforcement
 
 ---

@@ -3,7 +3,7 @@ import { Routes, Route } from 'react-router-dom';
 import { AuthProvider, useAuth } from './auth/hooks/AuthContext';
 import { DetailViewProvider } from './contexts/DetailViewContext';
 import { RouteGuard, AuthGuard } from './middleware/guards/RouteGuards';
-import MainLayout from './layouts/MainLayout';
+import MainLayout from './layout/MainLayout';
 
 function LoadingFallback() {
   return (
