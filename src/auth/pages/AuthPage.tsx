@@ -445,9 +445,9 @@ export function AuthPage() {
 
                   <p className="text-[11px] text-white/25 text-center leading-relaxed">
                     By continuing you agree to our{' '}
-                    <a href="https://teamly.com/legal/terms" className="text-white/40 underline hover:text-white/60 transition-colors" target="_blank" rel="noreferrer">Terms</a>,{' '}
+                    <a href="/terms" className="text-white/40 underline hover:text-white/60 transition-colors">Terms</a>,{' '}
                     <a href="/privacy" className="text-white/40 underline hover:text-white/60 transition-colors">Privacy Policy</a> and{' '}
-                    <a href="https://teamly.com/legal/cookie-policy" className="text-white/40 underline hover:text-white/60 transition-colors" target="_blank" rel="noreferrer">Cookie Policy</a>.
+                    <a href="/cookie-policy" className="text-white/40 underline hover:text-white/60 transition-colors">Cookie Policy</a>.
                   </p>
                 </motion.div>
               )}
@@ -545,7 +545,7 @@ export function AuthPage() {
 
                   <p className="text-sm text-white/40 text-center">
                     By continuing, you agree to our{' '}
-                    <a href="https://teamly.com/legal/terms" className="text-[#ef4444] underline" target="_blank" rel="noreferrer">
+                    <a href="/terms" className="text-[#ef4444] underline">
                       Terms & Conditions
                     </a>{' '}
                     and acknowledge our{' '}
@@ -553,7 +553,7 @@ export function AuthPage() {
                       Privacy Policy
                     </a>.
                     Learn more in our{' '}
-                    <a href="https://teamly.com/legal/cookie-policy" className="text-[#ef4444] underline" target="_blank" rel="noreferrer">
+                    <a href="/cookie-policy" className="text-[#ef4444] underline">
                       Cookie Policy
                     </a>.
                   </p>
@@ -674,7 +674,7 @@ export function AuthPage() {
                       />
                       <span>
                         I have read and agree to the{' '}
-                        <a href="https://teamly.com/legal/terms" target="_blank" rel="noreferrer" className="text-[#ef4444] underline">
+                        <a href="/terms" className="text-[#ef4444] underline">
                           Terms & Conditions
                         </a>{' '}
                         and{' '}
@@ -698,7 +698,7 @@ export function AuthPage() {
 
                   <p className="text-[11px] text-white/25 text-center leading-relaxed">
                     By signing up you agree to our{' '}
-                    <a href="https://teamly.com/legal/terms" target="_blank" rel="noreferrer" className="text-[#ef4444] underline">
+                    <a href="/terms" className="text-[#ef4444] underline">
                       Terms & Conditions
                     </a>{' '}
                     and acknowledge our{' '}
@@ -706,7 +706,7 @@ export function AuthPage() {
                       Privacy Policy
                     </a>.
                     Learn more in our{' '}
-                    <a href="https://teamly.com/legal/cookie-policy" target="_blank" rel="noreferrer" className="text-[#ef4444] underline">
+                    <a href="/cookie-policy" className="text-[#ef4444] underline">
                       Cookie Policy
                     </a>.
                   </p>

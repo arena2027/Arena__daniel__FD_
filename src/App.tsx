@@ -20,7 +20,9 @@ function LoadingFallback() {
 const AuthPage = lazy(() => import('./auth/pages/AuthPage').then(m => ({ default: m.AuthPage })));
 const OTPPage = lazy(() => import('./auth/pages/OTPPage').then(m => ({ default: m.OTPPage })));
 const ForgotPasswordPage = lazy(() => import('./auth/pages/ForgotPasswordPage'));
-const PrivacyPolicyPage = lazy(() => import('./pages/PrivacyPolicyPage').then(m => ({ default: m.PrivacyPolicyPage })));
+const PrivacyPolicyPage = lazy(() => import('./auth/pages/PrivacyPolicyPage').then(m => ({ default: m.PrivacyPolicyPage })));
+const CookiePolicyPage = lazy(() => import('./auth/pages/CookiePolicyPage').then(m => ({ default: m.CookiePolicyPage })));
+const TermsPage = lazy(() => import('./auth/pages/TermsPage').then(m => ({ default: m.TermsPage })));
 
 // ── App Content Component ─────────────────────────────────────────────────────
 function AppContent() {
@@ -65,6 +67,22 @@ function AppContent() {
         element={
           <Suspense fallback={<LoadingFallback />}>
             <PrivacyPolicyPage />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/cookie-policy"
+        element={
+          <Suspense fallback={<LoadingFallback />}>
+            <CookiePolicyPage />
+          </Suspense>
+        }
+      />
+      <Route
+        path="/terms"
+        element={
+          <Suspense fallback={<LoadingFallback />}>
+            <TermsPage />
           </Suspense>
         }
       />
